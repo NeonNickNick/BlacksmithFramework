@@ -3,6 +3,7 @@ using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Defenses;
 using Blacksmith.Backend.SkillPackages.Core;
+using Blacksmith.DLC;
 
 namespace Blacksmith.Backend.SkillPackages.Logic
 {
@@ -10,11 +11,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
     using DSL = DSLforSkillLogic;
     public class Common : SkillPackageBase
     {
-        private static readonly List<string> _professions = new()
-        {
-            "warlock",
-            "driver"
-        };
+        private static List<string> Professions => ProfessionRegistry.Professions;
         public override string Name => "common";
         public Common()
         {
@@ -160,7 +157,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                 .UseResource(1, ResourceType.Iron)
                 .WriteFree(source => 
                 { 
-                    _professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
                     source.Focus.Skill.AddPackage(new Warlock());
                 });
             return DSL.Create(sc.Self, pen);
@@ -176,7 +173,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                 .UseResource(4, ResourceType.Iron)
                 .WriteFree(source =>
                 {
-                    _professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
                     source.Focus.Skill.AddPackage(new Cannon());
                 });
             return DSL.Create(sc.Self, pen);
@@ -192,7 +189,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                 .UseResource(3, ResourceType.Iron)
                 .WriteFree(source =>
                 {
-                    _professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
                     source.Focus.Skill.AddPackage(new Driver());
                 });
             return DSL.Create(sc.Self, pen);

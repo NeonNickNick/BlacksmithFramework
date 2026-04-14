@@ -100,6 +100,8 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
         //将这些resolution的延迟回合设为1，就欺骗了Judger
         //让它认为这些其实是player打出的下回合生效的effectresotluion，由此实现了转移的效果
         //AttackResolution转移同理，更加简单，不需要判断Target
+
+        //延时保护：实际上与转移是类似的
         private static void IfElseUtil(ActorSet source, ActorSet player, ActorSet enemy, Action<ActorSet, ActorSet> impl)
         {
             if(source == player)

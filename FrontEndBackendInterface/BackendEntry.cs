@@ -1,10 +1,20 @@
+using Blacksmith.Backend.Backend.SkillPackages.Logic;
 using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.JudgementLogic.Judgement;
 using Blacksmith.FrontendBackendInterface;
-using Blacksmith.Program;
 
 namespace Blacksmith.FrontEndBackendInterface
 {
+    public class DefaultSkillContext : ISkillContext
+    {
+        public ActorSet Self { get; }
+        public int Param { get; }
+        public DefaultSkillContext(ActorSet self, int param)
+        {
+            Self = self;
+            Param = param;
+        }
+    }
     public class BackendEntry : ISkillChoose
     {
         public ActorSet Player { get; private set; }

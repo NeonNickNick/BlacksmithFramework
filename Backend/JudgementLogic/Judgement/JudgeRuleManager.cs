@@ -146,6 +146,8 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
         private static void CancelAttackResolutions(List<AttackResolution> playerResolutions,
             List<AttackResolution> enemyResolutions)
         {
+            playerResolutions.OrderBy(a => -(int)a.Type);
+            enemyResolutions.OrderBy(a => -(int)a.Type);
             int playerIndex = 0;
             int enemyIndex = 0;
 
