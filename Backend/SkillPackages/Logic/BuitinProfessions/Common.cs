@@ -5,7 +5,7 @@ using Blacksmith.Backend.JudgementLogic.Defenses;
 using Blacksmith.Backend.SkillPackages.Core;
 using Blacksmith.DLC;
 
-namespace Blacksmith.Backend.SkillPackages.Logic
+namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
@@ -191,6 +191,32 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                 {
                     Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
                     source.Focus.Skill.AddPackage(new Driver());
+                });
+            return DSL.Create(sc.Self, pen);
+        }
+
+        private static bool BloodSigilCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Resource.Check(ResourceType.Iron, 7);
+        }
+        private static DSL.SourceFile BloodSigil(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .UseResource(3, ResourceType.Iron)
+                .WriteFree(source =>
+                {
+                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    List<string> addition = new()
+                    {
+                        "stick",
+                        "drill",
+                        "slash",
+                        "tear"
+                    };
+                    addition.ForEach(a => source.Focus.Skill.RemoveSkill("common", a));
+                    source.Focus.Skill.AddPackage(new BloodSigil());
+                    source.Focus.Health.GainMHP(4);
+                    source.Focus.Health.GainHP(4);
                 });
             return DSL.Create(sc.Self, pen);
         }

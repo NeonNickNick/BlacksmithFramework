@@ -15,7 +15,7 @@ namespace Blacksmith.Backend.JudgementLogic.Actor
         {
             public ResourceType CommonType { get; }
             public ResourceType GoldType { get; }
-            public float Common { get; set; } = 6;
+            public float Common { get; set; } = 10;
             public float Gold { get; set; } = 0;
             public ResourceTemplate(ResourceType commonType, ResourceType goldType = ResourceType.Count)
             {

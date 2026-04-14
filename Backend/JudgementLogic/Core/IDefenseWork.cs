@@ -5,6 +5,6 @@ namespace Blacksmith.Backend.JudgementLogic.Core
     public interface IDefenseWork
     {
         public abstract DefenseType Type { get; set; }
-        public int Work(Body source, Body owner, int Attack, AttackType type);
+        public (int, int) Work(Body source, Body owner, int Attack, AttackType type);
     }
 }

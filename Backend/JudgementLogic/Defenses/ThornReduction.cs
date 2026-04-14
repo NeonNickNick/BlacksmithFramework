@@ -19,14 +19,14 @@ namespace Blacksmith.Backend.JudgementLogic.Defenses
         {
             IsDead = true;
         }
-        public override int Work(Body source, Body owner, int attack, AttackType type)
+        public override (int, int)  Work(Body source, Body owner, int attack, AttackType type)
         {
             int res = (int)MathF.Max(0, attack - Power);
             if(type == AttackType.Physical)
             {
                 DSL.Create(owner.Community, sf => sf.WriteAttack(res / 2, AttackType.Magic, delayRounds: 1)).Compile().Execute(owner.Community);
             }
-            return res;
+            return (res, (int)MathF.Min(attack, Power));
         }
     }
 }

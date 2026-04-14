@@ -147,7 +147,11 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
 
             playerResolutions.RemoveAll(a => reflect.Contains(a));
 
-            reflect.ForEach(a => a.DelayRounds = 1);
+            reflect.ForEach(a => 
+            { 
+                a.DelayRounds = 1; 
+                a.Source = player;
+            });
 
             playerResolutions.AddRange(reflect);
         }

@@ -7,26 +7,21 @@ namespace Blacksmith.Backend.JudgementLogic.TurnContexts
 {
     public enum AttackStage
     {
-        OnHitDefense,
-        OnHitBody
+        OnEnd
     }
     public class AttackResolution : IResolution
     {
+        public ActorSet? Source { get; set; }
         public int DelayRounds { get; set; } = 0;
         public AttackType Type { get; set; }
         public float Power { get; set; }
         public Action<ActorSet> Execute { get; set; } = (a) => { };
+        public int TotalDamage { get; set; } = 0;
 
-        private readonly Dictionary<AttackStage, List<Action<ActorSet, Body, AttackResolution>>> _stages = new();
+        private readonly Dictionary<AttackStage, List<Action<ActorSet?, Body, AttackResolution>>> _stages = new();
         public AttackResolution() { }
-        public AttackResolution(AttackResolution original)
-        {
-            Type = original.Type;
-            Power = original.Power;
-            Execute = original.Execute;
-            _stages = original._stages;
-        }
-        public void AddStage(AttackStage stage, Action<ActorSet, Body, AttackResolution> action)
+
+        public void AddStage(AttackStage stage, Action<ActorSet?, Body, AttackResolution> action)
         {
             if (!_stages.TryGetValue(stage, out var list))
             {
@@ -35,12 +30,12 @@ namespace Blacksmith.Backend.JudgementLogic.TurnContexts
             }
             list.Add(action);
         }
-        public void RunStage(AttackStage stage, ActorSet source, Body target)
+        public void RunStage(AttackStage stage, Body target)
         {
             if (_stages.TryGetValue(stage, out var list))
             {
                 foreach (var a in list)
-                    a(source, target, this);
+                    a(Source, target, this);
             }
         }
     }

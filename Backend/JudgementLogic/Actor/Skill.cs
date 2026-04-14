@@ -1,6 +1,7 @@
 using Blacksmith.Backend.Backend.SkillPackages.Logic;
 using Blacksmith.Backend.SkillPackages.Core;
 using Blacksmith.Backend.SkillPackages.Logic;
+using Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions;
 namespace Blacksmith.Backend.JudgementLogic.Actor
 {
     using DSL = DSLforSkillLogic;
@@ -33,11 +34,11 @@ namespace Blacksmith.Backend.JudgementLogic.Actor
         }
         public void AddSkill(string packageName, string skillName)
         {
-            _packages.Find(p => p.Name == packageName).SkillPackage.AvailableSkillNames.Add(skillName);
+            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Add(skillName);
         }
         public void RemoveSkill(string packageName, string skillName)
         {
-            _packages.Find(p => p.Name == packageName).SkillPackage.AvailableSkillNames.Remove(skillName);
+            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Remove(skillName);
         }
         public SkillDeclareResult TryDeclare(string skillName, ISkillContext sc)
         {

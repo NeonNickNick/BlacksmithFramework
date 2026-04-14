@@ -1,3 +1,4 @@
+using System;
 using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Entities;
@@ -87,6 +88,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                 {
                     var resolution = new AttackResolution
                     {
+                        Source = source,
                         DelayRounds = delayRounds,
                         Type = attackType,
                         Power = power
@@ -101,35 +103,41 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                         if (resolution.Type != AttackType.Real)
                         {
                             var defenses = main.Defense.Get();
-                            resolution.RunStage(AttackStage.OnHitDefense, source, main);
-                            
+
                             foreach (var temp in defenses)
                             {
                                 if (temp.Type != DefenseType.RealReduction)
                                 {
                                     resolution.Power *= APFactor;
                                 }
-                                resolution.Power = temp.Work(source.Focus, main, (int)resolution.Power, resolution.Type);
+                                var res = temp.Work(resolution.Source.Focus, main, (int)resolution.Power, resolution.Type);
+                                resolution.Power = res.Item1;
+                                resolution.TotalDamage += res.Item2;
                                 if (temp.Type != DefenseType.RealReduction)
                                 {
                                     resolution.Power = MathF.Ceiling(resolution.Power / APFactor);
                                 }
                                 if (resolution.Power <= 0f)
                                 {
+                                    resolution.RunStage(AttackStage.OnEnd, main);
                                     return;
                                 }
                             }
-                            
                         }
-                        resolution.RunStage(AttackStage.OnHitBody, source, main);
                         main.Health.LoseHP((int)resolution.Power);
+                        resolution.TotalDamage += (int)resolution.Power;
+                        resolution.RunStage(AttackStage.OnEnd, main);
                     };
-                    source.Focus.TurnContext.WriteResolution(resolution);
+                    resolution.Source.Focus.TurnContext.WriteResolution(resolution);
                 }, SentenceType.Attack, StructureType.Main));
                 return this;
             }
-            public SourceFile OnHitDefense(Action<ActorSet, Body, AttackResolution> action)
+            public SourceFile BloodSuck(float percent)
             {
+                var suck = (ActorSet? source, Body target, AttackResolution resolution) =>
+                {
+                    source?.Focus.Health.GainHP((int)MathF.Ceiling(resolution.Power * percent));
+                };
                 _rhetoricCache.Push(new((ActorSet source) =>
                 {
                     var list = source.Focus.TurnContext.AttackResolutions;
@@ -138,24 +146,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                         return;
                     }
                     var last = list[^1];
-                    last.AddStage(AttackStage.OnHitDefense, action);
+                    last.AddStage(AttackStage.OnEnd, suck);
                 }, SentenceType.Attack, StructureType.Rhetoric, _sentences[^1]));
                 return this;
             }
-            public SourceFile OnHitBody(Action<ActorSet, Body, AttackResolution> action)
-            {
-                _rhetoricCache.Push(new((ActorSet source) =>
-                {
-                    var list = source.Focus.TurnContext.AttackResolutions;
-                    if (list.Count == 0)
-                    {
-                        return;
-                    }
-                    var last = list[^1];
-                    last.AddStage(AttackStage.OnHitBody, action);
-                }, SentenceType.Attack, StructureType.Rhetoric, _sentences[^1]));
-                return this;
-            }
+            
             public SourceFile WriteRecovery(int power)
             {
                 _sentences.Add(new((ActorSet source) =>
@@ -229,20 +224,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                     };
                     source.Focus.TurnContext.WriteResolution(resolution);
                 }, SentenceType.Effect, StructureType.Main));
-                return this;
-            }
-            public SourceFile OnSuccessfullyAdded(Action<ActorSet, Body, EffectResolution> action)
-            {
-                _rhetoricCache.Push(new((ActorSet source) =>
-                {
-                    var list = source.Focus.TurnContext.EffectResolutions;
-                    if (list.Count == 0)
-                    {
-                        return;
-                    }
-                    var last = list[^1];
-                    last.AddStage(EffectStage.OnSuccessfullyAdded, action);
-                }, SentenceType.Effect, StructureType.Rhetoric, _sentences[^1]));
                 return this;
             }
             public SourceFile UseResource(float need, ResourceType type, bool ifCommonOnly = false)

@@ -4,7 +4,7 @@ using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Defenses;
 using Blacksmith.Backend.SkillPackages.Core;
 
-namespace Blacksmith.Backend.SkillPackages.Logic
+namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;

@@ -13,10 +13,6 @@ namespace Blacksmith.DLC
 
             foreach (var dll in Directory.GetFiles(folderPath, "*.dll"))
             {
-                // 忽略 Blacksmith.dll
-                if (Path.GetFileName(dll).Equals("Blacksmith.dll", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
                 try
                 {
                     var assembly = Assembly.LoadFrom(dll);

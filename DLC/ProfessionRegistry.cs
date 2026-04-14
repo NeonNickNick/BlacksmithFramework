@@ -2,12 +2,7 @@ namespace Blacksmith.DLC
 {
     public static class ProfessionRegistry
     {
-        public static readonly List<string> Professions = new()
-        {
-            "warlock",
-            "cannon",
-            "driver"
-        };
+        public static readonly List<string> Professions = new();
         public static void Regist(string professionName)
         {
             if (Professions.Contains(professionName))

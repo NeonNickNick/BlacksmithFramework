@@ -1,5 +1,5 @@
 # 简介
-这是一个只有简易控制台界面的打铁，计划支持完整的打铁游戏规则。具体规则请看[打铁规则](Rule.md)
+这是一个只有简易控制台界面的打铁，计划支持完整的打铁游戏规则。具体规则请看[打铁规则](./MDs/Rule.md)
 
 使用方式：控制台启动，其中会显示输入规则。技能代号必须使用全小写。控制台程序会纠正非法输入。
 
@@ -20,25 +20,34 @@
 | 空间 | space | :--- |
 | 撕裂 | tear | :--- |
 | 转移 | reflect | Unsafe |
+| :--- | :--- | :--- |
 | 术士 | warlock | :--- |
-| 炮 | cannon | :--- |
-| 驱动器 | driver | :--- |
 | 积魔 | magic | :--- |
 | 魔法 | magicattack | 从1开始 |
 | 禁言 | mute | :--- |
 | 献祭 | sacrifice | :--- |
 | 炼金术 | alchemy | :--- |
 | 点铁成金 | midastouch | :--- |
+| :--- | :--- | :--- |
+| 驱动器 | driver | :--- |
 | 空间冲击 | spaceattack | :--- |
 | 时空变换 | time2space | :--- |
 | 空时变换 | space2time | :--- |
 | 空间屏障 | spacebarrier | 从1开始 |
+| :--- | :--- | :--- |
+| 炮 | cannon | :--- |
 | 炮击 | strike | :--- |
 | 二连击 | doublestrike | :--- |
 | 三连击 | triplestrike | :--- |
 | 炮管 | cannonbarrel | :--- |
 | 穿甲弹 | apshell | :--- |
 | :--- | :--- | :--- |
+| 鲜血印记 | bloodsigil | :--- |
+| 血刃 | bloodblade | :--- |
+| 嗜血 | bloodlust | :--- |
+| 回血 | bloodrecovery | :--- |
+| 血之盾 | bloodshield | :--- |
+| 狂怒 | bloodrage | :--- |
 
-# DLC支持
-允许通过添加新的.dll来自由地新增职业。该功能尚在开发中。
+# Mod支持
+允许通过添加新的.dll来自由地新增职业。该功能详见[Mod支持](./MDs/Mod.md)
