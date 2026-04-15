@@ -13,11 +13,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
         {
             InitializeSkills();
         }
-        private static bool BloodBladeCheck(ISkillContext sc)
+        private bool BloodBladeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Health.HP > 4;
         }
-        private static DSL.SourceFile BloodBlade(ISkillContext sc)
+        private DSL.SourceFile BloodBlade(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .WriteFree(source =>
@@ -29,35 +29,35 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
         /*
-        private static bool BloodLustCheck(ISkillContext sc)
+        private bool BloodLustCheck(ISkillContext sc)
         {
 
         }
-        private static DSL.SourceFile BloodLust(ISkillContext sc)
+        private DSL.SourceFile BloodLust(ISkillContext sc)
         {
 
         }
-        private static bool BloodRecoveryCheck(ISkillContext sc)
+        private bool BloodRecoveryCheck(ISkillContext sc)
         {
 
         }
-        private static DSL.SourceFile BloodRecovery(ISkillContext sc)
+        private DSL.SourceFile BloodRecovery(ISkillContext sc)
         {
 
         }
-        private static bool BloodShieldCheck(ISkillContext sc)
+        private bool BloodShieldCheck(ISkillContext sc)
         {
 
         }
-        private static DSL.SourceFile BloodShield(ISkillContext sc)
+        private DSL.SourceFile BloodShield(ISkillContext sc)
         {
 
         }
-        private static bool BloodRageCheck(ISkillContext sc)
+        private bool BloodRageCheck(ISkillContext sc)
         {
 
         }
-        private static DSL.SourceFile BloodRage(ISkillContext sc)
+        private DSL.SourceFile BloodRage(ISkillContext sc)
         {
 
         }*/

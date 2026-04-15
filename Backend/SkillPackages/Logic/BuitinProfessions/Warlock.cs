@@ -18,11 +18,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             InitializeSkills();
             AvailableSkillNames.Remove("midastouch");
         }
-        private static bool MagicCheck(ISkillContext sc)
+        private bool MagicCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1);
         }
-        private static DSL.SourceFile Magic(ISkillContext sc)
+        private DSL.SourceFile Magic(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Iron)
@@ -30,11 +30,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool MagicAttackCheck(ISkillContext sc)
+        private bool MagicAttackCheck(ISkillContext sc)
         {
             return sc.Param > 0 && sc.Self.Focus.Resource.Check(ResourceType.Magic, sc.Param);
         }
-        private static DSL.SourceFile MagicAttack(ISkillContext sc)
+        private DSL.SourceFile MagicAttack(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .WriteAttack(2 * sc.Param, AttackType.Physical, delayRounds: 0)
@@ -43,8 +43,8 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool MuteCheck(ISkillContext sc) => true;
-        private static DSL.SourceFile Mute(ISkillContext sc)
+        private bool MuteCheck(ISkillContext sc) => true;
+        private DSL.SourceFile Mute(ISkillContext sc)
         {
             Pen pen = sf => sf
                .WriteEffect(EffectType.AfterTransport, new(){ EffectTag.Debuff}, EffectTargetType.Enemy, 0, 1,
@@ -55,11 +55,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool SacrificeCheck(ISkillContext sc)
+        private bool SacrificeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Health.HP > 1;
         }
-        private static DSL.SourceFile Sacrifice(ISkillContext sc)
+        private DSL.SourceFile Sacrifice(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .WriteFree(source =>
@@ -72,11 +72,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool AlchemyCheck(ISkillContext sc)
+        private bool AlchemyCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 2);
         }
-        private static DSL.SourceFile Alchemy(ISkillContext sc)
+        private DSL.SourceFile Alchemy(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Iron)
@@ -88,12 +88,12 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool MidasTouchCheck(ISkillContext sc)
+        private bool MidasTouchCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1, true);
         }
 
-        private static DSL.SourceFile MidasTouch(ISkillContext sc)
+        private DSL.SourceFile MidasTouch(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Iron, true)

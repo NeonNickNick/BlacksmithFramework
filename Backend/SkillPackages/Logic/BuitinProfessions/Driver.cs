@@ -22,11 +22,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                 .WriteDefense((int)MathF.Min(5, sc.Self.Focus.Resource.QueryCommon(ResourceType.Time) * 2), new RealReduction());
             return DSL.Create(sc.Self, pen);
         }
-        private static bool SpaceAttackCheck(ISkillContext sc)
+        private bool SpaceAttackCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Space, 1);
         }
-        private static DSL.SourceFile SpaceAttack(ISkillContext sc)
+        private DSL.SourceFile SpaceAttack(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Space)
@@ -34,11 +34,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool Space2TimeCheck(ISkillContext sc)
+        private bool Space2TimeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Space, 1);
         }
-        private static DSL.SourceFile Space2Time(ISkillContext sc)
+        private DSL.SourceFile Space2Time(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Space)
@@ -47,11 +47,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool Time2SpaceCheck(ISkillContext sc)
+        private bool Time2SpaceCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Time, 1);
         }
-        private static DSL.SourceFile Time2Space(ISkillContext sc)
+        private DSL.SourceFile Time2Space(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Time)
@@ -60,11 +60,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool SpaceBarrierCheck(ISkillContext sc)
+        private bool SpaceBarrierCheck(ISkillContext sc)
         {
             return sc.Param > 0 && sc.Param <= 5 && sc.Self.Focus.Resource.Check(ResourceType.Iron, sc.Param);
         }
-        private static DSL.SourceFile SpaceBarrier(ISkillContext sc)
+        private DSL.SourceFile SpaceBarrier(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param, ResourceType.Iron)

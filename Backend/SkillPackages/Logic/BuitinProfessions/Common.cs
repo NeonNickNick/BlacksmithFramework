@@ -17,18 +17,18 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
         {
             InitializeSkills();
         }
-        private static bool IronCheck(ISkillContext sc) => true;
-        private static DSL.SourceFile Iron(ISkillContext sc)
+        private bool IronCheck(ISkillContext sc) => true;
+        private DSL.SourceFile Iron(ISkillContext sc)
         {
             Pen pen = sf => sf.WriteResource(1, ResourceType.Iron);
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool StickCheck(ISkillContext sc)
+        private bool StickCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 0.5f);
         }
-        private static DSL.SourceFile Stick(ISkillContext sc)
+        private DSL.SourceFile Stick(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(0.5f, ResourceType.Iron)
@@ -36,11 +36,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool DrillCheck(ISkillContext sc)
+        private bool DrillCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1.5f);
         }
-        private static DSL.SourceFile Drill(ISkillContext sc)
+        private DSL.SourceFile Drill(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1.5f, ResourceType.Iron)
@@ -48,11 +48,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool SlashCheck(ISkillContext sc)
+        private bool SlashCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 2.5f);
         }
-        private static DSL.SourceFile Slash(ISkillContext sc)
+        private DSL.SourceFile Slash(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(2.5f, ResourceType.Iron)
@@ -60,11 +60,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool ShieldCheck(ISkillContext sc)
+        private bool ShieldCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, sc.Param * 0.5f);
         }
-        private static DSL.SourceFile Shield(ISkillContext sc)
+        private DSL.SourceFile Shield(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param * 0.5f, ResourceType.Iron)
@@ -72,11 +72,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool ThornShieldCheck(ISkillContext sc)
+        private bool ThornShieldCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1 + sc.Param * 0.5f);
         }
-        private static DSL.SourceFile ThornShield(ISkillContext sc)
+        private DSL.SourceFile ThornShield(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1 + sc.Param * 0.5f, ResourceType.Iron)
@@ -84,11 +84,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool RecoveryCheck(ISkillContext sc)
+        private bool RecoveryCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1 + sc.Param);
         }
-        private static DSL.SourceFile Recovery(ISkillContext sc)
+        private DSL.SourceFile Recovery(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1 + sc.Param, ResourceType.Iron)
@@ -96,11 +96,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool SpaceCheck(ISkillContext sc)
+        private bool SpaceCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 3);
         }
-        private static DSL.SourceFile Space(ISkillContext sc)
+        private DSL.SourceFile Space(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(3, ResourceType.Iron)
@@ -108,11 +108,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool TimeCheck(ISkillContext sc)
+        private bool TimeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 3);
         }
-        private static DSL.SourceFile Time(ISkillContext sc)
+        private DSL.SourceFile Time(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(3, ResourceType.Iron)
@@ -120,22 +120,22 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool TearCheck(ISkillContext sc)
+        private bool TearCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Space, 1f);
         }
-        private static DSL.SourceFile Tear(ISkillContext sc)
+        private DSL.SourceFile Tear(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Space)
                 .WriteAttack(8, AttackType.Physical);
             return DSL.Create(sc.Self, pen);
         }
-        private static bool ReflectCheck(ISkillContext sc)
+        private bool ReflectCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Space, 2f);
         }
-        private static DSL.SourceFile Reflect(ISkillContext sc)
+        private DSL.SourceFile Reflect(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Space)
@@ -143,11 +143,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool WarlockCheck(ISkillContext sc)
+        private bool WarlockCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1f);
         }
-        private static DSL.SourceFile Warlock(ISkillContext sc)
+        private DSL.SourceFile Warlock(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Iron)
@@ -159,11 +159,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool CannonCheck(ISkillContext sc)
+        private bool CannonCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 4);
         }
-        private static DSL.SourceFile Cannon(ISkillContext sc)
+        private DSL.SourceFile Cannon(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(4, ResourceType.Iron)
@@ -175,11 +175,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool DriverCheck(ISkillContext sc)
+        private bool DriverCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 3);
         }
-        private static DSL.SourceFile Driver(ISkillContext sc)
+        private DSL.SourceFile Driver(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(3, ResourceType.Iron)
@@ -191,11 +191,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             return DSL.Create(sc.Self, pen);
         }
 
-        private static bool BloodSigilCheck(ISkillContext sc)
+        private bool BloodSigilCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 7);
         }
-        private static DSL.SourceFile BloodSigil(ISkillContext sc)
+        private DSL.SourceFile BloodSigil(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(3, ResourceType.Iron)

@@ -33,7 +33,7 @@ namespace Blacksmith.Backend.SkillPackages.Core
         {
             var type = this.GetType();
             // 获取所有私有静态方法
-            var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
+            var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
 
             foreach (var method in methods)
             {
@@ -65,9 +65,9 @@ namespace Blacksmith.Backend.SkillPackages.Core
 
                 // 创建委托
                 var checkDelegate = (Func<ISkillContext, bool>)Delegate.CreateDelegate(
-                    typeof(Func<ISkillContext, bool>), method);
+                    typeof(Func<ISkillContext, bool>), this, method);
                 var generatorDelegate = (Func<ISkillContext, DSL.SourceFile>)Delegate.CreateDelegate(
-                    typeof(Func<ISkillContext, DSL.SourceFile>), generatorMethod);
+                    typeof(Func<ISkillContext, DSL.SourceFile>), this, generatorMethod);
 
                 // 添加到集合
                 _availableSkillNames.Add(skillName);
