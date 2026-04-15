@@ -8,13 +8,9 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
-    public class Cannon : SkillPackageBase
+    public class Cannon : MainProfession
     {
         public override string Name => "cannon";
-        public Cannon()
-        {
-            InitializeSkills();
-        }
         public override DSL.SourceFile PassiveSkill(ISkillContext sc)
         {
             return new(sc.Self);

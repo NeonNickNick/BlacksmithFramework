@@ -2,6 +2,7 @@ using Blacksmith.Backend.Backend.SkillPackages.Logic;
 using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Defenses;
+using Blacksmith.Backend.JudgementLogic.Judgement;
 using Blacksmith.Backend.SkillPackages.Core;
 using Blacksmith.Mod;
 
@@ -9,14 +10,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
-    public class Common : SkillPackageBase
+    public class Common : MainProfession
     {
         private static List<string> Professions => ProfessionRegistry.Professions;
         public override string Name => "common";
-        public Common()
-        {
-            InitializeSkills();
-        }
+        
         private bool IronCheck(ISkillContext sc) => true;
         private DSL.SourceFile Iron(ISkillContext sc)
         {
@@ -153,7 +151,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                 .UseResource(1, ResourceType.Iron)
                 .WriteFree(source => 
                 { 
-                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    ExcludeAllProfessions(source);
                     source.Focus.Skill.AddPackage(new Warlock());
                 });
             return DSL.Create(sc.Self, pen);
@@ -169,7 +167,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                 .UseResource(4, ResourceType.Iron)
                 .WriteFree(source =>
                 {
-                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    ExcludeAllProfessions(source);
                     source.Focus.Skill.AddPackage(new Cannon());
                 });
             return DSL.Create(sc.Self, pen);
@@ -185,7 +183,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                 .UseResource(3, ResourceType.Iron)
                 .WriteFree(source =>
                 {
-                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    ExcludeAllProfessions(source);
                     source.Focus.Skill.AddPackage(new Driver());
                 });
             return DSL.Create(sc.Self, pen);
@@ -201,7 +199,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                 .UseResource(3, ResourceType.Iron)
                 .WriteFree(source =>
                 {
-                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+                    ExcludeAllProfessions(source);
                     List<string> addition = new()
                     {
                         "stick",
@@ -215,6 +213,15 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                     source.Focus.Health.GainHP(4);
                 });
             return DSL.Create(sc.Self, pen);
+        }
+        public static void ExcludeAllProfessions(ActorSet source)
+        {
+
+            Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
+        }
+        public static void ExcludeNone(ActorSet source, string self)
+        {
+            source.Focus.Skill.RemoveSkill("common", self);
         }
     }
 }

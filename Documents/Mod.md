@@ -81,20 +81,14 @@ Pen pen = sf => sf
 namespace Example.Mod{
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
-    public class MyProfession : SkillPackageBase{//必须继承这个抽象类
+    public class MyProfession : MainProfession{//主职业必须继承这个抽象类
         public string Name => "myprofession";//实现属性
         /*被动技能是可选的
         public override DSL.SourceFile PassiveSkill(ISkillContext sc){
             //此处即被动技能逻辑
         }
         */
-        public MyProfession(){//必须无参数
-            InitializeSkills();//重要，这个父类方法会反射得到技能表，如果不调用的话无法使用该职业技能
-            //此处可添加若干逻辑，例如warlock包具有逻辑
-            /*
-            AvailableSkillNames.Remove("midastouch");
-            */
-        }
+        //无需写构造函数
         //必须为实例方法
         private bool JokeCheck(ISkillContext sc){//方法名必须为$"{技能名}Check"，必须为bool(ISkillContext)。该方法作用在于检查技能是否能够使用
             return sc.Self.Focus.Health.HP > 5 && sc.Self.Focus.Resource.Check(ResourceType.Iron, 1);
@@ -123,18 +117,14 @@ namespace Example.Mod{
 namespace Example.Mod{
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
-    public class CommonExtensionForMyProfession : SkillPackageBase{//必须继承这个抽象类
+    public class CommonExtensionForMyProfession : ProfessionModifier{//修改器必须继承这个抽象类
         public string Name => "common";//通用包名字。事实上，如果想给其它包写技能可以直接改成其他包的名字
         /*被动技能即使写了也无效
         public override DSL.SourceFile PassiveSkill(ISkillContext sc){
             //此处即被动技能逻辑
         }
         */
-        public CommonExtensionForMyProfession(){//必须无参数
-            Type = PackageType.Modifier;//重要，需要主动生命这是一个修改器而不是一个主包
-            InitializeSkills();//重要，如果不调用主程序就不知道还有这个扩展
-            //此处可添加若干逻辑，例如如果扩展技能也要维护一个内部状态
-        }
+        //无需写构造函数
         //必须为实例方法
         private bool MyProfessionCheck(ISkillContext sc){//方法名必须为$"{技能名}Check"，必须为bool(ISkillContext)
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1);
@@ -145,8 +135,8 @@ namespace Example.Mod{
                 .UseResource(1, ResourceType.Iron)
                 .WriteFree(source => 
                 { 
-                    Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));//重要，因为每局游戏只能有一个职业。这条代码复制即可
-                    source.Focus.Skill.AddPackage(new Warlock());//重要，否则根本没添加新职业技能。这条代码复制即可
+                    Common.ExcludeAllProfessions(source);//重要，因为每局游戏只能有一个职业。这条代码复制即可，否则行为会不符合预期。
+                    source.Focus.Skill.AddPackage(new MyProfession());//重要，否则根本没添加新职业技能。这条代码复制即可
                 });
             return DSL.Create(sc.Self, pen);
         }

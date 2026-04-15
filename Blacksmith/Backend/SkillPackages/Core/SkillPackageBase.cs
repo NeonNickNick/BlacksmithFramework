@@ -21,7 +21,7 @@ namespace Blacksmith.Backend.SkillPackages.Core
     }
     public abstract class SkillPackageBase : ISkillPackage
     {
-        public PackageType Type { get; protected set; } = PackageType.Main;
+        public abstract PackageType PackageType { get; protected set; }
         private readonly List<string> _availableSkillNames = new();
         private readonly Dictionary<string, Func<ISkillContext, bool>> _skillChecker = new();
         private readonly Dictionary<string, Func<ISkillContext, DSL.SourceFile>> _skillSourceFileGenerator = new();
@@ -29,7 +29,7 @@ namespace Blacksmith.Backend.SkillPackages.Core
         public List<string> AvailableSkillNames => _availableSkillNames;
         public Dictionary<string, Func<ISkillContext, bool>> SkillChecker => _skillChecker;
         public Dictionary<string, Func<ISkillContext, DSL.SourceFile>> SkillSourceFileGenerator => _skillSourceFileGenerator;
-        protected void InitializeSkills()
+        protected SkillPackageBase(PackageType packageType)
         {
             var type = this.GetType();
             // 获取所有私有静态方法
@@ -73,11 +73,11 @@ namespace Blacksmith.Backend.SkillPackages.Core
                 _availableSkillNames.Add(skillName);
                 _skillChecker.Add(skillName, checkDelegate);
                 _skillSourceFileGenerator.Add(skillName, generatorDelegate);
-
-                if (Type == PackageType.Main)
-                {
-                    ProfessionRegistry.AddModeOnInit(this);
-                }
+            }
+            PackageType = packageType;
+            if (PackageType == PackageType.Main)
+            {
+                ProfessionRegistry.AddModeOnInit(this);
             }
         }
         public virtual DSL.SourceFile PassiveSkill(ISkillContext sc)
@@ -85,4 +85,5 @@ namespace Blacksmith.Backend.SkillPackages.Core
             return new(sc.Self);
         }
     }
+
 }

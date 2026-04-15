@@ -8,13 +8,9 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    public class Driver : SkillPackageBase
+    public class Driver : MainProfession
     {
         public override string Name => "driver";
-        public Driver()
-        {
-            InitializeSkills();
-        }
         public override DSL.SourceFile PassiveSkill(ISkillContext sc)
         {
             Pen pen = sf => sf

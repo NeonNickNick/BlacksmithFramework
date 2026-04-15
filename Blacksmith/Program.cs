@@ -16,7 +16,7 @@ namespace Blacksmith
             var ModProfessionPlugins = PluginLoader.LoadPlugins<SkillPackageBase>(".");
             foreach (var plugin in ModProfessionPlugins)
             {
-                if (plugin.Type == PackageType.Main)
+                if (plugin.PackageType == PackageType.Main)
                 {
                     ProfessionRegistry.RegistProfessionName(plugin.Name);
                 }
@@ -24,7 +24,7 @@ namespace Blacksmith
             //接下来记录Mod对已有包的修改，最重要的是给Common包扩展技能，否则无法使用Mod职业
             foreach (var plugin in ModProfessionPlugins)
             {
-                if(plugin.Type == PackageType.Modifier)
+                if(plugin.PackageType == PackageType.Modifier)
                 {
                     ProfessionRegistry.RegistProfessionModifier(plugin.Name, plugin);
                 }

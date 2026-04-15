@@ -6,13 +6,9 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
-    public class BloodSigil : SkillPackageBase
+    public class BloodSigil : MainProfession
     {
         public override string Name => "bloodsigil";
-        public BloodSigil()
-        {
-            InitializeSkills();
-        }
         private bool BloodBladeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Health.HP > 4;

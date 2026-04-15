@@ -1,0 +1,15 @@
+D:\Own\Huangs\Huangs\bin\Debug\net8.0\Huangs.deps.json
+D:\Own\Huangs\Huangs\bin\Debug\net8.0\Huangs.dll
+D:\Own\Huangs\Huangs\bin\Debug\net8.0\Huangs.pdb
+D:\Own\Huangs\Huangs\bin\Debug\net8.0\Blacksmith.dll
+D:\Own\Huangs\Huangs\bin\Debug\net8.0\Blacksmith.pdb
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.csproj.AssemblyReference.cache
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.GeneratedMSBuildEditorConfig.editorconfig
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.AssemblyInfoInputs.cache
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.AssemblyInfo.cs
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.csproj.CoreCompileInputs.cache
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.csproj.Up2Date
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.dll
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\refint\Huangs.dll
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\Huangs.pdb
+D:\Own\Huangs\Huangs\obj\Debug\net8.0\ref\Huangs.dll

@@ -10,12 +10,11 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
-    public class Warlock : SkillPackageBase
+    public class Warlock : MainProfession
     {
         public override string Name => "warlock";
         public Warlock()
         {
-            InitializeSkills();
             AvailableSkillNames.Remove("midastouch");
         }
         private bool MagicCheck(ISkillContext sc)

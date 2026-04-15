@@ -50,4 +50,4 @@
 | 狂怒 | bloodrage | :--- |
 
 # Mod支持
-允许通过添加新的.dll来自由地新增职业。该功能详见[Mod支持](./MDs/Mod.md)
+允许通过添加新的.dll来自由地新增职业。该功能详见[Mod支持](./Documents/Mod.md)
