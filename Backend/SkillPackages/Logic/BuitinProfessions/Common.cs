@@ -3,7 +3,7 @@ using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Defenses;
 using Blacksmith.Backend.SkillPackages.Core;
-using Blacksmith.DLC;
+using Blacksmith.Mod;
 
 namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
 {
@@ -16,10 +16,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
         public Common()
         {
             InitializeSkills();
-        }
-        public override DSL.SourceFile PassiveSkill(ISkillContext sc)
-        {
-            return new(sc.Self);
         }
         private static bool IronCheck(ISkillContext sc) => true;
         private static DSL.SourceFile Iron(ISkillContext sc)

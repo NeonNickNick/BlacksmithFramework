@@ -1,6 +1,7 @@
 using System.Reflection;
 using Blacksmith.Backend.Backend.SkillPackages.Logic;
 using Blacksmith.Backend.SkillPackages.Logic;
+using Blacksmith.Mod;
 
 namespace Blacksmith.Backend.SkillPackages.Core
 {
@@ -9,19 +10,25 @@ namespace Blacksmith.Backend.SkillPackages.Core
     {
         public string Name { get; }
         public List<string> AvailableSkillNames { get; }
-        public IReadOnlyDictionary<string, Func<ISkillContext, bool>> SkillChecker { get; }
-        public IReadOnlyDictionary<string, Func<ISkillContext, DSL.SourceFile>> SkillSourceFileGenerator { get; }
+        public Dictionary<string, Func<ISkillContext, bool>> SkillChecker { get; }
+        public Dictionary<string, Func<ISkillContext, DSL.SourceFile>> SkillSourceFileGenerator { get; }
         public abstract DSL.SourceFile PassiveSkill(ISkillContext sc);
+    }
+    public enum PackageType
+    {
+        Main,
+        Modifier
     }
     public abstract class SkillPackageBase : ISkillPackage
     {
+        public PackageType Type { get; protected set; } = PackageType.Main;
         private readonly List<string> _availableSkillNames = new();
         private readonly Dictionary<string, Func<ISkillContext, bool>> _skillChecker = new();
         private readonly Dictionary<string, Func<ISkillContext, DSL.SourceFile>> _skillSourceFileGenerator = new();
         public abstract string Name { get; }
         public List<string> AvailableSkillNames => _availableSkillNames;
-        public IReadOnlyDictionary<string, Func<ISkillContext, bool>> SkillChecker => _skillChecker;
-        public IReadOnlyDictionary<string, Func<ISkillContext, DSL.SourceFile>> SkillSourceFileGenerator => _skillSourceFileGenerator;
+        public Dictionary<string, Func<ISkillContext, bool>> SkillChecker => _skillChecker;
+        public Dictionary<string, Func<ISkillContext, DSL.SourceFile>> SkillSourceFileGenerator => _skillSourceFileGenerator;
         protected void InitializeSkills()
         {
             var type = this.GetType();
@@ -66,8 +73,16 @@ namespace Blacksmith.Backend.SkillPackages.Core
                 _availableSkillNames.Add(skillName);
                 _skillChecker.Add(skillName, checkDelegate);
                 _skillSourceFileGenerator.Add(skillName, generatorDelegate);
+
+                if (Type == PackageType.Main)
+                {
+                    ProfessionRegistry.AddModeOnInit(this);
+                }
             }
         }
-        public abstract DSL.SourceFile PassiveSkill(ISkillContext sc);
+        public virtual DSL.SourceFile PassiveSkill(ISkillContext sc)
+        {
+            return new(sc.Self);
+        }
     }
 }

@@ -9,10 +9,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
     public class BloodSigil : SkillPackageBase
     {
         public override string Name => "bloodsigil";
-        public override DSLforSkillLogic.SourceFile PassiveSkill(ISkillContext sc)
-        {
-            return new(sc.Self);
-        }
         public BloodSigil()
         {
             InitializeSkills();

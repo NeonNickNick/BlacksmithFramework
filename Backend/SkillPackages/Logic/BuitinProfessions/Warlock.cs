@@ -18,10 +18,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             InitializeSkills();
             AvailableSkillNames.Remove("midastouch");
         }
-        public override DSL.SourceFile PassiveSkill(ISkillContext sc)
-        {
-            return new(sc.Self);
-        }
         private static bool MagicCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1);

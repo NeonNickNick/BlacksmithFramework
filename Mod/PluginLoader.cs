@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Blacksmith.DLC
+namespace Blacksmith.Mod
 {
     public static class PluginLoader
     {

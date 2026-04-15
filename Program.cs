@@ -1,5 +1,5 @@
 using Blacksmith.Backend.SkillPackages.Core;
-using Blacksmith.DLC;
+using Blacksmith.Mod;
 using Blacksmith.Frontend;
 namespace Blacksmith
 {
@@ -12,10 +12,22 @@ namespace Blacksmith
         }
         private static void LoadProfessionPlugins()
         {
-            var plugins = PluginLoader.LoadPlugins<SkillPackageBase>(".");
-            foreach (var plugin in plugins)
+            //先注册Mod包名
+            var ModProfessionPlugins = PluginLoader.LoadPlugins<SkillPackageBase>(".");
+            foreach (var plugin in ModProfessionPlugins)
             {
-                ProfessionRegistry.Regist(plugin.Name);
+                if (plugin.Type == PackageType.Main)
+                {
+                    ProfessionRegistry.RegistProfessionName(plugin.Name);
+                }
+            }
+            //接下来记录Mod对已有包的修改，最重要的是给Common包扩展技能，否则无法使用Mod职业
+            foreach (var plugin in ModProfessionPlugins)
+            {
+                if(plugin.Type == PackageType.Modifier)
+                {
+                    ProfessionRegistry.RegistProfessionModifier(plugin.Name, plugin);
+                }
             }
         }
     }
