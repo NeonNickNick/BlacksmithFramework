@@ -10,6 +10,11 @@ namespace Blacksmith
             LoadProfessionPlugins();
             ConsoleFrontend.Start();
         }
+        private static void LoadTypePlugins()
+        {
+
+        }
+
         private static void LoadProfessionPlugins()
         {
             //先注册Mod包名
