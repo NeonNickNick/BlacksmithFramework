@@ -111,6 +111,8 @@ namespace Blacksmith.Frontend
                 string esn;
                 int ep;
 
+                 //临时：如果测试策略，选2，否则选1为控制台依次输入玩家和人机技能
+
                 if (aiStrategy != null)
                 {
                     Console.WriteLine($"\nsys::out >> \"Robert\" is thinking...\n");
