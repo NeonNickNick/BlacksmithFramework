@@ -20,7 +20,7 @@ namespace Blacksmith.Backend.JudgementLogic.Actor
             public bool IsActive { get; set; } = true;
             public Package(ISkillPackage skillpackage)
             {
-                Name = skillpackage.Name;
+                Name = skillpackage.GetType().Name;
                 SkillPackage = skillpackage;
             }
         }

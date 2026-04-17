@@ -16,11 +16,13 @@ namespace Blacksmith.Infra.ExtensibleEnum
                 return _EEValueTypeDict;
             }
         }
+        private static List<string> _names = new();
         public static void RegistBlacksmithEnum(Type type, BlacksmithEnum instance)
         {
-            if(!SupportedEnumDict.TryGetValue(type, out var value))
+            if(!SupportedEnumDict.TryGetValue(type, out var value) && !_names.Contains(type.Name))
             {
                 _supportedEnumDict[type] = instance;
+                _names.Add(type.Name);
             }
             else
             {

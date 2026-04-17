@@ -69,12 +69,16 @@ namespace Blacksmith.Infra.ExtensibleEnum
         }
         protected BlacksmithEnum()
         {
+            if (!_isOpen)
+            {
+                return;
+            }
             Instance = (T)this;
             var type = GetType();
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
             foreach (var method in methods)
             {
-                var metaData = method.GetCustomAttribute<IsBlacksmithEnumMenberExtension>();
+                var metaData = method.GetCustomAttribute<IsBlacksmithEnumMember>();
                 if (method.ReturnType != typeof(EEValue) ||
                     method.GetParameters().Length != 0 || 
                     metaData == null)
@@ -90,20 +94,20 @@ namespace Blacksmith.Infra.ExtensibleEnum
     }
     public class TestType : BlacksmithEnum<TestType>
     {
-        [IsBlacksmithEnumMenberExtension(256)]
+        [IsBlacksmithEnumMember(256)]
         public EEValue Physical() => GetEEValue();
 
-        [IsBlacksmithEnumMenberExtension(128)]
+        [IsBlacksmithEnumMember(128)]
         public EEValue Magical() => GetEEValue();
 
-        [IsBlacksmithEnumMenberExtension(0)]
+        [IsBlacksmithEnumMember(0)]
         public EEValue Real() => GetEEValue();
     }
     //模拟外部程序集
     [IsBlacksmithEnumModifier]
     public static class MyTestEnumExtension
     {
-        [IsBlacksmithEnumMenberExtension(256)]
+        [IsBlacksmithEnumMember(256)]
         public static TestType.EEValue Magical(this TestType testType) => TestType.GetEEValue();
     }
 

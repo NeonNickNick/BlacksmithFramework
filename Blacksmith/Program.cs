@@ -1,10 +1,12 @@
+using System.Reflection;
 using Blacksmith.AI;
 using Blacksmith.AI.Strategies;
 using Blacksmith.Backend.SkillPackages.Core;
-using Blacksmith.Mod;
 using Blacksmith.Frontend;
-using Blacksmith.Infra.ExtensibleProfession;
+using Blacksmith.Infra.Attributes;
 using Blacksmith.Infra.ExtensibleEnum;
+using Blacksmith.Infra.ExtensibleProfession;
+using Blacksmith.Mod;
 namespace Blacksmith
 {
     public static class Program
@@ -44,7 +46,7 @@ namespace Blacksmith
             {
                 if (plugin.PackageType == PackageType.Main)
                 {
-                    ProfessionRegistry.RegistProfessionName(plugin.Name);
+                    ProfessionRegistry.RegistProfessionName(plugin.GetType().Name);
                 }
             }
             //接下来记录Mod对已有包的修改，最重要的是给Common包扩展技能，否则无法使用Mod职业
@@ -52,7 +54,12 @@ namespace Blacksmith
             {
                 if(plugin.PackageType == PackageType.Modifier)
                 {
-                    ProfessionRegistry.RegistProfessionModifier(plugin.Name, plugin);
+                    var metaData = plugin.GetType().GetCustomAttribute<IsProfessionModifier>();
+                    if(metaData == null)
+                    {
+                        return;
+                    }
+                    ProfessionRegistry.RegistProfessionModifier(metaData.TargetName, plugin);
                 }
             }
         }

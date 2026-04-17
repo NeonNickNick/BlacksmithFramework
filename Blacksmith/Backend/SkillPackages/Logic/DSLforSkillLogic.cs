@@ -39,10 +39,18 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                     BindSentence = bindSentence;
                 }
             }
+
             protected readonly ActorSet _owner; 
             protected List<Sentence> _sentences = new();
             protected Stack<Sentence> _rhetoricCache = new();
             protected List<string> _mutationsOnCompile = new();
+            protected SourceFile(SourceFile origin)
+            {
+                _owner = origin._owner;
+                _sentences = origin._sentences;
+                _rhetoricCache = origin._rhetoricCache;
+                _mutationsOnCompile = origin._mutationsOnCompile;
+            }
             public SourceFile(ActorSet owner)
             {
                 _owner = owner;
@@ -129,7 +137,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                     };
                     resolution.Source.Focus.TurnContext.WriteResolution(resolution);
                 }, SentenceType.Attack, StructureType.Main));
-                return (AttackFile)this;
+                return new(this);
             }
             
             public SourceFile WriteRecovery(int power)
@@ -138,7 +146,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                 {
                     source.Focus.Health.GainHP(power);
                 }, SentenceType.Recovery, StructureType.Main));
-                return (RecoveryFile)this;
+                return new(this);
             }
             public SourceFile WriteDefense(
                 float power,
@@ -161,7 +169,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                     };
                     source.Focus.TurnContext.WriteResolution(resolution);
                 }, SentenceType.Defense, StructureType.Main));
-                return (DefenseFile)this;
+                return new(this);
             }
             public SourceFile WriteResource(
                 float power,
@@ -183,7 +191,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                     };
                     source.Focus.TurnContext.WriteResolution(resolution);
                 }, SentenceType.Resource, StructureType.Main));
-                return (ResourceFile)this;
+                return new(this);
             }
             public SourceFile WriteEffect(
                 EffectType type,
@@ -205,7 +213,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                     };
                     source.Focus.TurnContext.WriteResolution(resolution);
                 }, SentenceType.Effect, StructureType.Main));
-                return (EffectFile)this;
+                return new(this);
             }
             public SourceFile UseResource(float need, ResourceType type, bool ifCommonOnly = false)
             {
@@ -221,13 +229,13 @@ namespace Blacksmith.Backend.SkillPackages.Logic
         //安全性校验
         public class DefenseFile : SourceFile
         {
-            public DefenseFile(ActorSet owner) : base(owner)
+            public DefenseFile(SourceFile self) : base(self)
             {
             }
         }
         public class RecoveryFile : SourceFile
         {
-            public RecoveryFile(ActorSet owner) : base(owner)
+            public RecoveryFile(SourceFile self) : base(self)
             {
             }
         }
@@ -251,19 +259,19 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                 }, SentenceType.Attack, StructureType.Rhetoric, _sentences[^1]));
                 return this;
             }
-            public AttackFile(ActorSet owner) : base(owner)
+            public AttackFile(SourceFile self) : base(self)
             {
             }
         }
         public class ResourceFile : SourceFile
         {
-            public ResourceFile(ActorSet owner) : base(owner)
+            public ResourceFile(SourceFile self) : base(self)
             {
             }
         }
         public class EffectFile : SourceFile
         {
-            public EffectFile(ActorSet owner) : base(owner)
+            public EffectFile(SourceFile self) : base(self)
             {
             }
         }

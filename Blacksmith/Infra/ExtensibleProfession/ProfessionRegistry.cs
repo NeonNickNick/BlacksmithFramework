@@ -28,7 +28,7 @@ namespace Blacksmith.Infra.ExtensibleProfession
         }
         public static void AddModeOnInit(SkillPackageBase package)
         {
-            if(_modifiers.TryGetValue(package.Name, out var modifiers))
+            if(_modifiers.TryGetValue(package.GetType().Name, out var modifiers))
             {
                 foreach (var modifierOrigin in modifiers)
                 {

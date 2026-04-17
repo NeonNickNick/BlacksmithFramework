@@ -13,7 +13,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
     public class Common : MainProfession
     {
         private static List<string> Professions => ProfessionRegistry.Professions;
-        public override string Name => "common";
         
         private bool IronCheck(ISkillContext sc) => true;
         private DSL.SourceFile Iron(ISkillContext sc)

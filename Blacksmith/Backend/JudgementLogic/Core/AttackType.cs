@@ -8,11 +8,11 @@ namespace Blacksmith.Backend.JudgementLogic.Core
     }/*
     public class AttackType : BlacksmithEnum<AttackType>
     {
-        [IsBlacksmithEnumMenberExtension(256)]
+        [IsBlacksmithEnumMember(256)]
         public EEValue Physical() => GetEEValue();
-        [IsBlacksmithEnumMenberExtension(128)]
+        [IsBlacksmithEnumMember(128)]
         public EEValue Magical() => GetEEValue();
-        [IsBlacksmithEnumMenberExtension(0)]
+        [IsBlacksmithEnumMember(0)]
         public EEValue Real() => GetEEValue();
     }*/
 }

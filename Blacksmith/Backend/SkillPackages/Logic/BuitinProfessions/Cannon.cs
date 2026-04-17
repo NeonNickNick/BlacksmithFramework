@@ -10,7 +10,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
     using DSL = DSLforSkillLogic;
     public class Cannon : MainProfession
     {
-        public override string Name => "cannon";
         public override DSL.SourceFile PassiveSkill(ISkillContext sc)
         {
             return new(sc.Self);

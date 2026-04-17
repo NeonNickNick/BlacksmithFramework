@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <Reference Include="Blacksmith">
-      <HintPath>..\..\Blacksmith\Blacksmith\bin\Debug\net8.0\Blacksmith.dll</HintPath>
+      <HintPath>..\..\..\Blacksmith\bin\Debug\net8.0\Blacksmith.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -10,7 +10,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public class Driver : MainProfession
     {
-        public override string Name => "driver";
         public override DSL.SourceFile PassiveSkill(ISkillContext sc)
         {
             Pen pen = sf => sf

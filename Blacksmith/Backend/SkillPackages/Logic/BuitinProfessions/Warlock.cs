@@ -12,7 +12,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
     using DSL = DSLforSkillLogic;
     public class Warlock : MainProfession
     {
-        public override string Name => "warlock";
         public Warlock()
         {
             AvailableSkillNames.Remove("midastouch");

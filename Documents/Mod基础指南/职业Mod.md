@@ -1,14 +1,15 @@
-# Mod基础指南
-本文档面向拿到本项目编译后DLL或源码并希望通过内部提供API添加新职业，并且不关心底层实现的开发者。说明如何实现一个Mod，如何使用项目提供的DSL以及一些重要的 API 与约定。
+# 职业Mod
+本文档面向拿到本项目编译后DLL或源码并希望通过内部提供API添加新职业，并且不关心底层实现的开发者。具体说明如何实现一个职业Mod，如何使用项目提供的DSL以及一些重要的 API 与约定。
 
 目前Mod支持的功能具体包括：添加新职业、给内置职业添加新技能或覆盖其技能（无法修改被动技能，如驱动器时之盾），给Mod职业添加新技能或覆盖其技能（无法修改被动技能）。
 
+请先阅读：[枚举Mod](./枚举Mod.md)
 ## 总体流程
-- 创建一个.NET 8类库项目，添加对游戏主程序导出的程序集Blacksmith.dll的引用。
+创建一个.NET 8类库项目，添加对游戏主程序导出的程序集Blacksmith.dll的引用。
 
-- 在项目中按照下面的步骤编写若干类。
+在项目中按照下面的步骤编写若干类。
 
-- 将编译产物放到游戏可执行文件所在目录，程序启动时会自动扫描并加载Mod。
+将编译产物放到游戏可执行文件所在目录，程序启动时会自动扫描并加载Mod。
 
 ## APIs
 ### 关于 ISkillContext
@@ -16,7 +17,7 @@
 - sc.Self: 当前使用技能的一方（ActorSet实例）
 - sc.Param: 技能的参数（若技能需要参数，如恢复2）
 
-（Mod中可以直接按此约定访问 sc.Self / sc.Param；如果需要其它信息，请查看或引用项目中 ISkillContext 的真实定义）
+Mod中可以直接按此约定访问 sc.Self / sc.Param；如果需要其它信息，请查看或引用项目中 ISkillContext 的真实定义
 
 ### 关于Body和ActorSet
 玩家核心类为Body类。它包装在ActorSet类中备用（为幻书预留），当前可以只考虑直接访问，即sc.Self.Focus，即可获得玩家Body类
@@ -70,8 +71,7 @@ Pen pen = sf => sf
 */
 ```
 接下来是一个详细的例子。
-## 编写Mod实例
-以保持一致性。
+## 编写职业Mod案例
 
 主程序集提供了反射方法来自动获取技能名和技能方法，因此只需要按照约定实现抽象类，编写技能方法即可方便地添加新职业。
 
@@ -81,8 +81,7 @@ Pen pen = sf => sf
 namespace Example.Mod{
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
-    public class MyProfession : MainProfession{//主职业必须继承这个抽象类
-        public string Name => "myprofession";//实现属性，必须是全小写
+    public class MyProfession : MainProfession{//主职业必须继承这个抽象类。类名即职业名
         /*被动技能是可选的
         public override DSL.SourceFile PassiveSkill(ISkillContext sc){
             //此处即被动技能逻辑
@@ -94,7 +93,7 @@ namespace Example.Mod{
             return sc.Self.Focus.Health.HP > 5 && sc.Self.Focus.Resource.Check(ResourceType.Iron, 1);
         }
         //必须为实例方法
-        private DSL.SourceFile Joke(ISkillContext sc){//方法名必须为$"技能名"，必须为DSL.SourceFile(ISkillContext)。该方法即技能逻辑，建议使用提供的DSL编写
+        private DSL.SourceFile Joke(ISkillContext sc){//方法名必须为$"{技能名}"，必须为DSL.SourceFile(ISkillContext)。该方法即技能逻辑，建议使用提供的DSL编写
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Iron)
                 .WriteFree(source =>
@@ -117,8 +116,8 @@ namespace Example.Mod{
 namespace Example.Mod{
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     using DSL = DSLforSkillLogic;
+    [IsProfessionModifier("Common")]//重要，必须注明修改的是哪个职业。字符串即职业名
     public class CommonExtensionForMyProfession : ProfessionModifier{//修改器必须继承这个抽象类
-        public string Name => "common";//通用包名字。事实上，如果想给其它包写技能可以直接改成其他包的名字
         /*被动技能即使写了也无效
         public override DSL.SourceFile PassiveSkill(ISkillContext sc){
             //此处即被动技能逻辑
@@ -148,4 +147,4 @@ namespace Example.Mod{
 接下来打包即可。
 
 ## 温馨提示
-该方案不保证多个Mod能够兼容。如果两个Mod都修改了同一个技能，那么后被主程序加载的会生效。可以通过调整文件名来实现控制生效。有关更高级的Mod编写，例如自由语句，规则链接的完整功能请见文档[Mod 进阶指南](./ModAdvanced.md)
+该方案不保证多个Mod能够兼容。如果两个Mod都修改了同一个技能，那么后被主程序加载的会生效。可以通过调整文件名来实现控制生效。如果两个Mod定义了同一个职业，游戏会直接抛出异常。有关更高级的Mod编写，例如自由语句，规则链接的完整功能请见文档[Mod 进阶指南](./ModAdvanced.md)

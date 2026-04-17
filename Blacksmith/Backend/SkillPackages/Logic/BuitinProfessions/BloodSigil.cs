@@ -10,7 +10,6 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
     public class BloodSigil : MainProfession
     {
         private float _increase = 1f;
-        public override string Name => "bloodsigil";
         private int IncreaseAttack(int origin)
         {
             var res = (int)MathF.Ceiling(origin * _increase);

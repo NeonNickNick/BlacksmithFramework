@@ -3,6 +3,7 @@ using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.SkillPackages.Core;
 using Blacksmith.Backend.SkillPackages.Logic;
 using Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions;
+using Blacksmith.Infra.Attributes;
 
 namespace HuWangs
 {
@@ -10,7 +11,6 @@ namespace HuWangs
     using DSL = DSLforSkillLogic;
     public class HuWangs : MainProfession
     {
-        public override string Name => "huwangs";
         private bool HappyCheck(ISkillContext sc) => true;
         private DSL.SourceFile Happy(ISkillContext sc)
         {
@@ -18,9 +18,9 @@ namespace HuWangs
             return new(sc.Self);
         }
     }
+    [IsProfessionModifier("Common")]
     public class HuWangsModifier : ProfessionModifier
     {
-        public override string Name => "common";
         private bool HuWangsCheck(ISkillContext sc) => true;
         private DSL.SourceFile HuWangs(ISkillContext sc)
         {
@@ -31,6 +31,13 @@ namespace HuWangs
                     Common.ExcludeAllProfessions(source);
                     source.Focus.Skill.AddPackage(new HuWangs());
                 });
+            return DSL.Create(sc.Self, pen);
+        }
+        private bool IronCheck(ISkillContext sc) => true;
+        private DSL.SourceFile Iron(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .WriteResource(2, ResourceType.Iron);
             return DSL.Create(sc.Self, pen);
         }
     }

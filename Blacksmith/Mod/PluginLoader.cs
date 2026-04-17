@@ -82,7 +82,7 @@ namespace Blacksmith.Mod
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
             foreach (var method in methods)
             {
-                var metaData = method.GetCustomAttribute<IsBlacksmithEnumMenberExtension>();
+                var metaData = method.GetCustomAttribute<IsBlacksmithEnumMember>();
                 var temp = method.GetParameters()[0].ParameterType;
                 if (metaData == null ||
                     method.GetParameters().Length != 1 ||
