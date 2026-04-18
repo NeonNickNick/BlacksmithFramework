@@ -28,7 +28,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                     source.Focus.Health.LoseHP(4);
                 })
                 .WriteAttack(IncreaseAttack(6), AttackType.Instance.Magical())
-                    .BloodSuck(0.66f);
+                    .WithBloodSuck(0.66f);
             return DSL.Create(sc.Self, pen);
         }
         private bool BloodLustCheck(ISkillContext sc)
@@ -79,7 +79,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                     source.Focus.Health.LoseHP(1);
                 })
                 .WriteAttack(IncreaseAttack(5), AttackType.Instance.Magical())
-                    .BloodSuck(1.5f);
+                    .WithBloodSuck(1.5f);
             return DSL.Create(sc.Self, pen);
         }
     }

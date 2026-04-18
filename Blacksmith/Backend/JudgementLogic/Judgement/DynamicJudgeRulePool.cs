@@ -1,9 +1,11 @@
-using Blacksmith.Backend.JudgementLogic.Core;
+using System.Data;
+using Blacksmith.Backend.JudgementLogic.Judgement.Core;
 
 namespace Blacksmith.Backend.JudgementLogic.Judgement
 {
     public enum JudgeStage
     {
+        OnBegin,
         OnEffectTaking_AfterResolutionWritten,
         OnEffectSwaping,
         OnAttackCanceling,
@@ -12,7 +14,8 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
         OnEffectTaking_AfterTransport,
         OnApplyingOthers,
         OnUpdating,
-        OnEffectTaking_AfterResult
+        OnEffectTaking_AfterResult,
+        OnEnd
     }
     public enum RuleType
     {
@@ -27,39 +30,41 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
     public class Mutation
     {
         public int RemainingRounds;
+        public int DelayRounds;
         public JudgeStage Stage;
         public RuleType RuleType;
         public ModifierOrder ModifierOrder;
         public Action<ActorSet, ActorSet> JudgeRule;
-        public Mutation(Mutation origin)
-        {
-            RemainingRounds = origin.RemainingRounds;
-            Stage = origin.Stage;
-            RuleType = origin.RuleType;
-            ModifierOrder = origin.ModifierOrder;
-            JudgeRule = origin.JudgeRule;
-        }
-        public Mutation(int remainingRounds, JudgeStage stage, RuleType ruleType, ModifierOrder modifierOrder, Action<ActorSet, ActorSet> judgeRule)
+        public Mutation(
+            Action<ActorSet, ActorSet> judgeRule,
+            JudgeStage stage, 
+            RuleType ruleType, 
+            ModifierOrder modifierOrder,
+            int remainingRounds = 1,
+            int delayRounds = 0)
         {
             RemainingRounds = remainingRounds;
+            DelayRounds = delayRounds;
             Stage = stage;
             RuleType = ruleType;
             ModifierOrder = modifierOrder;
             JudgeRule = judgeRule;
         }
     }
-    public static class JudgeRulePool
+    public static class DynamicJudgeRulePool
     {
         private class MutationPrototype
         {
             public int RemainingRounds;
+            public int DelayRounds;
             public JudgeStage Stage;
             public RuleType RuleType;
             public ModifierOrder ModifierOrder;
             public Action<ActorSet, ActorSet, ActorSet> JudgeRulePrototype;
-            public MutationPrototype(int remainingRounds, JudgeStage stage, RuleType ruleType, ModifierOrder modifierOrder, Action<ActorSet, ActorSet, ActorSet> judgeRulePrototype)
+            public MutationPrototype(int remainingRounds, int delayRounds, JudgeStage stage, RuleType ruleType, ModifierOrder modifierOrder, Action<ActorSet, ActorSet, ActorSet> judgeRulePrototype)
             {
                 RemainingRounds = remainingRounds;
+                DelayRounds = delayRounds;
                 Stage = stage;
                 RuleType = ruleType;
                 ModifierOrder = modifierOrder;
@@ -67,21 +72,32 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
             }
             public Mutation Specialize(ActorSet source)
             {
-                return new(RemainingRounds, Stage, RuleType, ModifierOrder, (player, enemy) => JudgeRulePrototype(source, player, enemy));
+                return new((player, enemy) => JudgeRulePrototype(source, player, enemy), Stage, RuleType, ModifierOrder, RemainingRounds, DelayRounds);
             }
         }
-        private static readonly Dictionary<string, List<MutationPrototype>> _mutationPrototypes = new()
+        private static readonly Dictionary<DynamicJudgeRuleName.BEValue, List<MutationPrototype>> _mutationPrototypes = new();
+        public static void RegistDynamic(
+            DynamicJudgeRuleName.BEValue name, 
+            List<Mutation> mutations)
         {
-            { "reflect", 
-                new(){
-                    new(1, JudgeStage.OnEffectSwaping, RuleType.Modifier, ModifierOrder.After, Reflect_AfterEffectSwaping_Modifier_After),
-                    new(1, JudgeStage.OnAttackSwaping, RuleType.Modifier, ModifierOrder.After, Reflect_AfterAttackSwaping_Modifier_After)
-                } 
-            },
-        };
-        public static List<Mutation> Query(ActorSet source, string mutationName)
+            _mutationPrototypes[name] = new();
+            foreach (var mutation in mutations)
+            {
+                _mutationPrototypes[name].Add(new(
+                    mutation.RemainingRounds,
+                    mutation.DelayRounds,
+                    mutation.Stage,
+                    mutation.RuleType,
+                    mutation.ModifierOrder,
+                    (source, player, enemy) =>
+                    {
+                        IfElseUtil(source, player, enemy, mutation.JudgeRule);
+                    }));
+            }
+        }
+        public static List<Mutation> Query(ActorSet source, DynamicJudgeRuleName.BEValue name)
         {
-            return _mutationPrototypes[mutationName].Select(m => m.Specialize(source)).ToList();
+            return _mutationPrototypes[name].Select(m => m.Specialize(source)).ToList();
         }
         //从这里开始是转移、延时保护等个别技能的专属规则
 
@@ -115,45 +131,6 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
             {
                 throw new ArgumentException("Unreachable!");
             }
-        }
-      
-        private static void Reflect_AfterEffectSwaping_Modifier_After(ActorSet source, ActorSet player, ActorSet enemy)
-        {
-            IfElseUtil(source, player, enemy, Reflect_AfterEffectSwaping_Modifier_After_Impl);
-        }
-        private static void Reflect_AfterEffectSwaping_Modifier_After_Impl(ActorSet player, ActorSet enemy)
-        {
-            
-            var playerResolutions = player.Focus.TurnContext.EffectResolutions;
-
-            var reflect = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToList();
-
-            playerResolutions.RemoveAll(e => reflect.Contains(e));
-
-            reflect.ForEach(e => e.DelayRounds = 1);
-
-            playerResolutions.AddRange(reflect);
-        }
-
-        private static void Reflect_AfterAttackSwaping_Modifier_After(ActorSet source, ActorSet player, ActorSet enemy)
-        {
-            IfElseUtil(source, player, enemy, Reflect_AfterAttackSwaping_Modifier_After_Impl);
-        }
-        private static void Reflect_AfterAttackSwaping_Modifier_After_Impl(ActorSet player, ActorSet enemy)
-        {
-            var playerResolutions = player.Focus.TurnContext.AttackResolutions;
-
-            var reflect = playerResolutions.Where(a => a.DelayRounds == 0).ToList();
-
-            playerResolutions.RemoveAll(a => reflect.Contains(a));
-
-            reflect.ForEach(a => 
-            { 
-                a.DelayRounds = 1; 
-                a.Source = player;
-            });
-
-            playerResolutions.AddRange(reflect);
         }
     }
 }

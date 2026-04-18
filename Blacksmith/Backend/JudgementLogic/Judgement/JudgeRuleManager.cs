@@ -1,4 +1,5 @@
 using Blacksmith.Backend.JudgementLogic.Core;
+using Blacksmith.Backend.JudgementLogic.Judgement.Core;
 using Blacksmith.Backend.JudgementLogic.TurnContexts;
 using Blacksmith.Backend.Utils;
 
@@ -8,60 +9,90 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
     {
         public class StageRuleContainer
         {
-            private enum Mark
+            public class RuleUnit
             {
-                Before,
-                Override,
-                After
+                public int RemainingRounds;
+                public int DelayRounds;
+                public Action<ActorSet, ActorSet> Rule;
+                public void TimePass()
+                {
+                    if(DelayRounds > 0)
+                    {
+                        DelayRounds--;
+                    }
+                    else
+                    {
+                        RemainingRounds--;
+                    }
+                }
+                public RuleUnit(int remainingRounds, int delayRounds, Action<ActorSet, ActorSet> rule)
+                {
+                    RemainingRounds = remainingRounds;
+                    DelayRounds = delayRounds;
+                    Rule = rule;
+                }
             }
             private readonly Action<ActorSet, ActorSet> _baseRule;
-            private Action<ActorSet, ActorSet>? _overrideRule; // 非对合
-            public readonly List<Action<ActorSet, ActorSet>> _modifiersBefore = new();
-            public readonly List<Action<ActorSet, ActorSet>> _modifiersAfter = new();
+            private readonly List<RuleUnit> _overrideRules = new();
+            public readonly List<RuleUnit> _modifiersBefore = new();
+            public readonly List<RuleUnit> _modifiersAfter = new();
             public StageRuleContainer(Action<ActorSet, ActorSet> baseRule)
             {
                 _baseRule = baseRule;
             }
-            public void SetOverride(Action<ActorSet, ActorSet>? rule)
+            public void AddOverride(RuleUnit ruleUnit)
             {
-                _overrideRule = rule;
+                _overrideRules.Add(ruleUnit);
             }
-            public void AddModifier(Action<ActorSet, ActorSet> rule, ModifierOrder modifierOrder)
+            public void AddModifier(RuleUnit ruleUnit, ModifierOrder modifierOrder)
             {
                 if (modifierOrder == ModifierOrder.Before)
                 {
-                    _modifiersBefore.Add(rule);
+                    _modifiersBefore.Add(ruleUnit);
                 }
                 else
                 {
-                    _modifiersAfter.Add(rule);
+                    _modifiersAfter.Add(ruleUnit);
                 }
             }
-            public void RemoveModifier(Action<ActorSet, ActorSet> rule, ModifierOrder modifierOrder)
+            public void Update()
             {
-                if (modifierOrder == ModifierOrder.Before)
-                {
-                    _modifiersBefore.Remove(rule);
-                }
-                else
-                {
-                    _modifiersAfter.Remove(rule);
-                }
+                _overrideRules.RemoveAll(o => o.RemainingRounds <= 0);
+                _modifiersBefore.RemoveAll(o => o.RemainingRounds <= 0);
+                _modifiersAfter.RemoveAll(o => o.RemainingRounds <= 0);
+
+                _overrideRules.ForEach(o => o.TimePass());
+                _modifiersBefore.ForEach(o => o.TimePass());
+                _modifiersAfter.ForEach(o => o.TimePass());
             }
             public Action<ActorSet, ActorSet> Build()
             {
+                Update();
+                var overrideRules = _overrideRules
+                    .Where(m => m.RemainingRounds == 0)
+                    .Select(m => m.Rule)
+                    .ToList();
+                var modifiersBefore = _modifiersBefore
+                    .Where(m => m.RemainingRounds == 0)
+                    .Select(m => m.Rule)
+                    .ToList();
+                var modifiersAfter = _modifiersAfter
+                    .Where(m => m.RemainingRounds == 0)
+                    .Select(m => m.Rule)
+                    .ToList();
+                var overrideRule = overrideRules.Count > 0 ? overrideRules[^1] : null;
                 return (player, enemy) =>
                 {
                     // BEFORE modifiers
-                    foreach (var rule in _modifiersBefore)
+                    foreach (var rule in modifiersBefore)
                     {
                         rule(player, enemy);
                     }
                     // 核心规则
-                    var core = _overrideRule ?? _baseRule;
+                    var core = overrideRule ?? _baseRule;
                     core(player, enemy);
                     // AFTER modifiers
-                    foreach (var rule in _modifiersAfter)
+                    foreach (var rule in modifiersAfter)
                     {
                         rule(player, enemy);
                     }
@@ -71,6 +102,10 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
 
         private readonly SortedDictionary<JudgeStage, StageRuleContainer> _ruleContainers = new()
         {
+            {
+                JudgeStage.OnBegin,
+                new((player, enemy) => { })
+            },
             {
                 JudgeStage.OnEffectTaking_AfterResolutionWritten,
                 new((player, enemy) => TakeEffects(EffectType.Instance.AfterResolutionWritten(), player, enemy))
@@ -106,6 +141,10 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
             {
                 JudgeStage.OnEffectTaking_AfterResult,
                 new((player, enemy) => TakeEffects(EffectType.Instance.AfterResult(), player, enemy))
+            },
+            {
+                JudgeStage.OnEnd,
+                new((player, enemy) => { })
             }
         };
         #region Default Rules（原有逻辑）
@@ -235,70 +274,21 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
 
             return result;
         }
-        public class ActiveJudgeRuleMark
+        public void AddJudgeRule(ActorSet source, DynamicJudgeRuleName.BEValue name)
         {
-            public string MutationName = "";
-            public int RemainingRounds;
-            public JudgeStage Stage;
-            public RuleType RuleType;
-            public ModifierOrder ModifierOrder;
-            public Action<ActorSet, ActorSet>? RuleRef;
-        }
-        private List<ActiveJudgeRuleMark> _activeJudgeRuleMarks = new();
-        public void AddJudgeRule(ActorSet source, string mutationName)
-        {
-            List<Mutation> mutations = JudgeRulePool.Query(source, mutationName);
+            List<Mutation> mutations = DynamicJudgeRulePool.Query(source, name);
             foreach (var mutation in mutations)
             {
-                ActiveJudgeRuleMark mark = new()
+                StageRuleContainer.RuleUnit unit = new(mutation.RemainingRounds, mutation.DelayRounds, mutation.JudgeRule);
+                if (mutation.RuleType == RuleType.Override)
                 {
-                    MutationName = mutationName,
-                    RemainingRounds = mutation.RemainingRounds,
-                    Stage = mutation.Stage,
-                    RuleType = mutation.RuleType,
-                    ModifierOrder = mutation.ModifierOrder,
-                    RuleRef = mutation.JudgeRule
-                };
-                if (mark.RuleType == RuleType.Override)
-                {
-                    int index = _activeJudgeRuleMarks.FindIndex(a => a.Stage == mark.Stage && a.RuleType == RuleType.Override);
-                    if (index > -1)
-                    {
-                        _activeJudgeRuleMarks.RemoveAt(index);
-                        _activeJudgeRuleMarks.Add(mark);
-                        _ruleContainers[mark.Stage].SetOverride(mutation.JudgeRule);
-                        return;
-                    }
-                    _activeJudgeRuleMarks.Add(mark);
-                    _ruleContainers[mark.Stage].SetOverride(mutation.JudgeRule);
+                    _ruleContainers[mutation.Stage].AddOverride(unit);
                 }
                 else
                 {
-                    _activeJudgeRuleMarks.Add(mark);
-                    _ruleContainers[mark.Stage].AddModifier(mutation.JudgeRule, mutation.ModifierOrder);
+                    _ruleContainers[mutation.Stage].AddModifier(unit, mutation.ModifierOrder);
                 }
             }
-        }
-        public void Update()
-        {
-            
-            foreach(var mark in _activeJudgeRuleMarks)
-            {
-                mark.RemainingRounds--;
-                if(mark.RemainingRounds > 0)
-                {
-                    continue;
-                }
-                if (mark.RuleType == RuleType.Override)
-                {
-                    _ruleContainers[mark.Stage].SetOverride(null);
-                }
-                else
-                {
-                    _ruleContainers[mark.Stage].RemoveModifier(mark.RuleRef!, mark.ModifierOrder);
-                }
-            }
-            _activeJudgeRuleMarks.RemoveAll(a => a.RemainingRounds <= 0);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Blacksmith.Backend.JudgementLogic.TurnContexts
 {
     public enum AttackStage
     {
+        OnHitArmorFirstTime,
         OnEnd
     }
     public class AttackResolution : IResolution

@@ -43,7 +43,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic
             protected readonly ActorSet _owner; 
             protected List<Sentence> _sentences = new();
             protected Stack<Sentence> _rhetoricCache = new();
-            protected List<string> _mutationsOnCompile = new();
+            protected List<DynamicJudgeRuleName.BEValue> _mutationsOnCompile = new();
             protected SourceFile(SourceFile origin)
             {
                 _owner = origin._owner;
@@ -107,20 +107,39 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                         {
                             return;
                         }
+                        bool ifHitArmor = false;
                         if (resolution.Type != AttackType.Instance.Real())
                         {
                             var defenses = main.Defense.Get();
-
+                            var APList = new List<DefenseType.BEValue>()
+                            {
+                                DefenseType.Instance.ThornReduction(),
+                                DefenseType.Instance.CommonReduction(),
+                                DefenseType.Instance.RockArmor(),
+                                DefenseType.Instance.ReadlArmor(),
+                                DefenseType.Instance.CommonArmor()
+                            };
+                            var armorList = new List<DefenseType.BEValue>()
+                            {
+                                DefenseType.Instance.RockArmor(),
+                                DefenseType.Instance.ReadlArmor(),
+                                DefenseType.Instance.CommonArmor()
+                            };
                             foreach (var temp in defenses)
                             {
-                                if (temp.Type != DefenseType.Instance.RealReduction())
+                                if(!ifHitArmor && armorList.Contains(temp.Type))
+                                {
+                                    ifHitArmor = true;
+                                    resolution.RunStage(AttackStage.OnHitArmorFirstTime, main);
+                                }
+                                if (APList.Contains(temp.Type))
                                 {
                                     resolution.Power *= APFactor;
                                 }
                                 var res = temp.Work(resolution.Source.Focus, main, (int)resolution.Power, resolution.Type);
                                 resolution.Power = res.Item1;
                                 resolution.TotalDamage += res.Item2;
-                                if (temp.Type != DefenseType.Instance.RealReduction())
+                                if (APList.Contains(temp.Type))
                                 {
                                     resolution.Power = MathF.Ceiling(resolution.Power / APFactor);
                                 }
@@ -130,6 +149,10 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                                     return;
                                 }
                             }
+                        }
+                        if (!ifHitArmor)
+                        {
+                            resolution.RunStage(AttackStage.OnHitArmorFirstTime, main);
                         }
                         main.Health.LoseHP((int)resolution.Power);
                         resolution.TotalDamage += (int)resolution.Power;
@@ -218,9 +241,12 @@ namespace Blacksmith.Backend.SkillPackages.Logic
             {
                 return WriteFree(source => source.Focus.Resource.Use(type, need, ifCommonOnly));
             }
-            public SourceFile LinkJudgeRule(string ruleKey)
+            public SourceFile LinkJudgeRuleDynamic(
+                DynamicJudgeRuleName.BEValue ruleKey,
+                List<Mutation> mutations)
             {
                 _mutationsOnCompile.Add(ruleKey);
+                DynamicJudgeRulePool.RegistDynamic(ruleKey, mutations);
                 return this;
             }
         }
@@ -240,12 +266,8 @@ namespace Blacksmith.Backend.SkillPackages.Logic
         }
         public class AttackFile : SourceFile
         {
-            public AttackFile BloodSuck(float percent)
+            public AttackFile WithFree(AttackStage stage, Action<ActorSet?, Body, AttackResolution> action)
             {
-                var suck = (ActorSet? source, Body target, AttackResolution resolution) =>
-                {
-                    source?.Focus.Health.GainHP((int)MathF.Ceiling(resolution.Power * percent));
-                };
                 _rhetoricCache.Push(new((ActorSet source) =>
                 {
                     var list = source.Focus.TurnContext.AttackResolutions;
@@ -254,9 +276,31 @@ namespace Blacksmith.Backend.SkillPackages.Logic
                         return;
                     }
                     var last = list[^1];
-                    last.AddStage(AttackStage.OnEnd, suck);
+                    last.AddStage(stage, action);
                 }, SentenceType.Attack, StructureType.Rhetoric, _sentences[^1]));
                 return this;
+            }
+            public AttackFile WithBloodSuck(float percent)
+            {
+                var suck = (ActorSet? source, Body target, AttackResolution resolution) =>
+                {
+                    source?.Focus.Health.GainHP((int)MathF.Ceiling(resolution.Power * percent));
+                };
+                return WithFree(AttackStage.OnEnd, suck);
+            }
+            public AttackFile WithInterupt()
+            {
+                var interuptList = new List<ResourceType.BEValue>()
+                {
+                    ResourceType.Instance.Iron(),
+                    ResourceType.Instance.Gold_Iron(),
+                    ResourceType.Instance.Magic()
+                };
+                var interupt = (ActorSet? source, Body target, AttackResolution resolution) =>
+                {
+                    target.TurnContext.ResourceResolutions.RemoveAll(r => interuptList.Contains(r.Type));
+                };
+                return WithFree(AttackStage.OnHitArmorFirstTime, interupt);
             }
             public AttackFile(SourceFile self) : base(self)
             {

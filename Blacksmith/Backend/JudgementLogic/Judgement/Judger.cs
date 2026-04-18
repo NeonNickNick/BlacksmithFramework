@@ -34,7 +34,6 @@ namespace Blacksmith.Backend.JudgementLogic.Judgement
             _playerIntents = Compile(playerSfs);
             _enemyIntents = Compile(enemySfs);
             _onJudge();
-            JudgeRuleManager.Update();
         }
 
         public void TranslateIntentsToResolutions()

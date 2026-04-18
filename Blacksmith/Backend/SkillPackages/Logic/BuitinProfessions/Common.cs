@@ -2,6 +2,7 @@ using Blacksmith.Backend.Backend.SkillPackages.Logic;
 using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Defenses;
 using Blacksmith.Backend.JudgementLogic.Judgement;
+using Blacksmith.Backend.JudgementLogic.Judgement.Core;
 using Blacksmith.Backend.SkillPackages.Core;
 using Blacksmith.Infra.ExtensibleProfession;
 
@@ -135,7 +136,21 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
         {
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Instance.Space())
-                .LinkJudgeRule("reflect");
+                .LinkJudgeRuleDynamic(
+                    DynamicJudgeRuleName.Instance.Reflect(),
+                    new()
+                    {
+                        new(
+                            ReflectRule.EffectSwaping_Modifier_After,
+                            JudgeStage.OnEffectSwaping,
+                            RuleType.Modifier,
+                            ModifierOrder.After),
+						new(
+							ReflectRule.AttackSwaping_Modifier_After,
+							JudgeStage.OnAttackSwaping,
+							RuleType.Modifier,
+							ModifierOrder.After)
+					});
             return DSL.Create(sc.Self, pen);
         }
 
@@ -212,7 +227,22 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
                 });
             return DSL.Create(sc.Self, pen);
         }
-        public static void ExcludeAllProfessions(ActorSet source)
+		private bool LancerCheck(ISkillContext sc)
+		{
+			return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 3);
+		}
+		private DSL.SourceFile Lancer(ISkillContext sc)
+		{
+			Pen pen = sf => sf
+				.UseResource(3, ResourceType.Instance.Iron())
+				.WriteFree(source =>
+				{
+					ExcludeAllProfessions(source);
+					source.Focus.Skill.AddPackage(new Lancer());
+				});
+			return DSL.Create(sc.Self, pen);
+		}
+		public static void ExcludeAllProfessions(ActorSet source)
         {
 
             Professions.ForEach(p => source.Focus.Skill.RemoveSkill("common", p));
@@ -222,4 +252,35 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
             source.Focus.Skill.RemoveSkill("common", self);
         }
     }
+    public static class ReflectRule
+    {
+		public static void EffectSwaping_Modifier_After(ActorSet player, ActorSet enemy)
+		{
+			var playerResolutions = player.Focus.TurnContext.EffectResolutions;
+
+			var reflect = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToList();
+
+			playerResolutions.RemoveAll(e => reflect.Contains(e));
+
+			reflect.ForEach(e => e.DelayRounds = 1);
+
+			playerResolutions.AddRange(reflect);
+		}
+		public static void AttackSwaping_Modifier_After(ActorSet player, ActorSet enemy)
+		{
+			var playerResolutions = player.Focus.TurnContext.AttackResolutions;
+
+			var reflect = playerResolutions.Where(a => a.DelayRounds == 0).ToList();
+
+			playerResolutions.RemoveAll(a => reflect.Contains(a));
+
+			reflect.ForEach(a =>
+			{
+				a.DelayRounds = 1;
+				a.Source = player;
+			});
+
+			playerResolutions.AddRange(reflect);
+		}
+	}
 }
