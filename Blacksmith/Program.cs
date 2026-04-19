@@ -12,11 +12,12 @@ namespace Blacksmith
 {
     public static class Program
     {
-        public static void Main()
+        public static void Main(string[] args)
         {
             PluginLoader.Initialize(AppContext.BaseDirectory);
             LoadBlacksmithEnumModifierPlugins();
             LoadProfessionPlugins();
+            
             //Selector.StartSelect();
             GeneralStrategyParams? param = null;
             try
@@ -32,7 +33,32 @@ namespace Blacksmith
                 new BloodSigilStrategy(),
                 new GeneralStrategy(param)
             };
-            ConsoleFrontend.Start(strategies);
+
+            Console.WriteLine("Welcome!\n");
+            Console.WriteLine(">1 -> Cli");
+            Console.WriteLine(">2 -> Web");
+            while (true)
+            {
+                Console.Write(">");
+                string? input = Console.ReadLine();
+                if(input == null)
+                {
+                    continue;
+                }
+                if(int.TryParse(input, out var value))
+                {
+                    if(value == 1)
+                    {
+                        ConsoleFrontend.Start(strategies);
+                    }
+                    if(value == 2)
+                    {
+                        LocalHost.Start(strategies);
+                    }
+                }
+            }
+
+            
         }
         private static void LoadBlacksmithEnumModifierPlugins()
         {

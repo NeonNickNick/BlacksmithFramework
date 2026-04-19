@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blacksmith UI</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+
+        <h1>Blacksmith Battle</h1>
+
+        <div class="card">
+            <select id="strategy"></select>
+            <button id="startBtn">Start</button>
+        </div>
+
+        <div class="card control-panel">
+            <input id="skill" placeholder="your skill param" />
+            <input id="eskill" placeholder="enemy skill param (manual only)" />
+            <button id="declareBtn">Declare</button>
+        </div>
+
+        <div class="card turn-view">
+            <div class="turn-header">
+                <button id="prevBtn">◀</button>
+                <span id="turnIndex">Turn 0</span>
+                <button id="nextBtn">▶</button>
+            </div>
+
+            <div class="turn-content">
+                <div class="side">
+                    <h3>You</h3>
+                    <div id="pHP"></div>
+                </div>
+
+                <div class="center">
+                    <div id="actionText"></div>
+                    <pre id="detailLog"></pre>
+                </div>
+
+                <div class="side">
+                    <h3>Enemy</h3>
+                    <div id="eHP"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/state.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

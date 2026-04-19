@@ -13,7 +13,7 @@ namespace Blacksmith.Frontend
             BackendStarter backendStarter = new();
             GameInstance gameInstance = backendStarter.StartBackend();
             //打印提示
-            Console.WriteLine("Welcome!");
+            Console.WriteLine("Welcome to BlacksmithFramework Cli!");
             Console.WriteLine();
             Console.WriteLine("sys::out >> Select enemy control mode:");
             Console.WriteLine("sys::out >> 1 - Manual (control Robert yourself)");
