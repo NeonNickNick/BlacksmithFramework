@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Judgement;
@@ -6,12 +7,14 @@ using Blacksmith.FrontendBackendInterface;
 
 namespace Blacksmith.AI.Strategies
 {
+
     public class GeneralStrategy : IAIStrategy
     {
         public string Name => "General";
 
         private GameInstance _main = null!;
-        private Random _random = new Random();
+        private static ThreadLocal<Random> _random =
+    new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
 
         // MCTS 参数
         private const int MaxIterations = 5000;
@@ -25,25 +28,70 @@ namespace Blacksmith.AI.Strategies
 
         public (string skillName, int param) ChooseSkill(ActorSet self, ActorSet opponent)
         {
-            var rootState = _main.DeepCopy();
+            int threadCount = Math.Min(8, Environment.ProcessorCount);
 
+            var tasks = new List<Task<List<MCTSNode>>>();
+
+            for (int t = 0; t < threadCount; t++)
+            {
+                tasks.Add(Task.Run(() =>
+                {
+                    var localGame = _main.DeepCopy();
+                    return RunMCTS(localGame, MaxIterations / threadCount);
+                }));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+
+            // ===== 合并 root children =====
+            var merged = new Dictionary<(string, int), (double wins, int visits)>();
+
+            foreach (var task in tasks)
+            {
+                foreach (var child in task.Result)
+                {
+                    var action = child.Action!.Value;
+
+                    if (!merged.ContainsKey(action))
+                        merged[action] = (0, 0);
+
+                    var v = merged[action];
+                    v.wins += child.Wins;
+                    v.visits += child.Visits;
+
+                    merged[action] = v;
+                }
+            }
+
+            // 转回 node 结构（给你原来的采样函数用）
+            var finalChildren = merged.Select(kv =>
+            {
+                return new MCTSNode(null!, null!, new List<(string, int)>())
+                {
+                    Action = kv.Key,
+                    Wins = kv.Value.wins,
+                    Visits = kv.Value.visits
+                };
+            }).ToList();
+
+            return SampleFromTopK(finalChildren, _main.History.SkillHistory.Count);
+        }
+        private List<MCTSNode> RunMCTS(GameInstance rootState, int iterations)
+        {
             var rootActions = GetAllAvailable(rootState.Enemy, rootState);
-            if (rootActions.Count == 0)
-                return ("", 0);
-
             var root = new MCTSNode(rootState, null, rootActions);
 
-            for (int i = 0; i < MaxIterations; i++)
+            for (int i = 0; i < iterations; i++)
             {
                 var node = root;
 
-                // 1. Selection
+                // Selection
                 while (node.UntriedActions.Count == 0 && node.Children.Count > 0)
                 {
                     node = Select(node);
                 }
 
-                // 2. Expansion
+                // Expansion
                 if (node.UntriedActions.Count > 0)
                 {
                     var action = node.UntriedActions[0];
@@ -63,14 +111,11 @@ namespace Blacksmith.AI.Strategies
                     var child = new MCTSNode(nextState, node, nextActions);
                     child.Action = action;
 
-                    // ⭐ 提前注入一点局面价值（降低随机性影响）
-                    child.Wins += Evaluate(nextState) * 0.2;
-
                     node.Children.Add(child);
                     node = child;
                 }
 
-                // 3. Simulation（仍然走几步，但最终用Evaluate）
+                // Rollout
                 var simState = node.State.DeepCopy();
 
                 for (int d = 0; d < RolloutDepth; d++)
@@ -86,7 +131,7 @@ namespace Blacksmith.AI.Strategies
 
                 double result = Evaluate(simState);
 
-                // 4. Backpropagation
+                // Backprop
                 while (node != null)
                 {
                     node.Visits++;
@@ -95,7 +140,7 @@ namespace Blacksmith.AI.Strategies
                 }
             }
 
-            return SampleFromTopK(root.Children, root.State.History.SkillHistory.Count);
+            return root.Children;
         }
         private (string, int) SampleFromTopK(List<MCTSNode> children, int round)
         {
@@ -125,7 +170,7 @@ namespace Blacksmith.AI.Strategies
             }
 
             // 采样
-            double r = _random.NextDouble() * sum;
+            double r = _random.Value!.NextDouble() * sum;
             double acc = 0;
 
             for (int i = 0; i < topK.Count; i++)
@@ -139,9 +184,7 @@ namespace Blacksmith.AI.Strategies
 
             return topK.Last().Action!.Value;
         }
-        // =========================
-        // MCTS 节点
-        // =========================
+
 
         private class MCTSNode
         {
@@ -174,10 +217,6 @@ namespace Blacksmith.AI.Strategies
                 return uct;
             }).First();
         }
-
-        // =========================
-        // 评估函数（核心）
-        // =========================
 
         private double Evaluate(GameInstance state)
         {
@@ -327,16 +366,11 @@ namespace Blacksmith.AI.Strategies
             return score;
         }
 
-
         private bool IsTerminal(GameInstance state)
         {
             return state.Enemy.Focus.Health.HP <= 0 ||
                    state.Player.Focus.Health.HP <= 0;
         }
-
-        // =========================
-        // 动作生成（无污染版）
-        // =========================
 
         private (string, int) RandomAction(ActorSet actor, GameInstance instance)
         {
@@ -344,9 +378,8 @@ namespace Blacksmith.AI.Strategies
             if (actions.Count == 0)
                 return ("", 0);
 
-            return actions[_random.Next(actions.Count)];
+            return actions[_random.Value!.Next(actions.Count)];
         }
-
         private List<(string, int)> GetAllAvailable(ActorSet actor, GameInstance instance)
         {
             List<(string, int)> res = new();
@@ -361,7 +394,7 @@ namespace Blacksmith.AI.Strategies
                     "drill",
                     "recovery",
                     "shield",
-                    "thornshield",
+                    //"thornshield",
                     "mute"
                 };
                 if (useless.Contains(name))
