@@ -403,7 +403,7 @@ namespace Blacksmith.AI.Strategies
                 }
                 for (int i = 0; i <= 5; i++)
                 {
-                    if(name != "magicattack" && i > 0)
+                    if(name != "magicattack" && name != "spaceattack" && i > 0)
                     {
                         break;
                     }
