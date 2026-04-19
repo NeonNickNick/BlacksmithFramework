@@ -245,11 +245,7 @@ namespace Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions
         public static void ExcludeAllProfessions(ActorSet source)
         {
 
-            Professions.ForEach(p => source.Focus.Skill.RemoveSkill(nameof(Common), p));
-        }
-        public static void ExcludeNone(ActorSet source, string self)
-        {
-            source.Focus.Skill.RemoveSkill(nameof(Common), self);
+            Professions.ForEach(p => source.Focus.Skill.RemoveSkill(nameof(Common), p.ToLower()));
         }
     }
     public static class ReflectRule

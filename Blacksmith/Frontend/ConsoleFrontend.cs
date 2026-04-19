@@ -224,7 +224,7 @@ namespace Blacksmith.Frontend
                 -------------------------------------------------------------------------------------------------
                 You:
                 HP: {player.Health.HP}/{player.Health.MHP}
-                Resource: Iron: {player.Resource.QueryCommon(ResourceType.Instance.Iron())}/{player.Resource.QueryGold(ResourceType.Instance.Iron())}  Space: {player.Resource.QueryCommon(ResourceType.Instance.Space())}  Time: {player.Resource.QueryCommon(ResourceType.Instance.Time())}
+                Resource: Iron: {player.Resource.QueryCommon(ResourceType.Instance.Iron())}/{player.Resource.QueryGold(ResourceType.Instance.Iron())}  Space: {player.Resource.QueryCommon(ResourceType.Instance.Space())}  Time: {player.Resource.QueryCommon(ResourceType.Instance.Time())}  Magic: {player.Resource.QueryCommon(ResourceType.Instance.Magic())}
                 """);
             string ds = $"";
             player.Defense.Defenses.ForEach(d => ds += $"{d.Type}: {d.Power}  ");
@@ -237,7 +237,7 @@ namespace Blacksmith.Frontend
                 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 Robert:
                 HP: {enemy.Health.HP}/{enemy.Health.MHP}
-                Resource: Iron: {enemy.Resource.QueryCommon(ResourceType.Instance.Iron())}/{enemy.Resource.QueryGold(ResourceType.Instance.Iron())}  Space: {enemy.Resource.QueryCommon(ResourceType.Instance.Space())}  Time: {enemy.Resource.QueryCommon(ResourceType.Instance.Time())}
+                Resource: Iron: {enemy.Resource.QueryCommon(ResourceType.Instance.Iron())}/{enemy.Resource.QueryGold(ResourceType.Instance.Iron())}  Space: {enemy.Resource.QueryCommon(ResourceType.Instance.Space())}  Time: {enemy.Resource.QueryCommon(ResourceType.Instance.Time())}  Magic: {enemy.Resource.QueryCommon(ResourceType.Instance.Magic())}
                 """);
             ds = $"";
             enemy.Defense.Defenses.ForEach(d => ds += $"{d.Type}: {d.Power}  ");
