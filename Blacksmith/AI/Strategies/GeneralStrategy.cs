@@ -1,4 +1,4 @@
-using System.Text.Json;
+using Blacksmith.AI.Core;
 using Blacksmith.Backend.JudgementLogic.Actor;
 using Blacksmith.Backend.JudgementLogic.Core;
 using Blacksmith.Backend.JudgementLogic.Judgement;
@@ -7,52 +7,88 @@ using Blacksmith.FrontendBackendInterface;
 
 namespace Blacksmith.AI.Strategies
 {
-    public class GeneralStrategyParams
+    public class GeneralStrategyParams : StrategyParamBase
     {
-        public double TemperatureCoefficient { get; set; } = 0.03; // 原 0.03 * round
+        public GeneralStrategyParams() : base() { }
+        public GeneralStrategyParams(GeneralStrategyParams other) : base(other) { }
+
+        public GeneralStrategyParams GetMutation(Random rand, double MutationScale)
+        {
+            double Mut(double v)
+            {
+                double noise = (rand.NextDouble() * 2 - 1);
+                return v * (1 + noise * MutationScale);
+            }
+            GeneralStrategyParams res = new(this);
+            foreach(var name in res._fieldDict.Keys)
+            {
+                double value = (double)res._fieldDict[name].GetValue(res)!;
+                res._fieldDict[name].SetValue(res, Mut(value));
+            }
+            return res;
+        }
+        public GeneralStrategyParams GetCrossWith(Random rand, GeneralStrategyParams other)
+        {
+            double Pick(double a, double b)
+            {
+                return rand.NextDouble() < 0.5 ? a : b;
+            }
+            GeneralStrategyParams res = new();
+            foreach(var name in res._fieldDict.Keys)
+            {
+                double a = (double)this._fieldDict[name].GetValue(this)!;
+                double b = (double)other._fieldDict[name].GetValue(other)!;
+                res._fieldDict[name].SetValue(res, Pick(a, b));
+            }
+            return res;
+        }
+        public double TemperatureCoefficient  = 0.03; // 原 0.03 * round
 
         // 终局奖励/惩罚
-        public double TerminalWinScore { get; set; } = 1e9;
-        public double TerminalLoseScore { get; set; } = -1e9;
+        public double WinScore  = 1e9;
+        public double LoseScore  = -1e9;
+
+        //交叉权重
+        public double PlayerResourceEnemyHPRatio = 100;
+        public double EnemyResourcePlayerHPRatio = 100;
 
         // ========== 早期资源权重 ==========
-        public double EarlyIronWeight { get; set; } = 1200;
-        public double EarlyExcessIronWeight { get; set; } = 1200;     // 超过4铁时的额外奖励
-        public double EarlySpaceWeight { get; set; } = 4000;
-        public double EarlyTimeWeight { get; set; } = 3500;
-        public double EarlyMagicWeight { get; set; } = 2000;
-        public double EarlyIronOverstockPenalty { get; set; } = 80;   // 超过5铁的惩罚
+        public double EarlyIronWeight  = 1200;
+        public double EarlyExcessIronWeight  = 1200;     // 超过4铁时的额外奖励
+        public double EarlySpaceWeight  = 4000;
+        public double EarlyTimeWeight  = 3500;
+        public double EarlyDefaultWeight = 2000;
+        public double EarlyIronOverstockPenalty  = 80;   // 超过7铁的惩罚
 
         // ========== 中期资源权重 ==========
-        public double MidIronWeight { get; set; } = 60;
-        public double MidSpaceWeight { get; set; } = 200;
-        public double MidTimeWeight { get; set; } = 180;
-        public double MidMagicWeight { get; set; } = 120;
+        public double MidIronWeight  = 300;
+        public double MidSpaceWeight  = 1000;
+        public double MidTimeWeight  = 900;
+        public double MidDefaultWeight = 600;
 
         // ========== 后期资源权重 ==========
-        public double LateIronWeight { get; set; } = 20;
-        public double LateSpaceWeight { get; set; } = 50;
-        public double LateTimeWeight { get; set; } = 50;
-        public double LateMagicWeight { get; set; } = 30;
+        public double LateIronWeight  = 100;
+        public double LateSpaceWeight  = 250;
+        public double LateTimeWeight  = 250;
+        public double LateDefaultWeight = 150;
 
         // ========== 职业相关 ==========
-        public double HaveProfessionBonus { get; set; } = 500;
-        public double EnemyHasProfessionPenalty { get; set; } = -800;
-        public double IronDeficitPenaltyWhenEnemyHasProfession { get; set; } = -300;
-        public double IronDeficitPenaltyWhenBothNoProfession { get; set; } = -1000;
-        public double IronDeficitThreshold { get; set; } = 2;         // 铁差阈值
+        public double HaveProfessionBonus  = 500;
+        public double IronDeficitPenaltyWhenEnemyHasProfession  = 300;
+        public double IronDeficitPenaltyWhenBothNoProfession  = 1000;
+        public double IronDeficitThreshold  = 3;         // 铁差阈值
 
         // ========== 攻击策略权重 ==========
-        public double EarlyUnnecessaryAttackPenaltyMultiplier { get; set; } = 30;    // (100 - HP) * 30
-        public double MidAdvantageAttackBonusMultiplier { get; set; } = 2;           // hpDiff * 2
-        public double MidUnnecessaryAttackPenaltyMultiplier { get; set; } = 10;      // (100 - HP) * 10
-        public double WithProfessionDamageBonusMultiplier { get; set; } = 20;        // (100 - HP) * 20
-        public double WithProfessionHpDiffBonusMultiplier { get; set; } = 5;         // hpDiff * 5
-        public double HpAdvantageThreshold { get; set; } = 20;                       // hpDiff > 20 才算优势
+        public double EarlyUnnecessaryAttackPenaltyMultiplier  = 30;    // (100 - HP) * 30
+        public double MidAdvantageAttackBonusMultiplier  = 2;           // hpDiff * 2
+        public double MidUnnecessaryAttackPenaltyMultiplier  = 10;      // (100 - HP) * 10
+        public double WithProfessionDamageBonusMultiplier  = 20;        // (100 - HP) * 20
+        public double WithProfessionHpDiffBonusMultiplier  = 5;         // hpDiff * 5
+        public double HpAdvantageThreshold  = 20;                       // hpDiff > 20 才算优势
 
         // ========== 回合节奏 ==========
-        public double EarlyRoundBonusPerRound { get; set; } = 1;
-        public double LateRoundPenaltyPerRound { get; set; } = 4;
+        public double EarlyRoundBonusPerRound  = 1;
+        public double LateRoundPenaltyPerRound  = 40;
     }
     public class GeneralStrategy : IAIStrategy
     {
@@ -259,15 +295,17 @@ namespace Blacksmith.AI.Strategies
             double enemyMagic = enemy.Focus.Resource.QueryAll(ResourceType.Instance.Magic());
 
             double playerIron = player.Focus.Resource.QueryAll(ResourceType.Instance.Iron());
+            double playerSpace = player.Focus.Resource.QueryAll(ResourceType.Instance.Space());
+            double playerMagic = player.Focus.Resource.QueryAll(ResourceType.Instance.Magic());
 
             bool haveProfession = enemy.Focus.Skill.HaveProfession;
             bool playerHaveProfession = player.Focus.Skill.HaveProfession;
 
-            int round = state.History.SkillHistory.Count;
+            int round = state.History.SkillHistory.Count;//已经过的回合数
 
             // 终局
-            if (enemyHP <= 0) return _params.TerminalLoseScore;
-            if (playerHP <= 0) return _params.TerminalWinScore;
+            if (enemyHP <= 0) return _params.LoseScore;
+            if (playerHP <= 0) return _params.WinScore;
 
             double score = 0;
 
@@ -275,6 +313,16 @@ namespace Blacksmith.AI.Strategies
             bool early = round < 8;
             bool mid = round >= 8 && round < 15;
             bool late = round >= 15;
+
+            //0 交叉关注
+            //引入双方铁和生命值之间的关系
+            score -= 
+                ((playerIron + 3 * playerSpace + 2 * playerMagic) / (enemyHP + 1e-6 )) * 
+                    _params.PlayerResourceEnemyHPRatio;
+            
+            score += 
+                ((enemyIron + 3 * enemySpace + 2 * enemyMagic) / (playerHP + 1e-6)) *
+                    _params.EnemyResourcePlayerHPRatio;
 
             // 1️⃣ 资源系统
             double resourceScore = 0;
@@ -284,40 +332,46 @@ namespace Blacksmith.AI.Strategies
                 resourceScore += Math.Max(0, enemyIron - 4) * _params.EarlyExcessIronWeight;
                 resourceScore += enemySpace * _params.EarlySpaceWeight;
                 resourceScore += enemyTime * _params.EarlyTimeWeight;
-                resourceScore += enemyMagic * _params.EarlyMagicWeight;
-                resourceScore -= Math.Max(0, enemyIron - 5) * _params.EarlyIronOverstockPenalty;
+                resourceScore += enemyMagic * _params.EarlyDefaultWeight;
+                resourceScore -= Math.Max(0, enemyIron - 7) * _params.EarlyIronOverstockPenalty;
             }
             else if (mid)
             {
                 resourceScore += enemyIron * _params.MidIronWeight;
                 resourceScore += enemySpace * _params.MidSpaceWeight;
                 resourceScore += enemyTime * _params.MidTimeWeight;
-                resourceScore += enemyMagic * _params.MidMagicWeight;
+                resourceScore += enemyMagic * _params.MidDefaultWeight;
             }
             else // late
             {
                 resourceScore += enemyIron * _params.LateIronWeight;
                 resourceScore += enemySpace * _params.LateSpaceWeight;
                 resourceScore += enemyTime * _params.LateTimeWeight;
-                resourceScore += enemyMagic * _params.LateMagicWeight;
+                resourceScore += enemyMagic * _params.LateDefaultWeight;
             }
             score += resourceScore;
 
             // 2️⃣ 职业系统
-            if (haveProfession)
+            if (haveProfession)//有职业就奖励
                 score += _params.HaveProfessionBonus;
 
             if (playerHaveProfession && !haveProfession)
             {
-                score += _params.EnemyHasProfessionPenalty;
+                if (round >= 8)
+                {
+                    //如果已经过了8回合还没有职业，给严厉惩罚
+                    score -= 5e8;
+                }
                 if (enemyIron - playerIron < _params.IronDeficitThreshold)
-                    score += _params.IronDeficitPenaltyWhenEnemyHasProfession;
+                {
+                    score -= _params.IronDeficitPenaltyWhenEnemyHasProfession;
+                }//如果玩家已经选了职业但是铁差小于3（可变）
             }
 
             if (!playerHaveProfession && !haveProfession)
             {
                 if (enemyIron - playerIron < 0)
-                    score += _params.IronDeficitPenaltyWhenBothNoProfession;
+                    score -= _params.IronDeficitPenaltyWhenBothNoProfession;
             }
 
             // 3️⃣ 攻击策略

@@ -43,10 +43,10 @@ namespace Blacksmith.AI.Optimizer
                     var p1 = TournamentSelect(scored);
                     var p2 = TournamentSelect(scored);
 
-                    var child = Crossover(p1, p2);
+                    var child = p1.GetCrossWith(_rand, p2);
 
                     if (_rand.NextDouble() < MutationRate)
-                        child = Mutate(child);
+                        child = child.GetMutation(_rand, MutationScale);
 
                     next.Add(child);
                 }
@@ -60,10 +60,6 @@ namespace Blacksmith.AI.Optimizer
                 .OrderByDescending(x => x.score)
                 .First().param;
         }
-
-        // =========================
-        // 评估
-        // =========================
         private List<(GeneralStrategyParams param, int score)> EvaluatePopulation(List<GeneralStrategyParams> pop)
         {
             var result = new List<(GeneralStrategyParams, int)>();
@@ -86,10 +82,6 @@ namespace Blacksmith.AI.Optimizer
 
             return result;
         }
-
-        // =========================
-        // 锦标赛选择
-        // =========================
         private GeneralStrategyParams TournamentSelect(List<(GeneralStrategyParams param, int score)> pop)
         {
             var candidates = new List<(GeneralStrategyParams, int)>();
@@ -99,79 +91,6 @@ namespace Blacksmith.AI.Optimizer
 
             return candidates.OrderByDescending(x => x.Item2).First().Item1;
         }
-
-        // =========================
-        // 交叉（均匀交叉）
-        // =========================
-        private GeneralStrategyParams Crossover(GeneralStrategyParams a, GeneralStrategyParams b)
-        {
-            return new GeneralStrategyParams
-            {
-                TemperatureCoefficient = Pick(a.TemperatureCoefficient, b.TemperatureCoefficient),
-
-                EarlyIronWeight = Pick(a.EarlyIronWeight, b.EarlyIronWeight),
-                EarlySpaceWeight = Pick(a.EarlySpaceWeight, b.EarlySpaceWeight),
-                EarlyTimeWeight = Pick(a.EarlyTimeWeight, b.EarlyTimeWeight),
-                EarlyMagicWeight = Pick(a.EarlyMagicWeight, b.EarlyMagicWeight),
-
-                MidIronWeight = Pick(a.MidIronWeight, b.MidIronWeight),
-                MidSpaceWeight = Pick(a.MidSpaceWeight, b.MidSpaceWeight),
-                MidTimeWeight = Pick(a.MidTimeWeight, b.MidTimeWeight),
-                MidMagicWeight = Pick(a.MidMagicWeight, b.MidMagicWeight),
-
-                LateIronWeight = Pick(a.LateIronWeight, b.LateIronWeight),
-                LateSpaceWeight = Pick(a.LateSpaceWeight, b.LateSpaceWeight),
-                LateTimeWeight = Pick(a.LateTimeWeight, b.LateTimeWeight),
-                LateMagicWeight = Pick(a.LateMagicWeight, b.LateMagicWeight),
-
-                HaveProfessionBonus = Pick(a.HaveProfessionBonus, b.HaveProfessionBonus),
-                EnemyHasProfessionPenalty = Pick(a.EnemyHasProfessionPenalty, b.EnemyHasProfessionPenalty),
-            };
-        }
-
-        private double Pick(double a, double b)
-        {
-            return _rand.NextDouble() < 0.5 ? a : b;
-        }
-
-        // =========================
-        // 变异（乘法噪声）
-        // =========================
-        private GeneralStrategyParams Mutate(GeneralStrategyParams p)
-        {
-            double Mut(double v)
-            {
-                double noise = (_rand.NextDouble() * 2 - 1);
-                return v * (1 + noise * MutationScale);
-            }
-
-            return new GeneralStrategyParams
-            {
-                TemperatureCoefficient = Mut(p.TemperatureCoefficient),
-
-                EarlyIronWeight = Mut(p.EarlyIronWeight),
-                EarlySpaceWeight = Mut(p.EarlySpaceWeight),
-                EarlyTimeWeight = Mut(p.EarlyTimeWeight),
-                EarlyMagicWeight = Mut(p.EarlyMagicWeight),
-
-                MidIronWeight = Mut(p.MidIronWeight),
-                MidSpaceWeight = Mut(p.MidSpaceWeight),
-                MidTimeWeight = Mut(p.MidTimeWeight),
-                MidMagicWeight = Mut(p.MidMagicWeight),
-
-                LateIronWeight = Mut(p.LateIronWeight),
-                LateSpaceWeight = Mut(p.LateSpaceWeight),
-                LateTimeWeight = Mut(p.LateTimeWeight),
-                LateMagicWeight = Mut(p.LateMagicWeight),
-
-                HaveProfessionBonus = Mut(p.HaveProfessionBonus),
-                EnemyHasProfessionPenalty = Mut(p.EnemyHasProfessionPenalty),
-            };
-        }
-
-        // =========================
-        // 初始化
-        // =========================
         private List<GeneralStrategyParams> InitPopulation()
         {
             var list = new List<GeneralStrategyParams>();
@@ -179,7 +98,7 @@ namespace Blacksmith.AI.Optimizer
             for (int i = 0; i < PopulationSize; i++)
             {
                 var p = new GeneralStrategyParams();
-                p = Mutate(p); // 从默认值扰动
+                p = p.GetMutation(_rand, MutationScale); // 从默认值扰动
                 list.Add(p);
             }
 

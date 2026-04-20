@@ -33,7 +33,7 @@ namespace Blacksmith
                 new BloodSigilStrategy(),
                 new GeneralStrategy(param)
             };
-
+            /*
             Console.WriteLine("Welcome!\n");
             Console.WriteLine(">1 -> Cli");
             Console.WriteLine(">2 -> Web");
@@ -57,8 +57,8 @@ namespace Blacksmith
                     }
                 }
             }
-
-            
+            */
+            ConsoleFrontend.Start(strategies);
         }
         private static void LoadBlacksmithEnumModifierPlugins()
         {
