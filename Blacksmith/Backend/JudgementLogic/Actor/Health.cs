@@ -4,7 +4,6 @@ namespace Blacksmith.Backend.JudgementLogic.Actor
     {
         public int HP { get; private set; }
         public int MHP { get; private set; }
-        public event Action<int, int> OnHealthChanged;
         public Health(int hp, int mhp)
         {
             HP = hp;
@@ -14,22 +13,18 @@ namespace Blacksmith.Backend.JudgementLogic.Actor
         {
             HP = hp;
             MHP = mhp;
-            OnHealthChanged?.Invoke(HP, MHP);
         }
         public void GainHP(int addition)
         {
             HP = (int)MathF.Min(MHP, HP + addition);
-            OnHealthChanged?.Invoke(HP, MHP);
         }
         public void GainMHP(int addition)
         {
             MHP += addition;
-            OnHealthChanged?.Invoke(HP, MHP);
         }
         public void LoseHP(int loss)
         {
             HP = HP - loss;
-            OnHealthChanged?.Invoke(HP, MHP);
         }
         public bool LoseMHP(int loss)
         {
@@ -39,7 +34,6 @@ namespace Blacksmith.Backend.JudgementLogic.Actor
             }
             MHP -= loss;
             HP = (int)MathF.Min(MHP, HP);
-            OnHealthChanged?.Invoke(HP, MHP);
             return true;
         }
     }

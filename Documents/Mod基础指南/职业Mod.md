@@ -1,154 +1,246 @@
-# 职业Mod
+﻿# 职业Mod
 [返回](./引言.md)
 
-本文档面向拿到本项目编译后DLL或源码并希望通过内部提供API添加新职业，并且不关心底层实现的开发者。具体说明如何实现一个职业Mod，如何使用项目提供的DSL以及一些重要的 API 与约定。
+本文档面向希望添加新职业、扩展已有职业技能，或者编写职业获得方式的开发者。
 
-目前Mod支持的功能具体包括：添加新职业、给内置职业添加新技能或覆盖其技能（无法修改被动技能，如驱动器时之盾），给Mod职业添加新技能或覆盖其技能（无法修改被动技能）。
+当前项目支持：
+- 添加新的主职业
+- 给内置职业添加或覆盖技能
+- 给 Mod 职业添加或覆盖技能
+- 通过修改 `Common` 职业，为玩家提供“获得新职业”的入口技能
 
-请先阅读：[枚举Mod](./枚举Mod.md)
+不建议把这篇文档当作底层实现文档；如果你需要理解动态规则、阶段判定和 `Mutation`，请阅读 [Mod进阶指南](../Mod进阶指南/引言.md)。
+
 ## 总体流程
-创建一个.NET 8类库项目，添加对游戏主程序导出的程序集Blacksmith.dll的引用。
 
-在项目中按照下面的步骤编写若干类。
+1. 创建一个 `.NET 8` 类库项目。
+2. 引用游戏主程序集 `Blacksmith.dll`。
+3. 编写一个 `MainProfession` 或 `ProfessionModifier`。
+4. 把编译产物放到游戏可执行文件所在目录。
+5. 启动游戏，程序会自动扫描并加载该 DLL。
 
-将编译产物放到游戏可执行文件所在目录，程序启动时会自动扫描并加载Mod。
+## 核心类型
 
-## APIs
-### 关于 ISkillContext
-这是一个技能上下文接口，验证玩家资源数量等均从此进入。在现有实现中，ISkillContext 提供：
-- sc.Self: 当前使用技能的一方（ActorSet实例）
-- sc.Param: 技能的参数（若技能需要参数，如恢复2）
+### `ISkillContext`
 
-Mod中可以直接按此约定访问 sc.Self / sc.Param；如果需要其它信息，请查看或引用项目中 ISkillContext 的真实定义
+技能检查函数和技能实现函数都使用 `ISkillContext`：
 
-### 关于Body和ActorSet
-玩家核心类为Body类。它包装在ActorSet类中备用（为幻书预留），当前可以只考虑直接访问，即sc.Self.Focus，即可获得玩家Body类
-可以通过Body类来查询玩家信息，重要入口如下：
-- ActorSet Body.Community 玩家所属的一方
-- int Body.Health.HP 生命值
-- int Body.Health.MHP 最大生命值
-- void Body.LoseHP(int)
-- void Body.LoseMHP(int)
-- void Body.GainHP(int)
-- void Body.GainMHP(int)
+```csharp
+public interface ISkillContext
+{
+    string SkillName { get; }
+    ActorSet Self { get; }
+    int Param { get; }
+}
+```
 
-- bool Body.Resource.Check(ResourceType, float, bool = false)//该bool参数用于控制是否只检查普通资源，例如只检查普通铁。即第一个参数类型为金铁只要bool参数设置正确就能正确工作
-- float Body.Resource.QueryCommon(ResourceType)//查询普通资源数量。传入金铁也能正确工作，但是不建议
-- float Body.Resource.QueryGold(ResourceType)//查询金资源数量。传入铁也能正常工作。对于其他资源，不存在金类型，不建议调用这个方法，因为必定返回0f
+你最常用的是：
+- `sc.Self`：当前施放技能的一方
+- `sc.Self.Focus`：当前施放者的主体 `Body`
+- `sc.Param`：技能参数
 
-- void Body.Skill.AddPackage(ISkillPackage)//无需关心这个接口，直接new一个职业类进去即可添加职业
-- void AddSkill(string packageName, string skillName)//使这个技能变得可用。请务必检查拼写正确且技能名全小写，包名与实际保持一致。传错什么都不会发生
-- void RemoveSkill(string packageName, string skillName)//使这个技能禁用。请务必检查拼写正确且技能名全小写，包名与实际保持一致。传错什么都不会发生
+## `ActorSet` 与 `Body`
 
-### DSL简介
-提供了一套链式DSL屏蔽底层实现，具有易懂的参数，不需要特别注释，可以用类似自然语言的方式编写技能。建议使用的编写格式为类似Python的缩进形式
+当前游戏主要使用 `ActorSet.Focus` 作为主角色。常见访问方式：
 
-总共有两种语句，第一种即最常见的攻击、防御、资源获取等。第二种为第一种中的特定语句所专用，例如吸血，只能跟在攻击的后面。
+```csharp
+var self = sc.Self;
+var body = sc.Self.Focus;
+```
 
-建议在开始编写前先加上
+常用信息包括：
+- `body.Health.HP`
+- `body.Health.MHP`
+- `body.Resource.Check(...)`
+- `body.Resource.QueryCommon(...)`
+- `body.Resource.QueryGold(...)`
+- `body.Skill.AddPackage(...)`
+- `body.Skill.AddSkill(...)`
+- `body.Skill.RemoveSkill(...)`
+
+注意：
+- 生命值修改是通过 `body.Health.GainHP(...)` / `LoseHP(...)` 等完成的。
+- 不是 `Body.LoseHP(...)`，而是 `Body.Health.LoseHP(...)`。
+
+## 技能是如何被识别的
+
+职业包和修改包都继承自 `SkillPackageBase`。系统会通过反射自动收集：
+- 名为 `XxxCheck` 的私有实例方法，签名必须是 `bool (ISkillContext)`
+- 名为 `Xxx` 的私有实例方法，签名必须是 `DSL.SourceFile (ISkillContext)`
+
+两者配对后，技能名会被自动转换为小写，例如：
+- `HolyBookCheck` + `HolyBook` -> 技能名 `holybook`
+- `SpaceAttackCheck` + `SpaceAttack` -> 技能名 `spaceattack`
+
+因此：
+- 技能方法必须是实例方法
+- 必须使用 `private`
+- 技能方法名与检查方法名必须严格对应
+
+## DSL 基础用法
+
+推荐先写上这两个别名：
+
 ```csharp
 using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
 using DSL = DSLforSkillLogic;
-/*伪代码：
-  Pen pen = ...
-  return DSL.Create(sc.Self, pen);
-*/
 ```
-建议一个技能只有这两句。return DSL.Create(sc.Self, pen)是返回的标准形式。接下来主要看前面。
-pen是一个组合了若干句子的委托，后面直接根据技能效果依次写语句即可：
-```csharp
-/*
-Pen pen = sf => sf
 
-.WriteAttack(power, AttackType, APFactor = 1, delayRounds = 0)//攻击
-.WriteDefense(power, DefenseBase defense, delayRounds = 0)//防御，注意这里需要手动构造防御类传进去。可以参考内置包
-.WriteResource(power, ResourceType, delayRounds = 0)//资源获取
-.WriteEffect(EffectType, List<EffectTag>, EffectTargetType, power, duration, action)//效果（建议谨慎使用）
-.WriteRecovery(power)//恢复
-.WriteFree(action) //自由语句，提供了与底层实现交互的方式
-.UseResource(need, ResourceType, ifCommonOnly = false)//使用资源
-.BloodSuck(percent)//百分比吸血
-.Interupt()//打断资源获取
-
-*/
-```
-接下来是一个详细的例子。
-## 编写职业Mod案例
-
-主程序集提供了反射方法来自动获取技能名和技能方法，因此只需要按照约定实现抽象类，编写技能方法即可方便地添加新职业。
-
-接下来假设来编写一个职业，装备它需要消耗1个铁，它只有一个技能“Joke”：生命值大于5时，消耗1个铁和1点HP和1点MHP，获取一个铁，恢复1点生命值，造成3点物理伤害和3点法术伤害。其中，法术伤害具有50%吸血效果。
+标准写法通常是：
 
 ```csharp
-namespace Example.Mod{
-    using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    using DSL = DSLforSkillLogic;
-    public class MyProfession : MainProfession{//主职业必须继承这个抽象类。类名即职业名
-        /*被动技能是可选的
-        public override DSL.SourceFile PassiveSkill(ISkillContext sc){
-            //此处即被动技能逻辑
-        }
-        */
-        //无需写构造函数
-        //必须为私有实例方法
-        private bool JokeCheck(ISkillContext sc){//方法名必须为$"{技能名}Check"，必须为bool(ISkillContext)。该方法作用在于检查技能是否能够使用
-            return sc.Self.Focus.Health.HP > 5 && sc.Self.Focus.Resource.Check(ResourceType.Iron, 1);
-        }
-        //必须为私有实例方法
-        private DSL.SourceFile Joke(ISkillContext sc){//方法名必须为$"{技能名}"，必须为DSL.SourceFile(ISkillContext)。该方法即技能逻辑，建议使用提供的DSL编写
-            Pen pen = sf => sf
-                .UseResource(1, ResourceType.Iron)
-                .WriteFree(source =>
-                    {
-                        source.Focus.Health.LoseHP(1);
-                        source.Focus.Health.LoseMHP(1);
-                    })
-                .WriteRecovery(1)
-                .WriteAttack(3, AttackType.Physical)
-                .WriteAttack(3, AttackType.Magic)
-                    .BloodSuck(0.5f);//注意必须跟在要吸血的攻击后面。这个专用语句不会影响前面的物理攻击
-            return DSL.Create(sc.Self, pen);
-        }
+private DSL.SourceFile SomeSkill(ISkillContext sc)
+{
+    Pen pen = sf => sf
+        .UseResource(1, ResourceType.Instance.Iron())
+        .WriteAttack(3, AttackType.Instance.Physical());
+
+    return DSL.Create(sc.Self, pen);
+}
+```
+
+常用 DSL 语句：
+- `WriteAttack(power, attackType, APFactor = 1, delayRounds = 0)`
+- `WriteDefense(power, defense, delayRounds = 0)`
+- `WriteResource(power, resourceType, delayRounds = 0)`
+- `WriteRecovery(power)`
+- `WriteEffect(...)`
+- `WriteFree(action)`
+- `UseResource(need, resourceType, ifCommonOnly = false)`
+- `WithBloodSuck(percent)`
+- `WithInterupt()`
+
+语义非常清楚
+
+说明：
+- `WithBloodSuck` 和 `WithInterupt` 是接在最近一条攻击后面的攻击修辞，且只修饰前一条攻击。修饰非攻击语句无法通过编译。
+- `AttackType`、`ResourceType` 等都应通过 `Instance` 访问，例如 `AttackType.Instance.Physical()`。
+
+## 示例一：编写一个新职业
+
+下面是一个最小主职业示例：
+
+```csharp
+using Blacksmith.Backend.Backend.SkillPackages.Logic;
+using Blacksmith.Backend.JudgementLogic.Core;
+using Blacksmith.Backend.SkillPackages.Core;
+using Blacksmith.Backend.SkillPackages.Logic;
+
+namespace Example.Mod;
+
+using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
+using DSL = DSLforSkillLogic;
+
+public class MyProfession : MainProfession
+{
+    private bool JokeCheck(ISkillContext sc)
+    {
+        return sc.Self.Focus.Health.HP > 5
+            && sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1);
+    }
+
+    private DSL.SourceFile Joke(ISkillContext sc)
+    {
+        Pen pen = sf => sf
+            .UseResource(1, ResourceType.Instance.Iron())
+            .WriteFree(source =>
+            {
+                source.Focus.Health.LoseHP(1);
+                source.Focus.Health.LoseMHP(1);
+            })
+            .WriteRecovery(1)
+            .WriteAttack(3, AttackType.Instance.Physical())
+            .WriteAttack(3, AttackType.Instance.Magical())
+                .WithBloodSuck(0.5f);
+
+        return DSL.Create(sc.Self, pen);
     }
 }
 ```
-在完成这个职业后还不够，我们还要让通用技能包知道原来可以添加这个新职业。因此必须给通用技能包写一个扩展技能
+
+要点：
+- 新职业继承 `MainProfession`
+- 职业名默认就是类名 `MyProfession`
+- 被动技能可选，重写 `PassiveSkill(ISkillContext sc)` 即可
+
+## 示例二：让 `Common` 提供一个“转职技能”
+
+如果你只写了 `MainProfession`，游戏并不会自动给玩家一个获得该职业的技能。
+常见做法是给 `Common` 写一个修改器：
 
 ```csharp
-namespace Example.Mod{
-    using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    using DSL = DSLforSkillLogic;
-    [IsProfessionModifier("Common")]//重要，必须注明修改的是哪个职业。字符串即职业名
-    public class CommonExtensionForMyProfession : ProfessionModifier{//修改器必须继承这个抽象类
-        /*被动技能即使写了也无效
-        public override DSL.SourceFile PassiveSkill(ISkillContext sc){
-            //此处即被动技能逻辑
-        }
-        */
-        //无需写构造函数
-        //必须为私有实例方法
-        private bool MyProfessionCheck(ISkillContext sc){//方法名必须为$"{技能名}Check"，必须为bool(ISkillContext)
-            return sc.Self.Focus.Resource.Check(ResourceType.Iron, 1);
-        }
-        //必须为私有实例方法
-        private DSL.SourceFile MyProfession(ISkillContext sc){//方法名必须为$"技能名"，必须为DSL.SourceFile(ISkillContext)
-            sc.Self.Focus.Skill.AddPackage(new MyProfession());//重要，必须写在前面，否则获得职业的那一回合被动技能不生效
-            Pen pen = sf => sf
-                .UseResource(1, ResourceType.Iron)
-                .WriteFree(source => 
-                { 
-                    Common.ExcludeAllProfessions(source);//重要，因为每局游戏只能有一个职业。这条代码复制即可，否则行为会不符合预期。
-                });
-            return DSL.Create(sc.Self, pen);
-        }
+using Blacksmith.Backend.Backend.SkillPackages.Logic;
+using Blacksmith.Backend.JudgementLogic.Core;
+using Blacksmith.Backend.SkillPackages.Core;
+using Blacksmith.Backend.SkillPackages.Logic;
+using Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions;
+using Blacksmith.Infra.Attributes;
+
+namespace Example.Mod;
+
+using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
+using DSL = DSLforSkillLogic;
+
+[IsProfessionModifier(nameof(Common))]
+public class CommonModifier : ProfessionModifier
+{
+    private bool MyProfessionCheck(ISkillContext sc)
+    {
+        return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 2);
+    }
+
+    private DSL.SourceFile MyProfession(ISkillContext sc)
+    {
+        sc.Self.Focus.Skill.AddPackage(new MyProfession());
+
+        Pen pen = sf => sf
+            .UseResource(2, ResourceType.Instance.Iron())
+            .WriteFree(source =>
+            {
+                Common.ExcludeAllProfessions(source);
+            });
+
+        return DSL.Create(sc.Self, pen);
     }
 }
 ```
-技能方法和技能校验方法必须为实例方法。对于与技能包状态无关的工具方法建议设为静态，与状态有关的方法名需要避开“Check”与所有可能的技能名，建议给这种方法名加特殊前缀防止偶然重名。
 
-进一步，结合之前的枚举扩展，可以在Mod种扩展防御类型枚举等以及自己定义新的枚举类型。
+这里有两个关键点：
+- `[IsProfessionModifier(nameof(Common))]` 表示这个修改器要挂到 `Common` 包上
+- `Common.ExcludeAllProfessions(source)` 用于保证同一局里只保留一个职业
 
-接下来打包即可。
+## 修改已有职业技能
+
+如果你想给现有职业增加技能或覆盖技能：
+- 继承 `ProfessionModifier`
+- 用 `[IsProfessionModifier("目标职业名")]` 指向目标职业
+- 在修改器里写新的 `SkillCheck` / `Skill` 方法
+
+当前加载逻辑会把修改器中的技能追加到目标职业包；如果技能名重复，对应的检查器和生成器会被覆盖。
+
+## 关于被动技能
+
+- `MainProfession` 可以重写 `PassiveSkill`。
+- `ProfessionModifier` 即使重写了 `PassiveSkill`，也不会像主职业那样被当作独立职业被加入玩家技能包；它的主要作用是给目标包补技能，而不是替代目标包的被动逻辑。
+- 因此，如果你想写一个职业自己的被动，请写在 `MainProfession` 中。
+
+## 与当前代码对齐的注意事项
+
+1. `AttackType` 里法术攻击名是 `Magical()`，不是 `Magic()`。
+2. `Body` 上没有直接的 `LoseHP` / `GainHP`；应通过 `body.Health` 调用。
+3. 资源和攻击类型应使用 `Instance` 获取，例如 `ResourceType.Instance.Iron()`。
+4. 技能名最终会转成全小写，手动调用 `AddSkill/RemoveSkill` 时也要使用全小写技能名。
+5. `Common` 是一个真实职业包，修改 `Common` 是提供转职入口最常见的方式。
+
+## 参考示例
+
+可以直接参考仓库内的真实 Mod：
+- `ModExamples/HolyBookMod/HolyBook.cs`
+- `ModExamples/HolyBookMod/CommonModifier.cs`
+- `ModExamples/HolyBookMod/EnumExtension.cs`
 
 ## 温馨提示
-该方案不保证多个Mod能够兼容。如果两个Mod都修改了同一个技能，那么后被主程序加载的会生效。可以通过调整文件名来实现控制生效。如果两个Mod定义了同一个职业，游戏会直接抛出异常。有关更高级的Mod编写，例如自由语句，规则链接的完整功能请见文档[Mod 进阶指南](./ModAdvanced.md)
+
+1. 多个 Mod 如果修改了同一技能，后加载的会生效。
+2. 如果两个 Mod 定义了同名职业，程序会抛出异常。
+3. 职业 Mod 往往会同时依赖枚举扩展与 DSL，建议先读完基础指南，再进入进阶指南。
