@@ -1,20 +1,21 @@
-﻿# 职业Mod
+# 职业Mod
 [返回](./引言.md)
 
 本文档面向希望添加新职业、扩展已有职业技能，或者编写职业获得方式的开发者。
 
 当前项目支持：
+
 - 添加新的主职业
 - 给内置职业添加或覆盖技能
 - 给 Mod 职业添加或覆盖技能
 - 通过修改 `Common` 职业，为玩家提供“获得新职业”的入口技能
 
-不建议把这篇文档当作底层实现文档；如果你需要理解动态规则、阶段判定和 `Mutation`，请阅读 [Mod进阶指南](../Mod进阶指南/引言.md)。
+如果你需要理解动态规则、阶段判定和 `Mutation`，请阅读 [Mod进阶指南](../Mod进阶指南/引言.md)。
 
 ## 总体流程
 
 1. 创建一个 `.NET 8` 类库项目。
-2. 引用游戏主程序集 `Blacksmith.dll`。
+2. 引用 `BlacksmithCore.csproj`，或者引用编译后的 `BlacksmithCore.dll`。
 3. 编写一个 `MainProfession` 或 `ProfessionModifier`。
 4. 把编译产物放到游戏可执行文件所在目录。
 5. 启动游戏，程序会自动扫描并加载该 DLL。
@@ -35,11 +36,12 @@ public interface ISkillContext
 ```
 
 你最常用的是：
+
 - `sc.Self`：当前施放技能的一方
 - `sc.Self.Focus`：当前施放者的主体 `Body`
 - `sc.Param`：技能参数
 
-## `ActorSet` 与 `Body`
+### `ActorSet` 与 `Body`
 
 当前游戏主要使用 `ActorSet.Focus` 作为主角色。常见访问方式：
 
@@ -49,6 +51,7 @@ var body = sc.Self.Focus;
 ```
 
 常用信息包括：
+
 - `body.Health.HP`
 - `body.Health.MHP`
 - `body.Resource.Check(...)`
@@ -59,20 +62,24 @@ var body = sc.Self.Focus;
 - `body.Skill.RemoveSkill(...)`
 
 注意：
+
 - 生命值修改是通过 `body.Health.GainHP(...)` / `LoseHP(...)` 等完成的。
 - 不是 `Body.LoseHP(...)`，而是 `Body.Health.LoseHP(...)`。
 
 ## 技能是如何被识别的
 
 职业包和修改包都继承自 `SkillPackageBase`。系统会通过反射自动收集：
+
 - 名为 `XxxCheck` 的私有实例方法，签名必须是 `bool (ISkillContext)`
 - 名为 `Xxx` 的私有实例方法，签名必须是 `DSL.SourceFile (ISkillContext)`
 
 两者配对后，技能名会被自动转换为小写，例如：
+
 - `HolyBookCheck` + `HolyBook` -> 技能名 `holybook`
 - `SpaceAttackCheck` + `SpaceAttack` -> 技能名 `spaceattack`
 
 因此：
+
 - 技能方法必须是实例方法
 - 必须使用 `private`
 - 技能方法名与检查方法名必须严格对应
@@ -100,6 +107,7 @@ private DSL.SourceFile SomeSkill(ISkillContext sc)
 ```
 
 常用 DSL 语句：
+
 - `WriteAttack(power, attackType, APFactor = 1, delayRounds = 0)`
 - `WriteDefense(power, defense, delayRounds = 0)`
 - `WriteResource(power, resourceType, delayRounds = 0)`
@@ -110,10 +118,9 @@ private DSL.SourceFile SomeSkill(ISkillContext sc)
 - `WithBloodSuck(percent)`
 - `WithInterupt()`
 
-语义非常清楚
-
 说明：
-- `WithBloodSuck` 和 `WithInterupt` 是接在最近一条攻击后面的攻击修辞，且只修饰前一条攻击。修饰非攻击语句无法通过编译。
+
+- `WithBloodSuck` 和 `WithInterupt` 都是接在最近一条攻击后面的攻击修辞，只修饰前一条攻击。
 - `AttackType`、`ResourceType` 等都应通过 `Instance` 访问，例如 `AttackType.Instance.Physical()`。
 
 ## 示例一：编写一个新职业
@@ -121,10 +128,10 @@ private DSL.SourceFile SomeSkill(ISkillContext sc)
 下面是一个最小主职业示例：
 
 ```csharp
-using Blacksmith.Backend.Backend.SkillPackages.Logic;
-using Blacksmith.Backend.JudgementLogic.Core;
-using Blacksmith.Backend.SkillPackages.Core;
-using Blacksmith.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Backend.SkillPackages.Core;
+using BlacksmithCore.Backend.SkillPackages.Logic;
 
 namespace Example.Mod;
 
@@ -159,22 +166,22 @@ public class MyProfession : MainProfession
 ```
 
 要点：
+
 - 新职业继承 `MainProfession`
 - 职业名默认就是类名 `MyProfession`
 - 被动技能可选，重写 `PassiveSkill(ISkillContext sc)` 即可
 
 ## 示例二：让 `Common` 提供一个“转职技能”
 
-如果你只写了 `MainProfession`，游戏并不会自动给玩家一个获得该职业的技能。
-常见做法是给 `Common` 写一个修改器：
+如果你只写了 `MainProfession`，游戏并不会自动给玩家一个获得该职业的技能。常见做法是给 `Common` 写一个修改器：
 
 ```csharp
-using Blacksmith.Backend.Backend.SkillPackages.Logic;
-using Blacksmith.Backend.JudgementLogic.Core;
-using Blacksmith.Backend.SkillPackages.Core;
-using Blacksmith.Backend.SkillPackages.Logic;
-using Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions;
-using Blacksmith.Infra.Attributes;
+using BlacksmithCore.Backend.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Backend.SkillPackages.Core;
+using BlacksmithCore.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.SkillPackages.Logic.BuitinProfessions;
+using BlacksmithCore.Infra.Attributes;
 
 namespace Example.Mod;
 
@@ -206,12 +213,14 @@ public class CommonModifier : ProfessionModifier
 ```
 
 这里有两个关键点：
-- `[IsProfessionModifier(nameof(Common))]` 表示这个修改器要挂到 `Common` 包上
-- `Common.ExcludeAllProfessions(source)` 用于保证同一局里只保留一个职业
+
+- `[IsProfessionModifier(nameof(Common))]` 表示这个修改器要挂到 `Common` 包上。
+- `Common.ExcludeAllProfessions(source)` 用于保证同一局里只保留一个主职业入口。
 
 ## 修改已有职业技能
 
 如果你想给现有职业增加技能或覆盖技能：
+
 - 继承 `ProfessionModifier`
 - 用 `[IsProfessionModifier("目标职业名")]` 指向目标职业
 - 在修改器里写新的 `SkillCheck` / `Skill` 方法
@@ -221,8 +230,8 @@ public class CommonModifier : ProfessionModifier
 ## 关于被动技能
 
 - `MainProfession` 可以重写 `PassiveSkill`。
-- `ProfessionModifier` 即使重写了 `PassiveSkill`，也不会像主职业那样被当作独立职业被加入玩家技能包；它的主要作用是给目标包补技能，而不是替代目标包的被动逻辑。
-- 因此，如果你想写一个职业自己的被动，请写在 `MainProfession` 中。
+- `ProfessionModifier` 的主要职责是给目标包补技能，不应把它当成独立职业来设计。
+- 如果你想写一个职业自己的被动，请优先写在 `MainProfession` 中。
 
 ## 与当前代码对齐的注意事项
 
@@ -234,13 +243,20 @@ public class CommonModifier : ProfessionModifier
 
 ## 参考示例
 
-可以直接参考仓库内的真实 Mod：
-- `ModExamples/HolyBookMod/HolyBook.cs`
-- `ModExamples/HolyBookMod/CommonModifier.cs`
-- `ModExamples/HolyBookMod/EnumExtension.cs`
+仓库中的示例 Mod 位于：
+
+- `Blacksmith/ModExamples/HolyBook.cs`
+- `Blacksmith/ModExamples/CommonModifier.cs`
+- `Blacksmith/ModExamples/EnumExtension.cs`
+
+它展示了：
+
+- 如何新增职业
+- 如何为 `Common` 添加转职入口
+- 如何扩展资源与防御枚举
 
 ## 温馨提示
 
-1. 多个 Mod 如果修改了同一技能，后加载的会生效。
+1. 多个 Mod 如果声明了同名技能，后写入字典的实现会覆盖前者；实际覆盖顺序取决于 DLL 扫描顺序。
 2. 如果两个 Mod 定义了同名职业，程序会抛出异常。
 3. 职业 Mod 往往会同时依赖枚举扩展与 DSL，建议先读完基础指南，再进入进阶指南。

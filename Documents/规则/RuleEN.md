@@ -1,5 +1,7 @@
 # "Blacksmith" Core Rulebook v1.0
 
+> Note: this file is currently better treated as a mechanics overview. If you need the latest implementation details, profession behavior, or exact numeric values, prefer the code under `Blacksmith/BlacksmithCore`.
+
 ## 1. Basic Logical Architecture
 
 ### 1.1 Core Mechanics

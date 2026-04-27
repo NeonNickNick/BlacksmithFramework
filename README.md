@@ -1,82 +1,66 @@
-# 简介
-这是一个打铁游戏框架，不仅支持原版打铁的所有规则，还有一个智能的人机（自适应Mod，基于MCTS+遗传算法选择参数），以及一套方便且自由的对游戏进行扩展的方法，具体包括：编写新职业。修改现有职业的技能。修改新职业的技能。新增一种攻击类型。新增一套枚举。向新增枚举中添加成员。
+# Blacksmith Framework
 
-默认打开localhost前端。具体规则请看[打铁规则](./Documents/规则/RuleCN.md)
+Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。当前仓库已经收敛为一个本地 Web 宿主：程序启动后会加载运行目录中的插件 DLL，初始化内置 AI，然后在 `http://localhost:5000` 提供静态前端和最小 API。
 
-技能代号必须使用全小写。
+## 当前仓库结构
 
-调试请选择Manual模式；Bloodsigil模式是血手大人；智能人机请选择General模式。
+- `Blacksmith/BlacksmithClient`
+  当前唯一宿主项目。负责启动 ASP.NET Core 本地站点、暴露 `/api/*` 接口，并托管 `wwwroot` 前端资源。
+- `Blacksmith/BlacksmithCore`
+  游戏核心库。包含判定引擎、技能 DSL、职业包系统、AI 策略、插件加载器，以及 Web 快照模型。
+- `Blacksmith/ModExamples`
+  示例 Mod 源码目录，展示“扩展枚举 + 新职业 + Common 修改器”的组合写法。
+- `Documents`
+  中文规则、Mod 指南和项目架构文档。
 
-# Mod支持
-允许通过添加新的.dll来自由地新增职业。该功能详见
+## 运行方式
 
-[Mod基础指南](./Documents/Mod基础指南/引言.md)
+1. 进入解决方案目录：
 
-[Mod进阶指南](./Documents/Mod进阶指南/引言.md)
+   ```powershell
+   cd .\Blacksmith
+   ```
 
-# 技能代号
+2. 启动本地宿主：
 
-## 完全支持
+   ```powershell
+   dotnet run --project .\BlacksmithClient\BlacksmithClient.csproj
+   ```
 
-| 技能 | 代号 | 备注 |
-| :--- | :--- | :--- |
-| 打铁 | iron | :--- |
-| 刺 | stick | :--- |
-| 钻 | drill | :--- |
-| 切 | slash | :--- |
-| 盾 | shield | 从0开始 |
-| 刺盾 | thornshield | 从0开始 |
-| 恢复 | recovery | 从0开始 |
-| 时间 | time | :--- |
-| 空间 | space | :--- |
-| 撕裂 | tear | :--- |
-| 转移 | reflect | Unsafe |
-| :--- | :--- | :--- |
-| 术士 | warlock | :--- |
-| 积魔 | magic | :--- |
-| 魔法 | magicattack | 从1开始 |
-| 禁言 | mute | :--- |
-| 献祭 | sacrifice | :--- |
-| 炼金术 | alchemy | :--- |
-| 点铁成金 | midastouch | :--- |
-| :--- | :--- | :--- |
-| 驱动器 | driver | :--- |
-| 空间冲击 | spaceattack | :--- |
-| 时空变换 | time2space | :--- |
-| 空时变换 | space2time | :--- |
-| 空间屏障 | spacebarrier | 从1开始 |
-| :--- | :--- | :--- |
-| 炮 | cannon | :--- |
-| 炮击 | strike | :--- |
-| 二连击 | doublestrike | :--- |
-| 三连击 | triplestrike | :--- |
-| 炮管 | cannonbarrel | :--- |
-| 穿甲弹 | apshell | :--- |
-| :--- | :--- | :--- |
-| 鲜血印记 | bloodsigil | :--- |
-| 血刃 | bloodblade | :--- |
-| 嗜血 | bloodlust | :--- |
-| 回血 | bloodrecovery | :--- |
-| 血之盾 | bloodshield | :--- |
-| 狂怒 | bloodrage | :--- |
-| :--- | :--- | :--- |
-| 战矛 | lancer | :--- |
-| 天击 | skystrike | :--- |
-| 霸碎 | tyrantdestruction | :--- |
-| 龙牙 | dragontooth | :--- |
-| 连突 | triplestab | :--- |
-| 蓄力 | charge | :--- |
-| 伏龙翔天 | risingdragon | :--- |
+3. 程序会在 `http://localhost:5000` 启动，并尝试自动打开浏览器。
 
-## 待支持
+## 当前模式
 
-| 技能 | 代号 | 备注 |
-| :--- | :--- | :--- |
-| 圣书 | holybook | :--- |
-| 十字架 | cross | :--- |
-| 方舟 | ark | :--- |
-| 亵渎 | blasphemy | :--- |
-| 重生 | rebirth | :--- |
-| 脱罪 | exoneration | :--- |
-| 圣光 | holylight | 暂不支持 |
-| 审判 | judgement | 暂不支持 |
+- `Manual`
+  双方技能都由前端手动输入，适合调试规则。
+- `BloodSigil`
+  使用 `BloodSigilStrategy`。
+- `General`
+  使用 `GeneralStrategy`，若存在 `data.json` 会读取其中的参数。
+
+## 内置内容概览
+
+当前核心库内置的职业包主要包括：
+
+- `Common`
+- `Warlock`
+- `Cannon`
+- `Driver`
+- `BloodSigil`
+- `Lancer`
+
+`holybook` 相关内容目前位于 `Blacksmith/ModExamples`，它是示例 Mod，而不是 `BlacksmithCore` 的内置职业。
+
+## 文档导航
+
+- [规则说明](./Documents/规则/RuleCN.md)
+- [Mod 基础指南](./Documents/Mod基础指南/引言.md)
+- [Mod 进阶指南](./Documents/Mod进阶指南/引言.md)
+- [项目架构](./Documents/项目架构.md)
+
+## 现状说明
+
+- 插件加载入口在 `BlacksmithClient/Program.cs`，会先扫描运行目录中的 `.dll`，再注册扩展枚举和职业包。
+- 当前前后端不是分离的两个可执行项目，而是 `BlacksmithClient` 单独承载前端静态资源和后端 API。
+- `BlacksmithCore` 目标框架为 `net8.0`，`BlacksmithClient` 目标框架为 `net9.0`。
+- `Blacksmith/ModExamples` 目录已经并入当前解决方案；如果你把它当成自己的起点，建议优先参考文档中的“当前命名空间”写法，而不是直接照抄历史代码。

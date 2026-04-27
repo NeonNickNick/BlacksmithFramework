@@ -16,6 +16,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Actor
         {
             Community = community;
         }
+
         public void Update()
         {
             Defense.Update();
