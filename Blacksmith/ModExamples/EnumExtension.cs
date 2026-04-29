@@ -1,5 +1,5 @@
-using Blacksmith.Backend.JudgementLogic.Core;
-using Blacksmith.Infra.Attributes;
+using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Infra.Attributes;
 
 namespace ModExamples.HolyBookMod
 {

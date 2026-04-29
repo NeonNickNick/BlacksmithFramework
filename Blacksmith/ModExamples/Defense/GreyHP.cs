@@ -1,7 +1,7 @@
-using Blacksmith.Backend.JudgementLogic.Actor;
-using Blacksmith.Backend.JudgementLogic.Core;
-using Blacksmith.Backend.JudgementLogic.Defenses;
-using Blacksmith.Infra.ExtensibleEnum;
+using BlacksmithCore.Backend.JudgementLogic.Actor;
+using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Backend.JudgementLogic.Defenses;
+using BlacksmithCore.Infra.ExtensibleEnum;
 
 namespace ModExamples.HolyBookMod.Defense
 {

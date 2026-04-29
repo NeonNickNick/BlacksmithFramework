@@ -1,9 +1,9 @@
-using Blacksmith.Backend.Backend.SkillPackages.Logic;
-using Blacksmith.Backend.JudgementLogic.Core;
-using Blacksmith.Backend.SkillPackages.Core;
-using Blacksmith.Backend.SkillPackages.Logic;
-using Blacksmith.Backend.SkillPackages.Logic.BuitinProfessions;
-using Blacksmith.Infra.Attributes;
+using BlacksmithCore.Backend.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Backend.SkillPackages.Core;
+using BlacksmithCore.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.SkillPackages.Logic.BuitinProfessions;
+using BlacksmithCore.Infra.Attributes;
 
 namespace ModExamples.HolyBookMod
 {

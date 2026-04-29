@@ -1,12 +1,12 @@
-using Blacksmith.Backend.Backend.SkillPackages.Logic;
-using Blacksmith.Backend.JudgementLogic.Actor;
-using Blacksmith.Backend.JudgementLogic.Core;
-using Blacksmith.Backend.JudgementLogic.Defenses;
-using Blacksmith.Backend.JudgementLogic.Entities;
-using Blacksmith.Backend.JudgementLogic.Judgement;
-using Blacksmith.Backend.JudgementLogic.TurnContexts;
-using Blacksmith.Backend.SkillPackages.Core;
-using Blacksmith.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.Backend.SkillPackages.Logic;
+using BlacksmithCore.Backend.JudgementLogic.Actor;
+using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Backend.JudgementLogic.Defenses;
+using BlacksmithCore.Backend.JudgementLogic.Entities;
+using BlacksmithCore.Backend.JudgementLogic.Judgement;
+using BlacksmithCore.Backend.JudgementLogic.TurnContexts;
+using BlacksmithCore.Backend.SkillPackages.Core;
+using BlacksmithCore.Backend.SkillPackages.Logic;
 using ModExamples.HolyBookMod.Defense;
 namespace ModExamples.HolyBookMod
 {

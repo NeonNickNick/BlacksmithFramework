@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Blacksmith">
-      <HintPath>..\Blacksmith\bin\Debug\net8.0\Blacksmith.dll</HintPath>
+    <Reference Include="BlacksmithCore">
+      <HintPath>..\BlacksmithCore\bin\Debug\net8.0\BlacksmithCore.dll</HintPath>
     </Reference>
   </ItemGroup>
 
