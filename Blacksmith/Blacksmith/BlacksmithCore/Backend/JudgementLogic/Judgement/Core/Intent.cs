@@ -1,7 +1,9 @@
+using BlacksmithCore.Infra.Models;
+
 namespace BlacksmithCore.Backend.JudgementLogic.Judgement.Core
 {
     public class Intent
     {
-        public Action<ActorSet> Execute { get; set; }
+        public Action<Community> Execute { get; set; }
     }
 }

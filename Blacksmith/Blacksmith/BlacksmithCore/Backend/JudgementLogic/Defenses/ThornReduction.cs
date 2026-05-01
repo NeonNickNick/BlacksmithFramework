@@ -1,6 +1,6 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.SkillPackages;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Core;
 
 namespace BlacksmithCore.Backend.JudgementLogic.Defenses
 {
@@ -26,7 +26,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Defenses
             int absorbed = (int)MathF.Min(attack, Power);
             if (type == AttackType.Instance.Physical())
             {
-                DSL.Create(owner.Community, sf => sf.WriteAttack((int)MathF.Ceiling(absorbed / 2f), AttackType.Instance.Magical(), delayRounds: 1)).Compile().Execute(owner.Community);
+                DSL.Create(owner.Get<Community>(), sf => sf.WriteAttack((int)MathF.Ceiling(absorbed / 2f), AttackType.Instance.Magical(), delayRounds: 1)).Compile().Execute(owner.Get<Community>());
             }
             return (res, absorbed);
         }

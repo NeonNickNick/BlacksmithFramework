@@ -1,13 +1,14 @@
 using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
 using BlacksmithCore.Backend.SkillPackages;
+using BlacksmithCore.Infra.Models;
 
 namespace BlacksmithCore.Backend.JudgementLogic.Judgement
 {
     using DSL = DSLforSkillLogic;
     public class Judger
     {
-        public ActorSet Player { get; private set; }
-        public ActorSet Enemy { get; private set; }
+        public Community Player { get; private set; }
+        public Community Enemy { get; private set; }
         public JudgeRuleManager JudgeRuleManager { get; }
 
         private List<Intent> _playerIntents = new();
@@ -18,7 +19,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
         {
             (Player, Enemy) = (Enemy, Player);
         }
-        public Judger(ActorSet player, ActorSet enemy)
+        public Judger(Community player, Community enemy)
         {
             Player = player;
             Enemy = enemy;

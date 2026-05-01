@@ -1,8 +1,8 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-using BlacksmithCore.Backend.JudgementLogic.Core;
-using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Core;
 
-namespace BlacksmithCore.Backend.JudgementLogic.Entities
+namespace BlacksmithCore.Infra.Models.Particular
 {
     public class EffectEntity
     {

@@ -2,6 +2,7 @@ using System.Text.Json;
 using BlacksmithCore.AI.Optimizer;
 using BlacksmithCore.AI.Strategies;
 using BlacksmithCore.Driver;
+using BlacksmithCore.Infra.Models.Components;
 
 namespace BlacksmithCore.AI.NaturalSelection
 {
@@ -63,10 +64,10 @@ namespace BlacksmithCore.AI.NaturalSelection
         }
         private static int End(GameInstance gameInstance)
         {
-            if(gameInstance.Player.Focus.Health.HP <= 0)
+            if(gameInstance.Player.Focus.Get<Health>().HP <= 0)
             {
                 return 1;
-            }else if(gameInstance.Enemy.Focus.Health.HP <= 0)
+            }else if(gameInstance.Enemy.Focus.Get<Health>().HP <= 0)
             {
                 return -1;
             }

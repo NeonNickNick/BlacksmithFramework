@@ -1,8 +1,10 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.JudgementLogic.Defenses;
 using BlacksmithCore.Backend.JudgementLogic.Judgement;
 using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
-using BlacksmithCore.Backend.JudgementLogic.TurnContexts;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Components.Resolutions;
+using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 
 namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
@@ -20,7 +22,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
             .WriteRecovery(2);
         private bool _dark = false;
         private Pen _darkPen = sf => sf
-            .WriteFree(source => source.Focus.Health.LoseMHP(1))
+            .WriteFree(source => source.Focus.Get<Health>().LoseMHP(1))
             .WriteAttack(1, AttackType.Instance.Real(), delayRounds: 0)
             .WriteAttack(1, AttackType.Instance.Real(), delayRounds: 1);
 
@@ -59,7 +61,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         }
         private bool SkyStrikeCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
         private DSL.SourceFile SkyStrike(ISkillContext sc)
         {
@@ -72,7 +74,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         }
         private bool DragonToothCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
         private DSL.SourceFile DragonTooth(ISkillContext sc)
         {
@@ -85,7 +87,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         }
         private bool TyrantDestructionCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
         private DSL.SourceFile TyrantDestruction(ISkillContext sc)
         {
@@ -97,7 +99,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         }
         private bool TripleStabCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
         private DSL.SourceFile TripleStab(ISkillContext sc)
         {
@@ -116,7 +118,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         private bool _ifPassive = false;
         private bool RisingDragonCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), _chargeCost);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), _chargeCost);
         }
         private DSL.SourceFile RisingDragon(ISkillContext sc)
         {
@@ -127,7 +129,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         }
         private bool ChargeCheck(ISkillContext sc)
         {
-            return _chargeCount < 2 && sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), _chargeCost);
+            return _chargeCount < 2 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), _chargeCost);
         }
         private DSL.SourceFile Charge(ISkillContext sc)
         {
@@ -158,9 +160,9 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
                 });
             return DSL.Create(sc.Self, pen);
         }
-        private void AttackCanceling_Modifier_Before(ActorSet player, ActorSet enemy)
+        private void AttackCanceling_Modifier_Before(Community player, Community enemy)
         {
-            if (enemy.Focus.TurnContext.AttackResolutions.Find(a => a.DelayRounds == 0) == null)
+            if (enemy.Focus.Get<TurnContext>().Get<AttackResolution>().Find(a => a.DelayRounds == 0) == null)
             {
                 return;
             }

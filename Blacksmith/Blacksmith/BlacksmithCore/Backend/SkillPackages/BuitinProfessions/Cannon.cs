@@ -1,5 +1,6 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.JudgementLogic.Defenses;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 
 namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
@@ -14,7 +15,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         }
         private bool StrikeCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
         private DSL.SourceFile Strike(ISkillContext sc)
         {
@@ -26,7 +27,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool DoubleStrikeCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 2);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2);
         }
         private DSL.SourceFile DoubleStrike(ISkillContext sc)
         {
@@ -38,7 +39,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool TripleStrikeCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 3);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         private DSL.SourceFile TripleStrike(ISkillContext sc)
         {
@@ -50,7 +51,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool APShellCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
         private DSL.SourceFile APShell(ISkillContext sc)
         {

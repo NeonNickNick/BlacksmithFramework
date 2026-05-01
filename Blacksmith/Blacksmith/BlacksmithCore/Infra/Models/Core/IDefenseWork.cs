@@ -1,6 +1,6 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
+using BlacksmithCore.Infra.Models;
 
-namespace BlacksmithCore.Backend.JudgementLogic.Core
+namespace BlacksmithCore.Infra.Models.Core
 {
     public interface IDefenseWork
     {

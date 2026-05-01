@@ -1,8 +1,9 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
-using BlacksmithCore.Backend.JudgementLogic.Entities;
-namespace BlacksmithCore.Backend.JudgementLogic.Actor
+using BlacksmithCore.Infra.Models.Core;
+using BlacksmithCore.Infra.Models.Particular;
+using ClapInfra.ClapModels;
+namespace BlacksmithCore.Infra.Models.Components
 {
-    public class Effect
+    public class Effect : IUpdatePerRound
     {
         private readonly List<EffectEntity> _effects = new();
         public void Add(EffectEntity effectEntity)

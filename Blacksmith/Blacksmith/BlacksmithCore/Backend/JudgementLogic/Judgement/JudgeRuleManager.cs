@@ -1,7 +1,9 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
-using BlacksmithCore.Backend.JudgementLogic.TurnContexts;
 using BlacksmithCore.Backend.Utils;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Components.Resolutions;
+using BlacksmithCore.Infra.Models.Core;
 
 namespace BlacksmithCore.Backend.JudgementLogic.Judgement
 {
@@ -14,7 +16,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
             {
                 public int RemainingRounds;
                 public int DelayRounds;
-                public Action<ActorSet, ActorSet> Rule;
+                public Action<Community, Community> Rule;
                 public void TimePass()
                 {
                     if (DelayRounds > 0)
@@ -26,18 +28,18 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
                         RemainingRounds--;
                     }
                 }
-                public RuleUnit(int remainingRounds, int delayRounds, Action<ActorSet, ActorSet> rule)
+                public RuleUnit(int remainingRounds, int delayRounds, Action<Community, Community> rule)
                 {
                     RemainingRounds = remainingRounds;
                     DelayRounds = delayRounds;
                     Rule = rule;
                 }
             }
-            private readonly Action<ActorSet, ActorSet> _baseRule;
+            private readonly Action<Community, Community> _baseRule;
             private readonly List<RuleUnit> _overrideRules = new();
             public readonly List<RuleUnit> _modifiersBefore = new();
             public readonly List<RuleUnit> _modifiersAfter = new();
-            public StageRuleContainer(Action<ActorSet, ActorSet> baseRule)
+            public StageRuleContainer(Action<Community, Community> baseRule)
             {
                 _baseRule = baseRule;
             }
@@ -66,7 +68,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
                 _modifiersBefore.ForEach(o => o.TimePass());
                 _modifiersAfter.ForEach(o => o.TimePass());
             }
-            public Action<ActorSet, ActorSet> Build()
+            public Action<Community, Community> Build()
             {
                 Update();
                 var overrideRules = _overrideRules
@@ -149,19 +151,23 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
             }
         };
         #region Default Rules（原有逻辑）
-        private static void TakeEffects(EffectType.BEValue type, ActorSet player, ActorSet enemy)
+        private static void TakeEffects(EffectType.BEValue type, Community player, Community enemy)
         {
             foreach (var temp in player.ActorList)
-                temp.EffectEntityWork(type);
+            {
+                temp.Get<Effect>().Execute(type, temp);
+            }
 
             foreach (var temp in enemy.ActorList)
-                temp.EffectEntityWork(type);
+            {
+                temp.Get<Effect>().Execute(type, temp);
+            }
         }
 
-        private static void SwapEffects(ActorSet player, ActorSet enemy)
+        private static void SwapEffects(Community player, Community enemy)
         {
-            SwapEffects(player.Focus.TurnContext.EffectResolutions,
-                        enemy.Focus.TurnContext.EffectResolutions);
+            SwapEffects(player.Focus.Get<TurnContext>().Get<EffectResolution>(),
+                        enemy.Focus.Get<TurnContext>().Get<EffectResolution>());
         }
 
         private static void SwapEffects(List<EffectResolution> playerResolutions,
@@ -177,10 +183,10 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
             enemyResolutions.AddRange(playerTemp);
         }
 
-        private static void CancelAttacks(ActorSet player, ActorSet enemy)
+        private static void CancelAttacks(Community player, Community enemy)
         {
-            CancelAttackResolutions(player.Focus.TurnContext.AttackResolutions,
-                                    enemy.Focus.TurnContext.AttackResolutions);
+            CancelAttackResolutions(player.Focus.Get<TurnContext>().Get<AttackResolution>(),
+                                    enemy.Focus.Get<TurnContext>().Get<AttackResolution>());
         }
 
         private static void CancelAttackResolutions(List<AttackResolution> playerResolutions,
@@ -219,10 +225,10 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
             }
         }
 
-        private static void SwapAttacks(ActorSet player, ActorSet enemy)
+        private static void SwapAttacks(Community player, Community enemy)
         {
-            SwapAttacks(player.Focus.TurnContext.AttackResolutions,
-                        enemy.Focus.TurnContext.AttackResolutions);
+            SwapAttacks(player.Focus.Get<TurnContext>().Get<AttackResolution>(),
+                        enemy.Focus.Get<TurnContext>().Get<AttackResolution>());
         }
 
         private static void SwapAttacks(List<AttackResolution> playerResolutions,
@@ -237,24 +243,24 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
             playerResolutions.AddRange(enemyTemp);
             enemyResolutions.AddRange(playerTemp);
         }
-        private static void ApplyEffect(ActorSet player, ActorSet enemy)
+        private static void ApplyEffect(Community player, Community enemy)
         {
-            player.Focus.TurnContext.ExecuteEffect(player);
-            enemy.Focus.TurnContext.ExecuteEffect(enemy);
+            player.Focus.Get<TurnContext>().Execute<EffectResolution>(player);
+            enemy.Focus.Get<TurnContext>().Execute<EffectResolution>(enemy);
         }
-        private static void ApplyOthers(ActorSet player, ActorSet enemy)
+        private static void ApplyOthers(Community player, Community enemy)
         {
-            player.Focus.TurnContext.ExecuteDefense(player);
-            enemy.Focus.TurnContext.ExecuteDefense(enemy);
+            player.Focus.Get<TurnContext>().Execute<DefenseResolution>(player);
+            enemy.Focus.Get<TurnContext>().Execute<DefenseResolution>(enemy);
 
-            player.Focus.TurnContext.ExecuteAttack(player);
-            enemy.Focus.TurnContext.ExecuteAttack(enemy);
+            player.Focus.Get<TurnContext>().Execute<AttackResolution>(player);
+            enemy.Focus.Get<TurnContext>().Execute<AttackResolution>(enemy);
 
-            player.Focus.TurnContext.ExecuteResource(player);
-            enemy.Focus.TurnContext.ExecuteResource(enemy);
+            player.Focus.Get<TurnContext>().Execute<ResourceResolution>(player);
+            enemy.Focus.Get<TurnContext>().Execute<ResourceResolution>(enemy);
         }
 
-        private static void Update(ActorSet player, ActorSet enemy)
+        private static void Update(Community player, Community enemy)
         {
             foreach (var temp in player.ActorList)
                 temp.Update();
@@ -264,9 +270,9 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
         }
 
         #endregion
-        public Action<ActorSet, ActorSet> GetRule()
+        public Action<Community, Community> GetRule()
         {
-            Action<ActorSet, ActorSet> result = (a, b) => { };
+            Action<Community, Community> result = (a, b) => { };
 
             foreach (var stage in _ruleContainers.OrderBy(k => k.Key))
             {
@@ -279,7 +285,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
         {
             _dynamicPool.RegistDynamic(name, mutations);
         }
-        public void AddJudgeRule(ActorSet source, DynamicJudgeRuleName.BEValue name)
+        public void AddJudgeRule(Community source, DynamicJudgeRuleName.BEValue name)
         {
             List<Mutation> mutations = _dynamicPool.Query(source, name);
             foreach (var mutation in mutations)

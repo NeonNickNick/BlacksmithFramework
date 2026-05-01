@@ -1,7 +1,7 @@
 using BlacksmithCore.Infra.Attributes;
 using BlacksmithCore.Infra.Enum;
 
-namespace BlacksmithCore.Backend.JudgementLogic.Core
+namespace BlacksmithCore.Infra.Models.Core
 {
     public class ResourceType : BlacksmithEnum<ResourceType>
     {

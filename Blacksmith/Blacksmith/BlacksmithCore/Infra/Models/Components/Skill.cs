@@ -1,7 +1,7 @@
 using BlacksmithCore.Backend.SkillPackages;
 using BlacksmithCore.Backend.SkillPackages.BuitinProfessions;
 using BlacksmithCore.Infra.Profession;
-namespace BlacksmithCore.Backend.JudgementLogic.Actor
+namespace BlacksmithCore.Infra.Models.Components
 {
     using DSL = DSLforSkillLogic;
     public enum SkillDeclareResult

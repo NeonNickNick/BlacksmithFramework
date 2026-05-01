@@ -1,8 +1,9 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Infra.Models.Core;
+using ClapInfra.ClapModels;
 
-namespace BlacksmithCore.Backend.JudgementLogic.Actor
+namespace BlacksmithCore.Infra.Models.Components
 {
-    public class Defense
+    public class Defense : IUpdatePerRound
     {
         private List<DefenseBase> _defenses = new();
         public List<DefenseBase> Defenses => _defenses;

@@ -1,7 +1,7 @@
 using System.Reflection;
-using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Infra.Models.Core;
 
-namespace BlacksmithCore.Backend.JudgementLogic.Actor
+namespace BlacksmithCore.Infra.Models.Components
 {
 
     public class Resource
@@ -40,7 +40,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Actor
                     }
                     else
                     {
-                        Common -= (need - Gold);
+                        Common -= need - Gold;
                         Gold = 0;
                     }
                 }

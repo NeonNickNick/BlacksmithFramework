@@ -1,7 +1,8 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
-using BlacksmithCore.Backend.JudgementLogic.Judgement;
 using BlacksmithCore.Backend.SkillPackages.BuitinProfessions;
 using BlacksmithCore.Driver;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Core;
 
 namespace BlacksmithCore.AI.Strategies
 {
@@ -16,8 +17,8 @@ namespace BlacksmithCore.AI.Strategies
 
         }
         public (string skillName, int param) ChooseSkill(
-            ActorSet self,
-            ActorSet opponent)
+            Community self,
+            Community opponent)
         {
             _turn++;
 
@@ -27,14 +28,14 @@ namespace BlacksmithCore.AI.Strategies
             if (_turn == 8)
                 return ("bloodsigil", 0);
 
-            int hp = self.Focus.Health.HP;
+            int hp = self.Focus.Get<Health>().HP;
 
             if (hp <= 1)
                 return ("bloodrecovery", 0);
             if (hp <= 5)
                 return ("bloodrage", 0);
 
-            var packages = opponent.Focus.Skill.GetActivePackageNames();
+            var packages = opponent.Focus.Get<Skill>().GetActivePackageNames();
             string profession = packages.FirstOrDefault(p => p != nameof(Common)) ?? nameof(Common);
             int maxDmg = GetMaxSingleTurnDamage(opponent);
             bool killable = maxDmg >= hp + 2;
@@ -124,10 +125,10 @@ namespace BlacksmithCore.AI.Strategies
                 : ("bloodlust", 0);
         }
 
-        private int GetMaxSingleTurnDamage(ActorSet opponent)
+        private int GetMaxSingleTurnDamage(Community opponent)
         {
-            var skills = opponent.Focus.Skill.GetAvailableSkillNames();
-            var res = opponent.Focus.Resource;
+            var skills = opponent.Focus.Get<Skill>().GetAvailableSkillNames();
+            var res = opponent.Focus.Get<Resource>();
             int maxDmg = 0;
 
             // Common attacks
@@ -155,9 +156,9 @@ namespace BlacksmithCore.AI.Strategies
                 maxDmg = Math.Max(maxDmg, 11);
 
             // BloodSigil attacks
-            if (skills.Contains("bloodblade") && opponent.Focus.Health.HP > 4)
+            if (skills.Contains("bloodblade") && opponent.Focus.Get<Health>().HP > 4)
                 maxDmg = Math.Max(maxDmg, 6);
-            if (skills.Contains("bloodrage") && opponent.Focus.Health.HP > 1 && opponent.Focus.Health.HP <= 5)
+            if (skills.Contains("bloodrage") && opponent.Focus.Get<Health>().HP > 1 && opponent.Focus.Get<Health>().HP <= 5)
                 maxDmg = Math.Max(maxDmg, 5);
 
             return maxDmg;

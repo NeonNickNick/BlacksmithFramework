@@ -1,4 +1,4 @@
-namespace BlacksmithCore.Backend.JudgementLogic.Actor
+namespace BlacksmithCore.Infra.Models.Components
 {
     public class Health
     {

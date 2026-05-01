@@ -1,5 +1,5 @@
-using BlacksmithCore.Backend.JudgementLogic.Judgement;
 using BlacksmithCore.Driver;
+using BlacksmithCore.Infra.Models;
 
 namespace BlacksmithCore.AI
 {
@@ -8,7 +8,7 @@ namespace BlacksmithCore.AI
         string Name { get; }
         public void Init(GameInstance gameInstance);
         (string skillName, int param) ChooseSkill(
-            ActorSet self,
-            ActorSet opponent);
+            Community self,
+            Community opponent);
     }
 }

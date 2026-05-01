@@ -1,9 +1,7 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-using BlacksmithCore.Backend.JudgementLogic.Core;
-using BlacksmithCore.Backend.JudgementLogic.Judgement;
-using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Core;
 
-namespace BlacksmithCore.Backend.JudgementLogic.TurnContexts
+namespace BlacksmithCore.Infra.Models.Components.Resolutions
 {
     public enum EffectStage
     {
@@ -15,15 +13,15 @@ namespace BlacksmithCore.Backend.JudgementLogic.TurnContexts
         public readonly EffectType.BEValue Type;
         public EffectTargetType.BEValue TargetType { get; set; }
         public float Power { get; set; }
-        public Action<ActorSet> Execute { get; set; } = null!;
+        public Action<Community> Execute { get; set; } = null!;
         public EffectResolution(EffectType.BEValue type, EffectTargetType.BEValue targetType, float power)
         {
             Type = type;
             TargetType = targetType;
             Power = power;
         }
-        private readonly Dictionary<EffectStage, List<Action<ActorSet, Body, EffectResolution>>> _stages = new();
-        public void AddStage(EffectStage stage, Action<ActorSet, Body, EffectResolution> action)
+        private readonly Dictionary<EffectStage, List<Action<Community, Body, EffectResolution>>> _stages = new();
+        public void AddStage(EffectStage stage, Action<Community, Body, EffectResolution> action)
         {
             if (!_stages.TryGetValue(stage, out var list))
             {
@@ -32,7 +30,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.TurnContexts
             }
             list.Add(action);
         }
-        public void RunStage(EffectStage stage, ActorSet source, Body target)
+        public void RunStage(EffectStage stage, Community source, Body target)
         {
             if (_stages.TryGetValue(stage, out var list))
             {

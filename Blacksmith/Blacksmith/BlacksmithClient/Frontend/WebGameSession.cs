@@ -1,6 +1,7 @@
 using BlacksmithCore.AI;
-using BlacksmithCore.Backend.JudgementLogic.Actor;
 using BlacksmithCore.Driver;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
 
 namespace BlacksmithClient.Frontend
 {
@@ -111,8 +112,8 @@ namespace BlacksmithClient.Frontend
 
             return new
             {
-                player = BuildActor(pv, _game.Player.Focus.Skill.GetAvailableSkillNames()),
-                enemy = BuildActor(ev, _game.Enemy.Focus.Skill.GetAvailableSkillNames()),
+                player = BuildActor(pv, _game.Player.Focus.Get<Skill>().GetAvailableSkillNames()),
+                enemy = BuildActor(ev, _game.Enemy.Focus.Get<Skill>().GetAvailableSkillNames()),
                 turns = _game.History.SkillHistory.Select((pair, i) => new
                 {
                     index = i + 1,

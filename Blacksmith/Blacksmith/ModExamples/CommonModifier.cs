@@ -1,7 +1,8 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.SkillPackages;
 using BlacksmithCore.Backend.SkillPackages.BuitinProfessions;
 using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 
 namespace ModExamples
@@ -13,11 +14,11 @@ namespace ModExamples
     {
         private bool HolyBookCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 2f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2f);
         }
         private DSL.SourceFile HolyBook(ISkillContext sc)
         {
-            sc.Self.Focus.Skill.AddPackage(new HolyBook());
+            sc.Self.Focus.Get<Skill>().AddPackage(new HolyBook());
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Instance.Iron())
                 .WriteFree(source =>

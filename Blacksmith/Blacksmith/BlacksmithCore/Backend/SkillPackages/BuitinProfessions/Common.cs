@@ -1,7 +1,10 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.JudgementLogic.Defenses;
 using BlacksmithCore.Backend.JudgementLogic.Judgement;
 using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Components.Resolutions;
+using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 
 namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
@@ -21,7 +24,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         
         private bool StickCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 0.5f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 0.5f);
         }
         private DSL.SourceFile Stick(ISkillContext sc)
         {
@@ -33,7 +36,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool DrillCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1.5f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1.5f);
         }
         private DSL.SourceFile Drill(ISkillContext sc)
         {
@@ -45,7 +48,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool SlashCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 2.5f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2.5f);
         }
         private DSL.SourceFile Slash(ISkillContext sc)
         {
@@ -57,7 +60,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         
         private bool ShieldCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), sc.Param * 0.5f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), sc.Param * 0.5f);
         }
         private DSL.SourceFile Shield(ISkillContext sc)
         {
@@ -69,7 +72,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool ThornShieldCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1 + sc.Param * 0.5f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1 + sc.Param * 0.5f);
         }
         private DSL.SourceFile ThornShield(ISkillContext sc)
         {
@@ -81,7 +84,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool RecoveryCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1 + sc.Param);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1 + sc.Param);
         }
         private DSL.SourceFile Recovery(ISkillContext sc)
         {
@@ -93,7 +96,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         
         private bool SpaceCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 3);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         private DSL.SourceFile Space(ISkillContext sc)
         {
@@ -105,7 +108,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool TimeCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 3);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         private DSL.SourceFile Time(ISkillContext sc)
         {
@@ -117,7 +120,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool TearCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Space(), 1f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), 1f);
         }
         private DSL.SourceFile Tear(ISkillContext sc)
         {
@@ -128,7 +131,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         }
         private bool ReflectCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Space(), 2f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), 2f);
         }
         private DSL.SourceFile Reflect(ISkillContext sc)
         {
@@ -154,11 +157,11 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool WarlockCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 1f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1f);
         }
         private DSL.SourceFile Warlock(ISkillContext sc)
         {
-            sc.Self.Focus.Skill.AddPackage(new Warlock());
+            sc.Self.Focus.Get<Skill>().AddPackage(new Warlock());
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Iron())
                 .WriteFree(source =>
@@ -170,11 +173,11 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool CannonCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 4);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 4);
         }
         private DSL.SourceFile Cannon(ISkillContext sc)
         {
-            sc.Self.Focus.Skill.AddPackage(new Cannon());
+            sc.Self.Focus.Get<Skill>().AddPackage(new Cannon());
             Pen pen = sf => sf
                 .UseResource(4, ResourceType.Instance.Iron())
                 .WriteDefense(3, new CommonReduction())
@@ -187,11 +190,11 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool DriverCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 3);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         private DSL.SourceFile Driver(ISkillContext sc)
         {
-            sc.Self.Focus.Skill.AddPackage(new Driver());
+            sc.Self.Focus.Get<Skill>().AddPackage(new Driver());
             Pen pen = sf => sf
                 .UseResource(3, ResourceType.Instance.Iron())
                 .WriteFree(source =>
@@ -203,11 +206,11 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool BloodSigilCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 7);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 7);
         }
         private DSL.SourceFile BloodSigil(ISkillContext sc)
         {
-            sc.Self.Focus.Skill.AddPackage(new BloodSigil());
+            sc.Self.Focus.Get<Skill>().AddPackage(new BloodSigil());
             Pen pen = sf => sf
                 .UseResource(7, ResourceType.Instance.Iron())
                 .WriteFree(source =>
@@ -220,19 +223,19 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
                         "slash",
                         "tear"
                     };
-                    addition.ForEach(a => source.Focus.Skill.RemoveSkill(nameof(Common), a));
-                    source.Focus.Health.GainMHP(3);
-                    source.Focus.Health.GainHP(3);
+                    addition.ForEach(a => source.Focus.Get<Skill>().RemoveSkill(nameof(Common), a));
+                    source.Focus.Get<Health>().GainMHP(3);
+                    source.Focus.Get<Health>().GainHP(3);
                 });
             return DSL.Create(sc.Self, pen);
         }
         private bool LancerCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 4);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 4);
         }
         private DSL.SourceFile Lancer(ISkillContext sc)
         {
-            sc.Self.Focus.Skill.AddPackage(new Lancer());
+            sc.Self.Focus.Get<Skill>().AddPackage(new Lancer());
             Pen pen = sf => sf
                 .UseResource(4, ResourceType.Instance.Iron())
                 .WriteFree(source =>
@@ -241,17 +244,17 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
                 });
             return DSL.Create(sc.Self, pen);
         }
-        public static void ExcludeAllProfessions(ActorSet source)
+        public static void ExcludeAllProfessions(Community source)
         {
 
-            Professions.ForEach(p => source.Focus.Skill.RemoveSkill(nameof(Common), p.ToLower()));
+            Professions.ForEach(p => source.Focus.Get<Skill>().RemoveSkill(nameof(Common), p.ToLower()));
         }
     }
     public static class ReflectRule
     {
-        public static void EffectSwaping_Modifier_After(ActorSet player, ActorSet enemy)
+        public static void EffectSwaping_Modifier_After(Community player, Community enemy)
         {
-            var playerResolutions = player.Focus.TurnContext.EffectResolutions;
+            var playerResolutions = player.Focus.Get<TurnContext>().Get<EffectResolution>();
 
             var reflect = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToList();
 
@@ -261,9 +264,9 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
             playerResolutions.AddRange(reflect);
         }
-        public static void AttackSwaping_Modifier_After(ActorSet player, ActorSet enemy)
+        public static void AttackSwaping_Modifier_After(Community player, Community enemy)
         {
-            var playerResolutions = player.Focus.TurnContext.AttackResolutions;
+            var playerResolutions = player.Focus.Get<TurnContext>().Get<AttackResolution>();
 
             var reflect = playerResolutions.Where(a => a.DelayRounds == 0).ToList();
 

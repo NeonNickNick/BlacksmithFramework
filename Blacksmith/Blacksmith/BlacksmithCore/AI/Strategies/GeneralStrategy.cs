@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-using BlacksmithCore.Backend.JudgementLogic.Core;
-using BlacksmithCore.Backend.JudgementLogic.Judgement;
 using BlacksmithCore.Driver;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Core;
 
 
 namespace BlacksmithCore.AI.Strategies
@@ -199,7 +199,7 @@ namespace BlacksmithCore.AI.Strategies
             _main = gameInstance;
         }
 
-        public (string skillName, int param) ChooseSkill(ActorSet self, ActorSet opponent)
+        public (string skillName, int param) ChooseSkill(Community self, Community opponent)
         {
             int threadCount = Math.Min(8, Environment.ProcessorCount);
             var tasks = new List<Task<List<MCTSNode>>>();
@@ -369,20 +369,20 @@ namespace BlacksmithCore.AI.Strategies
             var enemy = state.Enemy;
             var player = state.Player;
 
-            double enemyHP = enemy.Focus.Health.HP;
-            double playerHP = player.Focus.Health.HP;
+            double enemyHP = enemy.Focus.Get<Health>().HP;
+            double playerHP = player.Focus.Get<Health>().HP;
 
-            double enemyIron = enemy.Focus.Resource.QueryAll(ResourceType.Instance.Iron());
-            double enemySpace = enemy.Focus.Resource.QueryAll(ResourceType.Instance.Space());
-            double enemyTime = enemy.Focus.Resource.QueryAll(ResourceType.Instance.Time());
-            double enemySpecific = enemy.Focus.Resource.QuerySpecific(ResourceType.Instance.Magic());
+            double enemyIron = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Iron());
+            double enemySpace = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Space());
+            double enemyTime = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Time());
+            double enemySpecific = enemy.Focus.Get<Resource>().QuerySpecific(ResourceType.Instance.Magic());
 
-            double playerIron = player.Focus.Resource.QueryAll(ResourceType.Instance.Iron());
-            double playerSpace = player.Focus.Resource.QueryAll(ResourceType.Instance.Space());
-            double playerSpecific = player.Focus.Resource.QuerySpecific(ResourceType.Instance.Magic());
+            double playerIron = player.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Iron());
+            double playerSpace = player.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Space());
+            double playerSpecific = player.Focus.Get<Resource>().QuerySpecific(ResourceType.Instance.Magic());
 
-            bool haveProfession = enemy.Focus.Skill.HaveProfession;
-            bool playerHaveProfession = player.Focus.Skill.HaveProfession;
+            bool haveProfession = enemy.Focus.Get<Skill>().HaveProfession;
+            bool playerHaveProfession = player.Focus.Get<Skill>().HaveProfession;
 
             int round = state.History.SkillHistory.Count;//已经过的回合数
 
@@ -488,11 +488,11 @@ namespace BlacksmithCore.AI.Strategies
 
         private bool IsTerminal(GameInstance state)
         {
-            return state.Enemy.Focus.Health.HP <= 0 ||
-                    state.Player.Focus.Health.HP <= 0;
+            return state.Enemy.Focus.Get<Health>().HP <= 0 ||
+                    state.Player.Focus.Get<Health>().HP <= 0;
         }
 
-        private (string, int) RandomAction(ActorSet actor, GameInstance instance)
+        private (string, int) RandomAction(Community actor, GameInstance instance)
         {
             var actions = GetAllAvailable(actor, instance);
             if (actions.Count == 0)
@@ -500,10 +500,10 @@ namespace BlacksmithCore.AI.Strategies
             return actions[_random.Value!.Next(actions.Count)];
         }
 
-        private List<(string, int)> GetAllAvailable(ActorSet actor, GameInstance instance)
+        private List<(string, int)> GetAllAvailable(Community actor, GameInstance instance)
         {
             List<(string, int)> res = new();
-            var names = actor.Focus.Skill.GetAvailableSkillNames();
+            var names = actor.Focus.Get<Skill>().GetAvailableSkillNames();
 
             foreach (var name in names)
             {

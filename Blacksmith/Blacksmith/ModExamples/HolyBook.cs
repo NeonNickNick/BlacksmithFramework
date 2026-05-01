@@ -1,11 +1,10 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.JudgementLogic.Defenses;
-using BlacksmithCore.Backend.JudgementLogic.Entities;
-using BlacksmithCore.Backend.JudgementLogic.TurnContexts;
 using BlacksmithCore.Backend.SkillPackages;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Components.Resolutions;
+using BlacksmithCore.Infra.Models.Core;
+using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
-using ModExamples;
 using ModExamples.Defense;
 namespace ModExamples
 {
@@ -15,7 +14,7 @@ namespace ModExamples
     {
         private bool CrossCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), 0.5f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 0.5f);
         }
         private DSL.SourceFile Cross(ISkillContext sc)
         {
@@ -33,7 +32,7 @@ namespace ModExamples
         }
         private bool ArkCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Cross(), 2f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 2f);
         }
         private DSL.SourceFile Ark(ISkillContext sc)
         {
@@ -46,7 +45,7 @@ namespace ModExamples
         private int _blasphemyCount = 0;
         private bool BlasphemyCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Cross(), 1f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 1f);
         }
         private DSL.SourceFile Blasphemy(ISkillContext sc)
         {
@@ -59,7 +58,7 @@ namespace ModExamples
         }
         private bool RebirthCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Cross(), 1f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 1f);
         }
         private DSL.SourceFile Rebirth(ISkillContext sc)
         {
@@ -74,9 +73,9 @@ namespace ModExamples
                     var entity = new EffectEntity(fakeResolution.Type, 3, fakeResolution);
                     entity.Execute = (body) =>
                     {
-                        body.Health.GainHP(3);
+                        body.Get<Health>().GainHP(3);
                     };
-                    source.Focus.Effect.Add(entity);
+                    source.Focus.Get<Effect>().Add(entity);
                 })
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 0)
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 1)
@@ -85,7 +84,7 @@ namespace ModExamples
         }
         private bool ExonerationCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Cross(), 1f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 1f);
         }
         private DSL.SourceFile Exoneration(ISkillContext sc)
         {

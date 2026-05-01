@@ -1,5 +1,5 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Models.Core;
 
 namespace ModExamples
 {

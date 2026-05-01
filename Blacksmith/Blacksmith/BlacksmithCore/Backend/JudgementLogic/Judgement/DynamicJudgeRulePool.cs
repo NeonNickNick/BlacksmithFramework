@@ -2,6 +2,7 @@ using System.Data;
 using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
 using BlacksmithCore.Infra.Attributes;
 using BlacksmithCore.Infra.Enum;
+using BlacksmithCore.Infra.Models;
 
 namespace BlacksmithCore.Backend.JudgementLogic.Judgement
 {
@@ -47,9 +48,9 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
         public JudgeStage.BEValue Stage;
         public RuleType RuleType;
         public ModifierOrder ModifierOrder;
-        public Action<ActorSet, ActorSet> JudgeRule;
+        public Action<Community, Community> JudgeRule;
         public Mutation(
-            Action<ActorSet, ActorSet> judgeRule,
+            Action<Community, Community> judgeRule,
             JudgeStage.BEValue stage,
             RuleType ruleType,
             ModifierOrder modifierOrder,
@@ -73,8 +74,8 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
             public JudgeStage.BEValue Stage;
             public RuleType RuleType;
             public ModifierOrder ModifierOrder;
-            public Action<ActorSet, ActorSet, ActorSet> JudgeRulePrototype;
-            public MutationPrototype(int remainingRounds, int delayRounds, JudgeStage.BEValue stage, RuleType ruleType, ModifierOrder modifierOrder, Action<ActorSet, ActorSet, ActorSet> judgeRulePrototype)
+            public Action<Community, Community, Community> JudgeRulePrototype;
+            public MutationPrototype(int remainingRounds, int delayRounds, JudgeStage.BEValue stage, RuleType ruleType, ModifierOrder modifierOrder, Action<Community, Community, Community> judgeRulePrototype)
             {
                 RemainingRounds = remainingRounds;
                 DelayRounds = delayRounds;
@@ -83,7 +84,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
                 ModifierOrder = modifierOrder;
                 JudgeRulePrototype = judgeRulePrototype;
             }
-            public Mutation Specialize(ActorSet source)
+            public Mutation Specialize(Community source)
             {
                 return new((player, enemy) => JudgeRulePrototype(source, player, enemy), Stage, RuleType, ModifierOrder, RemainingRounds, DelayRounds);
             }
@@ -108,7 +109,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
                     }));
             }
         }
-        public List<Mutation> Query(ActorSet source, DynamicJudgeRuleName.BEValue name)
+        public List<Mutation> Query(Community source, DynamicJudgeRuleName.BEValue name)
         {
             return _mutationPrototypes[name].Select(m => m.Specialize(source)).ToList();
         }
@@ -131,7 +132,7 @@ namespace BlacksmithCore.Backend.JudgementLogic.Judgement
         //AttackResolution转移同理，更加简单，不需要判断Target
 
         //延时保护：实际上与转移是类似的
-        private void IfElseUtil(ActorSet source, ActorSet player, ActorSet enemy, Action<ActorSet, ActorSet> impl)
+        private void IfElseUtil(Community source, Community player, Community enemy, Action<Community, Community> impl)
         {
             if (source == player)
             {

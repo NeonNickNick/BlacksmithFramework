@@ -1,5 +1,6 @@
-using BlacksmithCore.Backend.JudgementLogic.Core;
 using BlacksmithCore.Backend.JudgementLogic.Defenses;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 
 namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
@@ -12,12 +13,12 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
         {
             Pen pen = sf => sf
                 .WriteDefense(1, new RealReduction())
-                .WriteDefense((int)MathF.Min(5, sc.Self.Focus.Resource.Query(ResourceType.Instance.Time()) * 2), new RealReduction());
+                .WriteDefense((int)MathF.Min(5, sc.Self.Focus.Get<Resource>().Query(ResourceType.Instance.Time()) * 2), new RealReduction());
             return DSL.Create(sc.Self, pen);
         }
         private bool SpaceAttackCheck(ISkillContext sc)
         {
-            return sc.Param > 0 && sc.Self.Focus.Resource.Check(ResourceType.Instance.Space(), sc.Param);
+            return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), sc.Param);
         }
         private DSL.SourceFile SpaceAttack(ISkillContext sc)
         {
@@ -29,7 +30,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool Space2TimeCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Space(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), 1);
         }
         private DSL.SourceFile Space2Time(ISkillContext sc)
         {
@@ -42,7 +43,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool Time2SpaceCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Resource.Check(ResourceType.Instance.Time(), 1);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Time(), 1);
         }
         private DSL.SourceFile Time2Space(ISkillContext sc)
         {
@@ -55,7 +56,7 @@ namespace BlacksmithCore.Backend.SkillPackages.BuitinProfessions
 
         private bool SpaceBarrierCheck(ISkillContext sc)
         {
-            return sc.Param > 0 && sc.Param <= 5 && sc.Self.Focus.Resource.Check(ResourceType.Instance.Iron(), sc.Param);
+            return sc.Param > 0 && sc.Param <= 5 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), sc.Param);
         }
         private DSL.SourceFile SpaceBarrier(ISkillContext sc)
         {

@@ -1,5 +1,5 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-namespace BlacksmithCore.Backend.JudgementLogic.Core
+using BlacksmithCore.Infra.Models;
+namespace BlacksmithCore.Infra.Models.Core
 {
     public abstract class DefenseBase : IDefenseWork
     {

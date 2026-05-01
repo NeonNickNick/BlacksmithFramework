@@ -1,9 +1,10 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-using BlacksmithCore.Backend.JudgementLogic.Core;
-using BlacksmithCore.Backend.JudgementLogic.Entities;
 using BlacksmithCore.Backend.JudgementLogic.Judgement;
 using BlacksmithCore.Backend.JudgementLogic.Judgement.Core;
-using BlacksmithCore.Backend.JudgementLogic.TurnContexts;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Components.Resolutions;
+using BlacksmithCore.Infra.Models.Core;
+using BlacksmithCore.Infra.Models.Particular;
 namespace BlacksmithCore.Backend.SkillPackages
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
@@ -27,11 +28,11 @@ namespace BlacksmithCore.Backend.SkillPackages
             }
             protected class Sentence
             {
-                public Action<ActorSet> Structure { get; }
+                public Action<Community> Structure { get; }
                 public SentenceType SentenceType { get; }
                 public StructureType StructureType { get; }
                 public Sentence? BindSentence { get; }
-                public Sentence(Action<ActorSet> structure, SentenceType sentenceType, StructureType structureType, Sentence? bindSentence = null)
+                public Sentence(Action<Community> structure, SentenceType sentenceType, StructureType structureType, Sentence? bindSentence = null)
                 {
                     Structure = structure;
                     SentenceType = sentenceType;
@@ -40,7 +41,7 @@ namespace BlacksmithCore.Backend.SkillPackages
                 }
             }
 
-            protected readonly ActorSet _owner;
+            protected readonly Community _owner;
             protected List<Sentence> _sentences = new();
             protected Stack<Sentence> _rhetoricCache = new();
             protected Dictionary<DynamicJudgeRuleName.BEValue, List<Mutation>> _mutationsOnCompile = new();
@@ -51,7 +52,7 @@ namespace BlacksmithCore.Backend.SkillPackages
                 _rhetoricCache = origin._rhetoricCache;
                 _mutationsOnCompile = origin._mutationsOnCompile;
             }
-            public SourceFile(ActorSet owner)
+            public SourceFile(Community owner)
             {
                 _owner = owner;
             }
@@ -65,7 +66,7 @@ namespace BlacksmithCore.Backend.SkillPackages
                     int index = sentences.IndexOf(rhetoric.BindSentence!) + 1;
                     sentences.Insert(index, new(rhetoric.Structure, rhetoric.SentenceType, StructureType.Rhetoric));
                 }
-                Action<ActorSet> result = (a) => { };
+                Action<Community> result = (a) => { };
                 if (judger != null)
                 {
                     foreach (var pair in _mutationsOnCompile)
@@ -80,7 +81,7 @@ namespace BlacksmithCore.Backend.SkillPackages
                 }
                 return new() { Execute = result };
             }
-            public SourceFile WriteFree(Action<ActorSet> action)
+            public SourceFile WriteFree(Action<Community> action)
             {
                 _sentences.Add(new(action, SentenceType.Free, StructureType.Main));
                 return this;
@@ -111,7 +112,7 @@ namespace BlacksmithCore.Backend.SkillPackages
                         bool ifHitArmor = false;
                         if (resolution.Type != AttackType.Instance.Real())
                         {
-                            var defenses = main.Defense.Get();
+                            var defenses = main.Get<Defense>().Get();
                             var APList = new List<DefenseType.BEValue>()
                             {
                                 DefenseType.Instance.ThornReduction(),
@@ -155,11 +156,11 @@ namespace BlacksmithCore.Backend.SkillPackages
                         {
                             resolution.RunStage(AttackStage.OnHitArmorFirstTime, main);
                         }
-                        main.Health.LoseHP((int)resolution.Power);
+                        main.Get<Health>().LoseHP((int)resolution.Power);
                         resolution.TotalDamage += (int)resolution.Power;
                         resolution.RunStage(AttackStage.OnEnd, main);
                     };
-                    resolution.Source.Focus.TurnContext.WriteResolution(resolution);
+                    resolution.Source.Focus.Get<TurnContext>().WriteResolution(resolution);
                 }, SentenceType.Attack, StructureType.Main));
                 return new(this);
             }
@@ -168,7 +169,7 @@ namespace BlacksmithCore.Backend.SkillPackages
             {
                 _sentences.Add(new((source) =>
                 {
-                    source.Focus.Health.GainHP(power);
+                    source.Focus.Get<Health>().GainHP(power);
                 }, SentenceType.Recovery, StructureType.Main));
                 return new(this);
             }
@@ -189,9 +190,9 @@ namespace BlacksmithCore.Backend.SkillPackages
                     resolution.Execute = (target) =>
                     {
                         defense.Power = (int)resolution.Power;
-                        target.Focus.Defense.Add(resolution.Defense);
+                        target.Focus.Get<Defense>().Add(resolution.Defense);
                     };
-                    source.Focus.TurnContext.WriteResolution(resolution);
+                    source.Focus.Get<TurnContext>().WriteResolution(resolution);
                 }, SentenceType.Defense, StructureType.Main));
                 return new(this);
             }
@@ -211,9 +212,9 @@ namespace BlacksmithCore.Backend.SkillPackages
                     };
                     resolution.Execute = (target) =>
                     {
-                        target.Focus.Resource.Gain(resolution.Type, resolution.Power);
+                        target.Focus.Get<Resource>().Gain(resolution.Type, resolution.Power);
                     };
-                    source.Focus.TurnContext.WriteResolution(resolution);
+                    source.Focus.Get<TurnContext>().WriteResolution(resolution);
                 }, SentenceType.Resource, StructureType.Main));
                 return new(this);
             }
@@ -222,7 +223,7 @@ namespace BlacksmithCore.Backend.SkillPackages
                 EffectTargetType.BEValue targetType,
                 float power,
                 int duration,
-                Action<ActorSet, Body, EffectEntity> effectAction
+                Action<Community, Body, EffectEntity> effectAction
                 )
             {
                 _sentences.Add(new((source) =>
@@ -234,13 +235,13 @@ namespace BlacksmithCore.Backend.SkillPackages
                         AddEffectEntity(source, main, type, duration, resolution, effectAction);
                         resolution.RunStage(EffectStage.OnSuccessfullyAdded, source, main);
                     };
-                    source.Focus.TurnContext.WriteResolution(resolution);
+                    source.Focus.Get<TurnContext>().WriteResolution(resolution);
                 }, SentenceType.Effect, StructureType.Main));
                 return new(this);
             }
             public SourceFile UseResource(float need, ResourceType.BEValue type, bool ifCommonOnly = false)
             {
-                return WriteFree(source => source.Focus.Resource.Use(type, need, ifCommonOnly));
+                return WriteFree(source => source.Focus.Get<Resource>().Use(type, need, ifCommonOnly));
             }
             public SourceFile LinkJudgeRuleDynamic(
                 DynamicJudgeRuleName.BEValue ruleKey,
@@ -250,7 +251,6 @@ namespace BlacksmithCore.Backend.SkillPackages
                 return this;
             }
         }
-
         public class DefenseFile : SourceFile
         {
             public DefenseFile(SourceFile self) : base(self)
@@ -265,11 +265,11 @@ namespace BlacksmithCore.Backend.SkillPackages
         }
         public class AttackFile : SourceFile
         {
-            public AttackFile WithFree(AttackStage stage, Action<ActorSet?, Body, AttackResolution> action)
+            public AttackFile WithFree(AttackStage stage, Action<Community?, Body, AttackResolution> action)
             {
                 _rhetoricCache.Push(new((source) =>
                 {
-                    var list = source.Focus.TurnContext.AttackResolutions;
+                    var list = source.Focus.Get<TurnContext>().Get<AttackResolution>();
                     if (list.Count == 0)
                     {
                         return;
@@ -281,9 +281,9 @@ namespace BlacksmithCore.Backend.SkillPackages
             }
             public AttackFile WithBloodSuck(float percent)
             {
-                var suck = (ActorSet? source, Body target, AttackResolution resolution) =>
+                var suck = (Community? source, Body target, AttackResolution resolution) =>
                 {
-                    source?.Focus.Health.GainHP((int)MathF.Ceiling(resolution.Power * percent));
+                    source?.Focus.Get<Health>().GainHP((int)MathF.Ceiling(resolution.Power * percent));
                 };
                 return WithFree(AttackStage.OnEnd, suck);
             }
@@ -295,9 +295,9 @@ namespace BlacksmithCore.Backend.SkillPackages
                     ResourceType.Instance.Gold_Iron(),
                     ResourceType.Instance.Magic()
                 };
-                var interupt = (ActorSet? source, Body target, AttackResolution resolution) =>
+                var interupt = (Community? source, Body target, AttackResolution resolution) =>
                 {
-                    target.TurnContext.ResourceResolutions.RemoveAll(r => interuptList.Contains(r.Type));
+                    target.Get<TurnContext>().Get<ResourceResolution>().RemoveAll(r => interuptList.Contains(r.Type));
                 };
                 return WithFree(AttackStage.OnHitArmorFirstTime, interupt);
             }
@@ -324,18 +324,18 @@ namespace BlacksmithCore.Backend.SkillPackages
         {
             EffectEntity effect = new EffectEntity(type, duration, resolution);
             effect.Execute = (body) => effectAction(body, effect);
-            main.Effect.Add(effect);
+            main.Get<Effect>().Add(effect);
         }
         /// <summary>
         /// 专用于被EffectResolution引导的效果生成
         /// </summary>
-        public static void AddEffectEntity(ActorSet source, Body main, EffectType.BEValue type, int duration, EffectResolution resolution, Action<ActorSet, Body, EffectEntity> effectAction)
+        public static void AddEffectEntity(Community source, Body main, EffectType.BEValue type, int duration, EffectResolution resolution, Action<Community, Body, EffectEntity> effectAction)
         {
             EffectEntity effect = new EffectEntity(type, duration, resolution);
             effect.Execute = (body) => effectAction(source, body, effect);
-            main.Effect.Add(effect);
+            main.Get<Effect>().Add(effect);
         }
-        public static SourceFile Create(ActorSet source, Pen Pen)
+        public static SourceFile Create(Community source, Pen Pen)
         {
             var sourceFile = new SourceFile(source);
             return Pen(sourceFile);

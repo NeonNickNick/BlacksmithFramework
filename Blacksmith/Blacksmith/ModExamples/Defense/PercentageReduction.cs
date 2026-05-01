@@ -1,5 +1,5 @@
-using BlacksmithCore.Backend.JudgementLogic.Actor;
-using BlacksmithCore.Backend.JudgementLogic.Core;
+using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Core;
 
 namespace ModExamples.Defense
 {
