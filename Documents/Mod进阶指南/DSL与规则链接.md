@@ -19,7 +19,7 @@ SourceFile.LinkJudgeRuleDynamic(ruleKey, mutations)
 _mutationsOnCompile[ruleKey] = mutations;
 ```
 
-真正注册发生在 `Compile(judger)` 阶段：
+真正注册发生在 `Compile(judger)` 阶段（此方法由 `IDSLSourceFile` 接口定义，来自 ClapInfra 的 `IClapDSLSourceFile<...>.Compile`）：
 
 ```csharp
 judger.JudgeRuleManager.RegistJudgeRuleDynamic(pair.Key, pair.Value);
@@ -157,7 +157,7 @@ new Mutation(
 
 如果你想快速理解真实项目里的高级写法，建议直接读：
 
-- `Blacksmith/BlacksmithCore/Backend/SkillPackages/BuitinProfessions/Lancer.cs`
+- `Project/Blacksmith/BlacksmithCore/Specific/BuiltInProfessions/Lancer.cs`
 
 阅读顺序建议是：
 

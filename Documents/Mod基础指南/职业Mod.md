@@ -71,7 +71,7 @@ var body = sc.Self.Focus;
 职业包和修改包都继承自 `SkillPackageBase`（其底层反射配对来自 `ClapInfra.ClapProfession.ClapSkillPackage`）。系统会通过反射自动收集：
 
 - 名为 `XxxCheck` 的私有实例方法，签名必须是 `bool (ISkillContext)`
-- 名为 `Xxx` 的私有实例方法，签名必须是 `DSL.SourceFile (ISkillContext)`
+- 名为 `Xxx` 的私有实例方法，签名必须是 `IDSLSourceFile (ISkillContext)`
 
 两者配对后，技能名会被自动转换为小写，例如：
 
@@ -83,6 +83,7 @@ var body = sc.Self.Focus;
 - 技能方法必须是实例方法
 - 必须使用 `private`
 - 技能方法名与检查方法名必须严格对应
+- **技能方法必须返回接口 `IDSLSourceFile`，不能返回具体类 `DSL.SourceFile`**——返回具体类会导致反射配对失败，技能静默不可用
 
 ## DSL 基础用法
 
@@ -96,7 +97,7 @@ using DSL = DSLforSkillLogic;
 标准写法通常是：
 
 ```csharp
-private DSL.SourceFile SomeSkill(ISkillContext sc)
+private IDSLSourceFile SomeSkill(ISkillContext sc)
 {
     Pen pen = sf => sf
         .UseResource(1, ResourceType.Instance.Iron())
@@ -128,9 +129,7 @@ private DSL.SourceFile SomeSkill(ISkillContext sc)
 下面是一个最小主职业示例：
 
 ```csharp
-using BlacksmithCore.Backend.SkillPackages;
-using BlacksmithCore.Backend.SkillPackages.BuitinProfessions;
-using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
@@ -148,7 +147,7 @@ public class MyProfession : MainProfession
             && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
     }
 
-    private DSL.SourceFile Joke(ISkillContext sc)
+    private IDSLSourceFile Joke(ISkillContext sc)
     {
         Pen pen = sf => sf
             .UseResource(1, ResourceType.Instance.Iron())
@@ -178,12 +177,12 @@ public class MyProfession : MainProfession
 如果你只写了 `MainProfession`，游戏并不会自动给玩家一个获得该职业的技能。常见做法是给 `Common` 写一个修改器：
 
 ```csharp
-using BlacksmithCore.Backend.SkillPackages;
-using BlacksmithCore.Backend.SkillPackages.BuitinProfessions;
+using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Attributes;
-using BlacksmithCore.Infra.Models;
+using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
+using BlacksmithCore.Specific.BuiltInProfessions;
 
 namespace Example.Mod;
 
@@ -198,7 +197,7 @@ public class CommonModifier : ProfessionModifier
         return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2);
     }
 
-    private DSL.SourceFile MyProfession(ISkillContext sc)
+    private IDSLSourceFile MyProfession(ISkillContext sc)
     {
         sc.Self.Focus.Get<Skill>().AddPackage(new MyProfession());
 
@@ -247,9 +246,9 @@ public class CommonModifier : ProfessionModifier
 
 仓库中的示例 Mod 位于：
 
-- `Blacksmith/ModExamples/HolyBook.cs`
-- `Blacksmith/ModExamples/CommonModifier.cs`
-- `Blacksmith/ModExamples/EnumExtension.cs`
+- `Project/Blacksmith/ModExamples/HolyBook.cs`
+- `Project/Blacksmith/ModExamples/CommonModifier.cs`
+- `Project/Blacksmith/ModExamples/EnumExtension.cs`
 
 它展示了：
 

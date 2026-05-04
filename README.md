@@ -6,18 +6,18 @@ Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。程
 
 | 项目 | 说明 |
 |---|---|
-| `ClapInfra` | 最底层的基础设施库。提供可扩展枚举框架 `ClapEnum<T>`、技能包反射配对机制 `ClapSkillPackage`、通用实体组件模板 `ClapBody` 和 决议缓冲区模型`ClapTurnContext`。不依赖任何 Blacksmith 项目。 |
+| `ClapInfra` | 最底层的基础设施库。提供可扩展枚举框架 `ClapEnum<T>`、技能包反射配对机制 `ClapSkillPackage`、通用实体组件模板 `ClapBody`、决议缓冲区模型 `ClapTurnContext`、判定管线骨架 `ClapJudger`/`ClapJudgeRuleManager`/`ClapIntent`、DSL 编译契约 `IClapDSLSourceFile`，以及插件扫描工具 `DllLoader`。不依赖任何 Blacksmith 项目。 |
 | `BlacksmithCore` | 基于 `ClapInfra` 构建的核心引擎。包含领域模型、技能 DSL、判定引擎、动态规则、AI 策略、插件加载器。 |
 | `BlacksmithClient` | 唯一的运行入口。ASP.NET Core 本地站点，托管 `wwwroot` 静态前端，暴露 `/api/*` 最小 API，通过 `WebGameSession` 组装会话与快照。 |
 | `ModExamples` | 示例 Mod 源码。演示扩展枚举 + 新职业 + Common 修改器的组合写法。 |
 
-源代码位于 `Blacksmith/` 目录下，解决方案文件为 `Blacksmith/Blacksmith.sln`。所有项目目标框架为 `net8.0`。
+源代码位于 `Project/` 目录下，解决方案文件为 `Project/Blacksmith.sln`。所有项目目标框架为 `net8.0`。
 
 ## 运行方式
 
 ```powershell
-cd .\Blacksmith
-dotnet run --project .\BlacksmithClient\BlacksmithClient.csproj
+cd .\Project
+dotnet run --project .\Blacksmith\BlacksmithClient\BlacksmithClient.csproj
 ```
 
 程序在 `http://localhost:5000` 启动并自动打开浏览器。
@@ -54,7 +54,7 @@ dotnet run --project .\BlacksmithClient\BlacksmithClient.csproj
 
 Blacksmith 的扩展体系是"启动期装配型插件架构"：
 
-1. 程序启动时 `PluginLoader` 扫描运行目录全部 `.dll`
+1. 程序启动时 `PluginLoader`（基于 ClapInfra 的 `DllLoader`）扫描运行目录全部 `.dll`
 2. 反射发现 `BlacksmithEnum<T>` 子类、`[IsBlacksmithEnumModifier]` 静态类、`MainProfession` / `ProfessionModifier` 子类
 3. 注册扩展枚举成员、职业名和职业修改器
 4. 调用 `ClapEnum.CloseFactory()` 关闭枚举工厂

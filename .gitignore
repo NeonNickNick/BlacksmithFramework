@@ -11,6 +11,7 @@
 *.userosscache
 *.sln.docstates
 CLAUDE.md
+architecture-analysis.md
 
 # IDE folders
 .vs/

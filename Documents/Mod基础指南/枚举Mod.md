@@ -27,7 +27,7 @@
 2. 引用 `BlacksmithCore.csproj`，或者引用编译后的 `BlacksmithCore.dll`。
 3. 编写枚举类或枚举修改类。
 4. 将编译产物放到游戏可执行文件所在目录。
-5. 程序启动时会自动扫描该目录下的 `.dll` 并加载。
+5. 程序启动时会通过 `DllLoader`（ClapInfra）自动扫描该目录下的 `.dll` 并加载。
 
 ## 创建新的可扩展枚举
 
@@ -126,7 +126,7 @@ Gold_普通资源名
 
 ## 来自示例项目的真实写法
 
-仓库中的 `Blacksmith/ModExamples/EnumExtension.cs` 提供了一个实际例子：
+仓库中的 `Project/Blacksmith/ModExamples/EnumExtension.cs` 提供了一个实际例子：
 
 ```csharp
 [IsBlacksmithEnumModifier]
