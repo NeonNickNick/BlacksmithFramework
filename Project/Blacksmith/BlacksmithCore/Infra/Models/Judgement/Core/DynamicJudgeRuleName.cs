@@ -6,8 +6,8 @@ namespace BlacksmithCore.Infra.Models.Judgement.Core
     public class DynamicJudgeRuleName : BlacksmithEnum<DynamicJudgeRuleName>
     {
         [IsBlacksmithEnumMember(0)]
-        public BEValue Reflect() => GetBEValue();
+        public CEValue Reflect() => GetBEValue();
         [IsBlacksmithEnumMember(1)]
-        public BEValue Charge() => GetBEValue();
+        public CEValue Charge() => GetBEValue();
     }
 }

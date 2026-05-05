@@ -2,11 +2,9 @@ using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Judgement.Core;
 using ClapInfra.ClapJudgement;
-using ClapInfra.ClapJudgement.Core;
 
 namespace BlacksmithCore.Infra.Models.Judgement
 {
-    using DSL = DSLforSkillLogic;
     public class Judger : ClapJudger<Community, Judger, JudgeRuleManager, Intent, IDSLSourceFile>
     {
         public void Swap()

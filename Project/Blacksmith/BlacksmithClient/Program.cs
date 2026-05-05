@@ -1,8 +1,8 @@
+using BlacksmithClient.Frontend;
 using BlacksmithCore.AI;
 using BlacksmithCore.AI.Strategies;
-using BlacksmithClient.Frontend;
 using BlacksmithCore.Infra.Utils;
-namespace Blacksmith
+namespace BlacksmithClient
 {
     public static class Program
     {
@@ -19,6 +19,6 @@ namespace Blacksmith
             Console.WriteLine("Welcome!\n");
             LocalHost.Start(strategies);
         }
-        
+
     }
 }

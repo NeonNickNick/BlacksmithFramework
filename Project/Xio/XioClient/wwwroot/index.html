@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xio Realm Gate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <div class="background-orbit orbit-a"></div>
+        <div class="background-orbit orbit-b"></div>
+
+        <main class="layout">
+            <section class="hero panel">
+                <details class="hero-collapsible" id="heroPanel" open>
+                    <summary class="hero-summary">
+                        <div>
+                            <p class="eyebrow">Xio Framework</p>
+                            <h1>Realm Gate</h1>
+                        </div>
+                        <div class="hero-summary-meta">
+                            <div class="meta-card compact-meta">
+                                <span class="meta-label">Current Mode</span>
+                                <strong id="modeBadge">Not started</strong>
+                            </div>
+                            <div class="meta-card compact-meta">
+                                <span class="meta-label">Status</span>
+                                <strong id="resultBadge">Awaiting game</strong>
+                            </div>
+                        </div>
+                    </summary>
+                    <div class="hero-content">
+                        <div class="hero-copy-block" id="heroCopyBlock">
+                            <p class="hero-copy">Choose a mode, start or restart instantly, and inspect both cultivators through structured panels. AI modes are reserved for future release.</p>
+                        </div>
+
+                        <div class="hero-controls">
+                            <label class="hero-field">
+                                <span>Mode</span>
+                                <select id="strategy"></select>
+                            </label>
+                            <div class="button-row hero-buttons">
+                                <button id="startBtn" class="primary-btn">Start Game</button>
+                                <button id="restartBtn" class="ghost-btn">Restart</button>
+                            </div>
+                            <div class="hero-status-row">
+                                <span class="status-pill" id="connectionState">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <section class="control-grid">
+                <article class="panel action-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Turn Input</p>
+                            <h2>Declare Skills</h2>
+                        </div>
+                        <span class="status-pill muted" id="roundPill">Round 0</span>
+                    </div>
+
+                    <div class="rank-legend">
+                        <span class="legend-label">Rank prefixes:</span>
+                        <code>hj-</code>=Golden <code>zs-</code>=Diamond <code>hd-</code>=BlackHole <code>wx-</code>=WanXiang
+                    </div>
+
+                    <label class="field">
+                        <span>Your skill</span>
+                        <input id="skill" placeholder="x" autocomplete="off" />
+                    </label>
+
+                    <label class="field" id="enemyField">
+                        <span>Enemy skill</span>
+                        <input id="eskill" placeholder="x" autocomplete="off" />
+                    </label>
+
+                    <div class="button-row">
+                        <button id="declareBtn" class="primary-btn">Confirm Turn</button>
+                    </div>
+
+                    <p class="hint" id="modeHint">Manual mode lets you enter both sides of the turn.</p>
+                    <p class="hint" id="actionHint">Start a game to enable turn declaration.</p>
+                </article>
+
+                <article class="panel timeline-panel">
+                    <div class="panel-heading compact">
+                        <div>
+                            <p class="eyebrow">Battlefeed</p>
+                            <h2 id="turnIndex">Turn 0 / 0</h2>
+                        </div>
+                        <div class="button-row nav-row">
+                            <button id="prevBtn" class="ghost-btn small-btn">Previous</button>
+                            <button id="nextBtn" class="ghost-btn small-btn">Next</button>
+                        </div>
+                    </div>
+
+                    <div id="actionText" class="action-banner">No actions recorded yet.</div>
+                    <div id="turnSummary" class="summary-grid battle-summary"></div>
+                </article>
+            </section>
+
+            <section class="battle-grid">
+                <article class="panel fighter-panel">
+                    <div class="panel-heading compact">
+                        <div>
+                            <p class="eyebrow">Cultivator</p>
+                            <h2 id="playerName">You</h2>
+                        </div>
+                        <strong id="pRank">Rank --</strong>
+                    </div>
+                    <div class="rank-bar">
+                        <div class="rank-fill player-fill" id="playerRankFill"></div>
+                    </div>
+                    <div class="rank-detail" id="playerRankDetail">Inner Level 0 / 21</div>
+                    <details class="actor-section collapsible" open>
+                        <summary>Resources</summary>
+                        <div id="playerResources" class="token-grid empty-state-box">No data yet.</div>
+                    </details>
+                    <details class="actor-section collapsible" open>
+                        <summary>Available Skills</summary>
+                        <div id="playerSkills" class="token-grid empty-state-box">No data yet.</div>
+                    </details>
+                </article>
+
+                <article class="panel fighter-panel">
+                    <div class="panel-heading compact">
+                        <div>
+                            <p class="eyebrow">Opponent</p>
+                            <h2 id="enemyName">Opponent</h2>
+                        </div>
+                        <strong id="eRank">Rank --</strong>
+                    </div>
+                    <div class="rank-bar">
+                        <div class="rank-fill enemy-fill" id="enemyRankFill"></div>
+                    </div>
+                    <div class="rank-detail" id="enemyRankDetail">Inner Level 0 / 21</div>
+                    <details class="actor-section collapsible" open>
+                        <summary>Resources</summary>
+                        <div id="enemyResources" class="token-grid empty-state-box">No data yet.</div>
+                    </details>
+                    <details class="actor-section collapsible" open>
+                        <summary>Available Skills</summary>
+                        <div id="enemySkills" class="token-grid empty-state-box">No data yet.</div>
+                    </details>
+                </article>
+            </section>
+
+            <section class="panel history-panel">
+                <details class="history-collapsible" id="historyPanel">
+                    <summary class="panel-heading compact">
+                        <div>
+                            <p class="eyebrow">History</p>
+                            <h2>Recent Turns</h2>
+                        </div>
+                    </summary>
+                    <div id="historyList" class="history-list">
+                        <div class="history-empty">No turns yet. Once the battle starts, each round will be archived here.</div>
+                    </div>
+                </details>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/state.js"></script>
+    <script src="js/types.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -103,7 +103,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
             }
         }
 
-        private readonly SortedDictionary<JudgeStage.BEValue, StageRuleContainer> _ruleContainers = new()
+        private readonly SortedDictionary<JudgeStage.CEValue, StageRuleContainer> _ruleContainers = new()
         {
             {
                 JudgeStage.Instance.OnBegin(),
@@ -151,7 +151,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
             }
         };
         #region Default Rules（原有逻辑）
-        private static void TakeEffects(EffectType.BEValue type, Community player, Community enemy)
+        private static void TakeEffects(EffectType.CEValue type, Community player, Community enemy)
         {
             foreach (var temp in player.ActorList)
             {
@@ -284,11 +284,11 @@ namespace BlacksmithCore.Infra.Models.Judgement
 
             return result;
         }
-        public void RegistJudgeRuleDynamic(DynamicJudgeRuleName.BEValue name, List<Mutation> mutations)
+        public void RegistJudgeRuleDynamic(DynamicJudgeRuleName.CEValue name, List<Mutation> mutations)
         {
             _dynamicPool.RegistDynamic(name, mutations);
         }
-        public void AddJudgeRule(Community source, DynamicJudgeRuleName.BEValue name)
+        public void AddJudgeRule(Community source, DynamicJudgeRuleName.CEValue name)
         {
             List<Mutation> mutations = _dynamicPool.Query(source, name);
             foreach (var mutation in mutations)

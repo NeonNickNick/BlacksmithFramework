@@ -20,7 +20,7 @@ namespace BlacksmithCore.Infra.Models.Components
         })
         {
         }
-        protected override void ExecuteImpl<TResolution>(Community community, List<TResolution> list)
+        protected override void ExecuteImpl<TResolution>(Community community, List<TResolution> list, Func<TResolution, bool>? ifProcess)
         {
             var resolutions = list.Where(d => d.DelayRounds == 0).ToList();
             foreach (var temp in resolutions)

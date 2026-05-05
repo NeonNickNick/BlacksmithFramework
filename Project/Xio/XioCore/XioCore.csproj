@@ -1,11 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Blacksmith\BlacksmithCore\BlacksmithCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Infra\Models\Components\" />
+    <ProjectReference Include="..\..\ClapInfra\ClapInfra.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

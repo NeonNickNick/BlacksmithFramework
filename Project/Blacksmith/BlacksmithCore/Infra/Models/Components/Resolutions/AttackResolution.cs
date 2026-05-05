@@ -1,4 +1,3 @@
-using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 
@@ -13,7 +12,7 @@ namespace BlacksmithCore.Infra.Models.Components.Resolutions
     {
         public Community? Source { get; set; }
         public int DelayRounds { get; set; } = 0;
-        public AttackType.BEValue Type { get; set; }
+        public AttackType.CEValue Type { get; set; }
         public float Power { get; set; }
         public Action<Community> Execute { get; set; } = (a) => { };
         public int TotalDamage { get; set; } = 0;

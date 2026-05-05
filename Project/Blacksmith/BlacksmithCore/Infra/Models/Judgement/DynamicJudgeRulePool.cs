@@ -9,27 +9,27 @@ namespace BlacksmithCore.Infra.Models.Judgement
     public class JudgeStage : BlacksmithEnum<JudgeStage>
     {
         [IsBlacksmithEnumMember(0)]
-        public BEValue OnBegin() => GetBEValue();
+        public CEValue OnBegin() => GetBEValue();
         [IsBlacksmithEnumMember(8)]
-        public BEValue OnEffectTaking_AfterResolutionWritten() => GetBEValue();
+        public CEValue OnEffectTaking_AfterResolutionWritten() => GetBEValue();
         [IsBlacksmithEnumMember(16)]
-        public BEValue OnEffectSwaping() => GetBEValue();
+        public CEValue OnEffectSwaping() => GetBEValue();
         [IsBlacksmithEnumMember(32)]
-        public BEValue OnAttackCanceling() => GetBEValue();
+        public CEValue OnAttackCanceling() => GetBEValue();
         [IsBlacksmithEnumMember(64)]
-        public BEValue OnAttackSwaping() => GetBEValue();
+        public CEValue OnAttackSwaping() => GetBEValue();
         [IsBlacksmithEnumMember(128)]
-        public BEValue OnApplyingEffect() => GetBEValue();
+        public CEValue OnApplyingEffect() => GetBEValue();
         [IsBlacksmithEnumMember(256)]
-        public BEValue OnEffectTaking_AfterTransport() => GetBEValue();
+        public CEValue OnEffectTaking_AfterTransport() => GetBEValue();
         [IsBlacksmithEnumMember(512)]
-        public BEValue OnApplyingOthers() => GetBEValue();
+        public CEValue OnApplyingOthers() => GetBEValue();
         [IsBlacksmithEnumMember(1024)]
-        public BEValue OnUpdating() => GetBEValue();
+        public CEValue OnUpdating() => GetBEValue();
         [IsBlacksmithEnumMember(2048)]
-        public BEValue OnEffectTaking_AfterResult() => GetBEValue();
+        public CEValue OnEffectTaking_AfterResult() => GetBEValue();
         [IsBlacksmithEnumMember(4096)]
-        public BEValue OnEnd() => GetBEValue();
+        public CEValue OnEnd() => GetBEValue();
     }
     public enum RuleType
     {
@@ -45,13 +45,13 @@ namespace BlacksmithCore.Infra.Models.Judgement
     {
         public int RemainingRounds;
         public int DelayRounds;
-        public JudgeStage.BEValue Stage;
+        public JudgeStage.CEValue Stage;
         public RuleType RuleType;
         public ModifierOrder ModifierOrder;
         public Action<Community, Community> JudgeRule;
         public Mutation(
             Action<Community, Community> judgeRule,
-            JudgeStage.BEValue stage,
+            JudgeStage.CEValue stage,
             RuleType ruleType,
             ModifierOrder modifierOrder,
             int remainingRounds = 1,
@@ -71,11 +71,11 @@ namespace BlacksmithCore.Infra.Models.Judgement
         {
             public int RemainingRounds;
             public int DelayRounds;
-            public JudgeStage.BEValue Stage;
+            public JudgeStage.CEValue Stage;
             public RuleType RuleType;
             public ModifierOrder ModifierOrder;
             public Action<Community, Community, Community> JudgeRulePrototype;
-            public MutationPrototype(int remainingRounds, int delayRounds, JudgeStage.BEValue stage, RuleType ruleType, ModifierOrder modifierOrder, Action<Community, Community, Community> judgeRulePrototype)
+            public MutationPrototype(int remainingRounds, int delayRounds, JudgeStage.CEValue stage, RuleType ruleType, ModifierOrder modifierOrder, Action<Community, Community, Community> judgeRulePrototype)
             {
                 RemainingRounds = remainingRounds;
                 DelayRounds = delayRounds;
@@ -89,9 +89,9 @@ namespace BlacksmithCore.Infra.Models.Judgement
                 return new((player, enemy) => JudgeRulePrototype(source, player, enemy), Stage, RuleType, ModifierOrder, RemainingRounds, DelayRounds);
             }
         }
-        private readonly Dictionary<DynamicJudgeRuleName.BEValue, List<MutationPrototype>> _mutationPrototypes = new();
+        private readonly Dictionary<DynamicJudgeRuleName.CEValue, List<MutationPrototype>> _mutationPrototypes = new();
         public void RegistDynamic(
-            DynamicJudgeRuleName.BEValue name,
+            DynamicJudgeRuleName.CEValue name,
             List<Mutation> mutations)
         {
             _mutationPrototypes[name] = new();
@@ -109,7 +109,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
                     }));
             }
         }
-        public List<Mutation> Query(Community source, DynamicJudgeRuleName.BEValue name)
+        public List<Mutation> Query(Community source, DynamicJudgeRuleName.CEValue name)
         {
             return _mutationPrototypes[name].Select(m => m.Specialize(source)).ToList();
         }

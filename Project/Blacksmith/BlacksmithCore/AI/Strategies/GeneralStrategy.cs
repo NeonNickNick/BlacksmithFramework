@@ -3,6 +3,7 @@ using BlacksmithCore.Driver;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
+using ClapInfra.ClapModels.Components;
 
 
 namespace BlacksmithCore.AI.Strategies
@@ -133,53 +134,53 @@ namespace BlacksmithCore.AI.Strategies
             res.LateRoundPenaltyPerRound = Pick(LateRoundPenaltyPerRound, other.LateRoundPenaltyPerRound);
             return res;
         }
-        public double TemperatureCoefficient  = 0.03; // 原 0.03 * round
+        public double TemperatureCoefficient = 0.03; // 原 0.03 * round
 
         // 终局奖励/惩罚
-        public double WinScore  = 1e9;
-        public double LoseScore  = -1e9;
+        public double WinScore = 1e9;
+        public double LoseScore = -1e9;
 
         //交叉权重
         public double PlayerResourceEnemyHPRatio = 100;
         public double EnemyResourcePlayerHPRatio = 100;
 
         // ========== 早期资源权重 ==========
-        public double EarlyIronWeight  = 1200;
-        public double EarlyExcessIronWeight  = 1200;     // 超过4铁时的额外奖励
-        public double EarlySpaceWeight  = 4000;
-        public double EarlyTimeWeight  = 3500;
+        public double EarlyIronWeight = 1200;
+        public double EarlyExcessIronWeight = 1200;     // 超过4铁时的额外奖励
+        public double EarlySpaceWeight = 4000;
+        public double EarlyTimeWeight = 3500;
         public double EarlyDefaultWeight = 2000;
-        public double EarlyIronOverstockPenalty  = 80;   // 超过7铁的惩罚
+        public double EarlyIronOverstockPenalty = 80;   // 超过7铁的惩罚
 
         // ========== 中期资源权重 ==========
-        public double MidIronWeight  = 300;
-        public double MidSpaceWeight  = 1000;
-        public double MidTimeWeight  = 900;
+        public double MidIronWeight = 300;
+        public double MidSpaceWeight = 1000;
+        public double MidTimeWeight = 900;
         public double MidDefaultWeight = 600;
 
         // ========== 后期资源权重 ==========
-        public double LateIronWeight  = 100;
-        public double LateSpaceWeight  = 250;
-        public double LateTimeWeight  = 250;
+        public double LateIronWeight = 100;
+        public double LateSpaceWeight = 250;
+        public double LateTimeWeight = 250;
         public double LateDefaultWeight = 150;
 
         // ========== 职业相关 ==========
-        public double HaveProfessionBonus  = 500;
-        public double IronDeficitPenaltyWhenEnemyHasProfession  = 300;
-        public double IronDeficitPenaltyWhenBothNoProfession  = 1000;
-        public double IronDeficitThreshold  = 3;         // 铁差阈值
+        public double HaveProfessionBonus = 500;
+        public double IronDeficitPenaltyWhenEnemyHasProfession = 300;
+        public double IronDeficitPenaltyWhenBothNoProfession = 1000;
+        public double IronDeficitThreshold = 3;         // 铁差阈值
 
         // ========== 攻击策略权重 ==========
-        public double EarlyUnnecessaryAttackPenaltyMultiplier  = 30;    // (100 - HP) * 30
-        public double MidAdvantageAttackBonusMultiplier  = 2;           // hpDiff * 2
-        public double MidUnnecessaryAttackPenaltyMultiplier  = 10;      // (100 - HP) * 10
-        public double WithProfessionDamageBonusMultiplier  = 20;        // (100 - HP) * 20
-        public double WithProfessionHpDiffBonusMultiplier  = 5;         // hpDiff * 5
-        public double HpAdvantageThreshold  = 20;                       // hpDiff > 20 才算优势
+        public double EarlyUnnecessaryAttackPenaltyMultiplier = 30;    // (100 - HP) * 30
+        public double MidAdvantageAttackBonusMultiplier = 2;           // hpDiff * 2
+        public double MidUnnecessaryAttackPenaltyMultiplier = 10;      // (100 - HP) * 10
+        public double WithProfessionDamageBonusMultiplier = 20;        // (100 - HP) * 20
+        public double WithProfessionHpDiffBonusMultiplier = 5;         // hpDiff * 5
+        public double HpAdvantageThreshold = 20;                       // hpDiff > 20 才算优势
 
         // ========== 回合节奏 ==========
-        public double EarlyRoundBonusPerRound  = 1;
-        public double LateRoundPenaltyPerRound  = 40;
+        public double EarlyRoundBonusPerRound = 1;
+        public double LateRoundPenaltyPerRound = 40;
     }
     public class GeneralStrategy : IAIStrategy
     {
@@ -399,11 +400,11 @@ namespace BlacksmithCore.AI.Strategies
 
             //0 交叉关注
             //引入双方铁和生命值之间的关系
-            score -= 10 * 
-                ((playerIron + 3 * playerSpace + 2 * playerSpecific) / (enemyHP + 1e-6 )) * 
+            score -= 10 *
+                ((playerIron + 3 * playerSpace + 2 * playerSpecific) / (enemyHP + 1e-6)) *
                     _params.PlayerResourceEnemyHPRatio;
-            
-            score += 10 * 
+
+            score += 10 *
                 ((enemyIron + 3 * enemySpace + 2 * enemySpecific) / (playerHP + 1e-6)) *
                     _params.EnemyResourcePlayerHPRatio;
 

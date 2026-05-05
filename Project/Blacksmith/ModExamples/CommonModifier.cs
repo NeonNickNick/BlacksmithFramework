@@ -18,7 +18,7 @@ namespace ModExamples
         }
         private DSL.SourceFile HolyBook(ISkillContext sc)
         {
-            sc.Self.Focus.Get<Skill>().AddPackage(new HolyBook());
+            sc.Self.Focus.Get<Skill>().AddPackage(new(new HolyBook()));
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Instance.Iron())
                 .WriteFree(source =>

@@ -60,12 +60,12 @@ namespace ClapInfra.ClapModels.Components
                     $"Resolution type {resolution.GetType().Name} is not registered in the context.");
             }
         }
-        public void Execute<TResolution>(TCommunity community)
+        public void Execute<TResolution>(TCommunity community, Func<TResolution, bool>? ifProcess = null)
             where TResolution : TIResolution
         {
-            ExecuteImpl(community, Get<TResolution>());
+            ExecuteImpl(community, Get<TResolution>(), ifProcess);
         }
-        protected abstract void ExecuteImpl<TResolution>(TCommunity community, List<TResolution> list)
+        protected abstract void ExecuteImpl<TResolution>(TCommunity community, List<TResolution> list, Func<TResolution, bool>? ifProcess)
             where TResolution : TIResolution;
     }
 }

@@ -6,12 +6,12 @@ namespace BlacksmithCore.Infra.Models.Particular
 {
     public class EffectEntity
     {
-        public readonly EffectType.BEValue Type;
+        public readonly EffectType.CEValue Type;
         public int DelayTimes { get; set; } = 0;
         public int RemainingTimes { get; set; }
         public IResolution Resolution { get; set; }
         public Action<Body> Execute { get; set; } = null!;
-        public EffectEntity(EffectType.BEValue type, int remainingTimes, IResolution resolution)
+        public EffectEntity(EffectType.CEValue type, int remainingTimes, IResolution resolution)
         {
             Type = type;
             RemainingTimes = remainingTimes;

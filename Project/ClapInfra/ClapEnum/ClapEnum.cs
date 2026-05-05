@@ -25,35 +25,35 @@ namespace ClapInfra.ClapEnum
         //实际上可断言一定是先调用构造函数，此时已经不是null
         public static T Instance { get; private set; } = null!;
 
-        public struct BEValue : IComparable<BEValue>
+        public struct CEValue : IComparable<CEValue>
         {
             private static int _counter = 0;
             private readonly int _uniqueID;
             public readonly int _priority;
-            internal BEValue(int priority)
+            internal CEValue(int priority)
             {
                 if (!_isOpen)
                 {
-                    throw new ArgumentException("BEValue Factory has been closed!");
+                    throw new ArgumentException("CEValue Factory has been closed!");
                 }
                 _uniqueID = _counter++;
                 _priority = priority;
             }
-            public int CompareTo(BEValue other)
+            public int CompareTo(CEValue other)
             {
                 return _priority.CompareTo(other._priority);
             }
-            public static bool operator ==(BEValue left, BEValue right)
+            public static bool operator ==(CEValue left, CEValue right)
             {
                 return left._uniqueID == right._uniqueID;
             }
-            public static bool operator !=(BEValue left, BEValue right)
+            public static bool operator !=(CEValue left, CEValue right)
             {
                 return left._uniqueID != right._uniqueID;
             }
             public override bool Equals(object? obj)
             {
-                return obj is BEValue other && _uniqueID == other._uniqueID;
+                return obj is CEValue other && _uniqueID == other._uniqueID;
             }
             public override int GetHashCode()
             {
@@ -70,19 +70,19 @@ namespace ClapInfra.ClapEnum
         }
         public override Type GetBEValueType()
         {
-            return typeof(BEValue);
+            return typeof(CEValue);
         }
         public override void Create(string name, int priority)
         {
             if (!_isOpen)
             {
-                throw new ArgumentException("BEValue Factory has been closed!");
+                throw new ArgumentException("CEValue Factory has been closed!");
             }
             //这里选择直接覆盖。程序启动时就已经被构造
             //情况与技能包不同，技能包每次使用都需要创建实例，不便于指定构造参数来应用Modifier
             //因此采用的方法是在构造函数插入一个修改阶段
             //而Enum是全局单例，干脆在初始化阶段就修改
-            _enumDict[name] = new BEValue(priority);
+            _enumDict[name] = new CEValue(priority);
         }
         protected ClapEnum()
         {
@@ -96,7 +96,7 @@ namespace ClapInfra.ClapEnum
             foreach (var method in methods)
             {
                 var metaData = method.GetCustomAttribute<TMemberAttribute>();
-                if (method.ReturnType != typeof(BEValue) ||
+                if (method.ReturnType != typeof(CEValue) ||
                     method.GetParameters().Length != 0 ||
                     metaData == null)
                 {
@@ -106,8 +106,8 @@ namespace ClapInfra.ClapEnum
                 Create(methodName, metaData.Priority);
             }
         }
-        private static Dictionary<string, BEValue> _enumDict = new();
-        public static BEValue GetBEValue([CallerMemberName] string name = "") => _enumDict[name];
+        private static Dictionary<string, CEValue> _enumDict = new();
+        public static CEValue GetBEValue([CallerMemberName] string name = "") => _enumDict[name];
     }
 
 }

@@ -6,16 +6,16 @@ namespace BlacksmithCore.Infra.Models.Core
     public class DefenseType : BlacksmithEnum<DefenseType>
     {
         [IsBlacksmithEnumMember(0)]
-        public BEValue RealReduction() => GetBEValue();
+        public CEValue RealReduction() => GetBEValue();
         [IsBlacksmithEnumMember(8)]
-        public BEValue ThornReduction() => GetBEValue();
+        public CEValue ThornReduction() => GetBEValue();
         [IsBlacksmithEnumMember(16)]
-        public BEValue CommonReduction() => GetBEValue();
+        public CEValue CommonReduction() => GetBEValue();
         [IsBlacksmithEnumMember(32)]
-        public BEValue RockArmor() => GetBEValue();
+        public CEValue RockArmor() => GetBEValue();
         [IsBlacksmithEnumMember(64)]
-        public BEValue ReadlArmor() => GetBEValue();
+        public CEValue ReadlArmor() => GetBEValue();
         [IsBlacksmithEnumMember(128)]
-        public BEValue CommonArmor() => GetBEValue();
+        public CEValue CommonArmor() => GetBEValue();
     }
 }

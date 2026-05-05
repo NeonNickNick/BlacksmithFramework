@@ -3,8 +3,7 @@ using ClapInfra.ClapProfession;
 
 namespace BlacksmithCore.Infra.Profession
 {
-    using DSL = DSLforSkillLogic;
-    public interface ISkillPackage : ISkillPackage<ISkillContext, IDSLSourceFile>
+    public interface ISkillPackage : IClapSkillPackage<ISkillContext, IDSLSourceFile>
     {
     }
 }

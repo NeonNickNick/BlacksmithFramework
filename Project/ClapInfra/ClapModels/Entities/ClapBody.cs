@@ -29,7 +29,7 @@ namespace ClapInfra.ClapModels.Entities
         }
         public TTargetComponent Get<TTargetComponent>()
         {
-            if(_components.TryGetValue(typeof(TTargetComponent), out var value))
+            if (_components.TryGetValue(typeof(TTargetComponent), out var value))
             {
                 return (TTargetComponent)value;
             }
@@ -40,9 +40,9 @@ namespace ClapInfra.ClapModels.Entities
         }
         public void Update()
         {
-            foreach(var component in _components.Values)
+            foreach (var component in _components.Values)
             {
-                if(component is IUpdatePerRound updateComponent)
+                if (component is IUpdatePerRound updateComponent)
                 {
                     updateComponent.Update();
                 }

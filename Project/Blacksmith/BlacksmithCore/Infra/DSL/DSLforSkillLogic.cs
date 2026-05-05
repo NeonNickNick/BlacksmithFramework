@@ -5,9 +5,6 @@ using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Judgement;
 using BlacksmithCore.Infra.Models.Judgement.Core;
 using BlacksmithCore.Infra.Models.Particular;
-using ClapInfra.ClapDSL;
-using ClapInfra.ClapJudgement;
-using ClapInfra.ClapJudgement.Core;
 namespace BlacksmithCore.Infra.DSL
 {
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
@@ -47,7 +44,7 @@ namespace BlacksmithCore.Infra.DSL
             protected readonly Community _owner;
             protected List<Sentence> _sentences = new();
             protected Stack<Sentence> _rhetoricCache = new();
-            protected Dictionary<DynamicJudgeRuleName.BEValue, List<Mutation>> _mutationsOnCompile = new();
+            protected Dictionary<DynamicJudgeRuleName.CEValue, List<Mutation>> _mutationsOnCompile = new();
             protected SourceFile(SourceFile origin)
             {
                 _owner = origin._owner;
@@ -91,7 +88,7 @@ namespace BlacksmithCore.Infra.DSL
             }
             public AttackFile WriteAttack(
                 float power,
-                AttackType.BEValue attackType,
+                AttackType.CEValue attackType,
                 float APFactor = 1,
                 int delayRounds = 0
             )
@@ -116,7 +113,7 @@ namespace BlacksmithCore.Infra.DSL
                         if (resolution.Type != AttackType.Instance.Real())
                         {
                             var defenses = main.Get<Defense>().Get();
-                            var APList = new List<DefenseType.BEValue>()
+                            var APList = new List<DefenseType.CEValue>()
                             {
                                 DefenseType.Instance.ThornReduction(),
                                 DefenseType.Instance.CommonReduction(),
@@ -124,7 +121,7 @@ namespace BlacksmithCore.Infra.DSL
                                 DefenseType.Instance.ReadlArmor(),
                                 DefenseType.Instance.CommonArmor()
                             };
-                            var armorList = new List<DefenseType.BEValue>()
+                            var armorList = new List<DefenseType.CEValue>()
                             {
                                 DefenseType.Instance.RockArmor(),
                                 DefenseType.Instance.ReadlArmor(),
@@ -201,7 +198,7 @@ namespace BlacksmithCore.Infra.DSL
             }
             public SourceFile WriteResource(
                 float power,
-                ResourceType.BEValue type,
+                ResourceType.CEValue type,
                 int delayRounds = 0
             )
             {
@@ -222,8 +219,8 @@ namespace BlacksmithCore.Infra.DSL
                 return new(this);
             }
             public SourceFile WriteEffect(
-                EffectType.BEValue type,
-                EffectTargetType.BEValue targetType,
+                EffectType.CEValue type,
+                EffectTargetType.CEValue targetType,
                 float power,
                 int duration,
                 Action<Community, Body, EffectEntity> effectAction
@@ -242,12 +239,12 @@ namespace BlacksmithCore.Infra.DSL
                 }, SentenceType.Effect, StructureType.Main));
                 return new(this);
             }
-            public SourceFile UseResource(float need, ResourceType.BEValue type, bool ifCommonOnly = false)
+            public SourceFile UseResource(float need, ResourceType.CEValue type, bool ifCommonOnly = false)
             {
                 return WriteFree(source => source.Focus.Get<Resource>().Use(type, need, ifCommonOnly));
             }
             public SourceFile LinkJudgeRuleDynamic(
-                DynamicJudgeRuleName.BEValue ruleKey,
+                DynamicJudgeRuleName.CEValue ruleKey,
                 List<Mutation> mutations)
             {
                 _mutationsOnCompile[ruleKey] = mutations;
@@ -293,7 +290,7 @@ namespace BlacksmithCore.Infra.DSL
             }
             public AttackFile WithInterupt()
             {
-                var interuptList = new List<ResourceType.BEValue>()
+                var interuptList = new List<ResourceType.CEValue>()
                 {
                     ResourceType.Instance.Iron(),
                     ResourceType.Instance.Gold_Iron(),
@@ -324,7 +321,7 @@ namespace BlacksmithCore.Infra.DSL
         /// <summary>
         /// 专用于外部产生的孤立效果生成
         /// </summary>
-        public static void AddEffectEntity(Body main, EffectType.BEValue type, int duration, IResolution resolution, Action<Body, EffectEntity> effectAction)
+        public static void AddEffectEntity(Body main, EffectType.CEValue type, int duration, IResolution resolution, Action<Body, EffectEntity> effectAction)
         {
             EffectEntity effect = new EffectEntity(type, duration, resolution);
             effect.Execute = (body) => effectAction(body, effect);
@@ -333,7 +330,7 @@ namespace BlacksmithCore.Infra.DSL
         /// <summary>
         /// 专用于被EffectResolution引导的效果生成
         /// </summary>
-        public static void AddEffectEntity(Community source, Body main, EffectType.BEValue type, int duration, EffectResolution resolution, Action<Community, Body, EffectEntity> effectAction)
+        public static void AddEffectEntity(Community source, Body main, EffectType.CEValue type, int duration, EffectResolution resolution, Action<Community, Body, EffectEntity> effectAction)
         {
             EffectEntity effect = new EffectEntity(type, duration, resolution);
             effect.Execute = (body) => effectAction(source, body, effect);

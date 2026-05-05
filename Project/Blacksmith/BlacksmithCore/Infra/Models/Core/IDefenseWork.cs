@@ -4,7 +4,7 @@ namespace BlacksmithCore.Infra.Models.Core
 {
     public interface IDefenseWork
     {
-        public abstract DefenseType.BEValue Type { get; set; }
-        public (int, int) Work(Body source, Body owner, int Attack, AttackType.BEValue type);
+        public abstract DefenseType.CEValue Type { get; set; }
+        public (int, int) Work(Body source, Body owner, int Attack, AttackType.CEValue type);
     }
 }

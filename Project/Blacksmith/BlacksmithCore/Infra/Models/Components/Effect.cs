@@ -15,7 +15,7 @@ namespace BlacksmithCore.Infra.Models.Components
         {
             _effects.AddRange(effectEntities);
         }
-        public void Execute(EffectType.BEValue type, Body body)
+        public void Execute(EffectType.CEValue type, Body body)
         {
             List<EffectEntity> tempList = _effects.Where(e => e.Type == type).ToList();
             foreach (var temp in tempList)

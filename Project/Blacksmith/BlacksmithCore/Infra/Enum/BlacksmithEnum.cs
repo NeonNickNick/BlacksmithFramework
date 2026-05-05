@@ -7,7 +7,7 @@ namespace BlacksmithCore.Infra.Enum
     {
 
     }
-    public abstract class BlacksmithEnum<T> : 
+    public abstract class BlacksmithEnum<T> :
         ClapEnum<T, IsBlacksmithEnumMember>, IBlacksmithEnum
         where T : BlacksmithEnum<T>, new()
     {

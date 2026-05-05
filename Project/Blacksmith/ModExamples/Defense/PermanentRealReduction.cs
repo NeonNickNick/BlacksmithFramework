@@ -5,7 +5,7 @@ namespace ModExamples.Defense
 {
     public class PermanentRealReduction : DefenseBase
     {
-        public override DefenseType.BEValue Type { get; set; } = DefenseType.Instance.RealReduction();
+        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.RealReduction();
         public override int Power { get; set; } = 0;
         public int Baseline { get; set; } = 1;
         public override bool CanMerge { get; set; } = false;
@@ -22,7 +22,7 @@ namespace ModExamples.Defense
             }
         }
 
-        public override (int, int) Work(Body source, Body owner, int attack, AttackType.BEValue type)
+        public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
             return ((int)MathF.Max(0, attack - Power), (int)MathF.Min(attack, Power));
         }

@@ -1,32 +1,18 @@
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.BuiltInProfessions;
+using ClapInfra.ClapModels.Components;
 namespace BlacksmithCore.Infra.Models.Components
 {
-    using DSL = DSLforSkillLogic;
-    public enum SkillDeclareResult
+    public class PackageContainer : ClapPackageContainer<ISkillPackage>
     {
-        Success,
-        Illegal,
-        Rejected
-    }
-    public class Skill
-    {
-        private class Package
+        public PackageContainer(ISkillPackage skillpackage) : base(skillpackage)
         {
-            public string Name { get; }
-            public ISkillPackage SkillPackage { get; }
-            public bool IsActive { get; set; } = true;
-            public Package(ISkillPackage skillpackage)
-            {
-                Name = skillpackage.GetType().Name;
-                SkillPackage = skillpackage;
-            }
         }
-        private List<Package> _packages = new()
-        {
-            new(new Common())
-        };
+    }
+    public class Skill : ClapSkill<PackageContainer, ISkillPackage, ISkillContext, IDSLSourceFile>
+    {
+        protected override List<PackageContainer> _packages { get; set; } = new() { new(new Common()) };
         public List<string> GetView()
         {
             if (_packages.Count < 2)
@@ -38,66 +24,6 @@ namespace BlacksmithCore.Infra.Models.Components
             return temp;
         }
         public bool HaveProfession => _packages.Count > 1;
-        public void AddPackage(ISkillPackage skillPacakge)
-        {
-            _packages.Add(new(skillPacakge));
-        }
-        public void AddSkill(string packageName, string skillName)
-        {
-            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Add(skillName);
-        }
-        public void RemoveSkill(string packageName, string skillName)
-        {
-            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Remove(skillName);
-        }
-        public SkillDeclareResult TryDeclare(string skillName, ISkillContext sc)
-        {
-            foreach (var package in _packages)
-            {
-                if (!package.IsActive || !package.SkillPackage.AvailableSkillNames.Contains(skillName))
-                {
-                    continue;
-                }
-                if (package.SkillPackage.SkillChecker[skillName](sc))
-                {
-                    return SkillDeclareResult.Success;
-                }
-                else
-                {
-                    return SkillDeclareResult.Rejected;
-                }
-            }
-            return SkillDeclareResult.Illegal;
-        }
-        public IDSLSourceFile Declare(string skillName, ISkillContext sc)
-        {
-            foreach (var package in _packages)
-            {
-                if (!package.IsActive || !package.SkillPackage.AvailableSkillNames.Contains(skillName))
-                {
-                    continue;
-                }
-                return package.SkillPackage.SkillSourceFileGenerator[skillName](sc);
-            }
-            throw new ArgumentException("Unreachable1!");
-        }
-        public List<IDSLSourceFile> GetPassiveSkill(ISkillContext sc)
-        {
-            return _packages.Select(p => p.SkillPackage.PassiveSkill(sc)).ToList();
-        }
-        public List<string> GetAvailableSkillNames()
-        {
-            return _packages
-                .Where(p => p.IsActive)
-                .SelectMany(p => p.SkillPackage.AvailableSkillNames)
-                .ToList();
-        }
-        public List<string> GetActivePackageNames()
-        {
-            return _packages
-                .Where(p => p.IsActive)
-                .Select(p => p.Name)
-                .ToList();
-        }
+
     }
 }

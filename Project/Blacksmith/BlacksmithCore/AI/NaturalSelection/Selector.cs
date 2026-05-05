@@ -64,10 +64,11 @@ namespace BlacksmithCore.AI.NaturalSelection
         }
         private static int End(GameInstance gameInstance)
         {
-            if(gameInstance.Player.Focus.Get<Health>().HP <= 0)
+            if (gameInstance.Player.Focus.Get<Health>().HP <= 0)
             {
                 return 1;
-            }else if(gameInstance.Enemy.Focus.Get<Health>().HP <= 0)
+            }
+            else if (gameInstance.Enemy.Focus.Get<Health>().HP <= 0)
             {
                 return -1;
             }

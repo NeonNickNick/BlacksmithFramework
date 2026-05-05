@@ -1,8 +1,7 @@
 using System.Reflection;
-using ClapInfra.ClapDSL;
 namespace ClapInfra.ClapProfession
 {
-    public interface ISkillPackage<TISkillContext, TIDSLSourceFile>
+    public interface IClapSkillPackage<TISkillContext, TIDSLSourceFile>
     {
         public List<string> AvailableSkillNames { get; }
         public Dictionary<string, Func<TISkillContext, bool>> SkillChecker { get; }
@@ -14,8 +13,8 @@ namespace ClapInfra.ClapProfession
         Main,
         Modifier
     }
-    public abstract class ClapSkillPackage<TISkillContext, TIDSLSourceFile> 
-        : ISkillPackage<TISkillContext, TIDSLSourceFile>
+    public abstract class ClapSkillPackage<TISkillContext, TIDSLSourceFile>
+        : IClapSkillPackage<TISkillContext, TIDSLSourceFile>
     {
         public abstract PackageType PackageType { get; protected set; }
         private readonly List<string> _availableSkillNames = new();

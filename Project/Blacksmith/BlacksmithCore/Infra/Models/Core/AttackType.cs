@@ -6,10 +6,10 @@ namespace BlacksmithCore.Infra.Models.Core
     public class AttackType : BlacksmithEnum<AttackType>
     {
         [IsBlacksmithEnumMember(256)]
-        public BEValue Physical() => GetBEValue();
+        public CEValue Physical() => GetBEValue();
         [IsBlacksmithEnumMember(128)]
-        public BEValue Magical() => GetBEValue();
+        public CEValue Magical() => GetBEValue();
         [IsBlacksmithEnumMember(0)]
-        public BEValue Real() => GetBEValue();
+        public CEValue Real() => GetBEValue();
     }
 }

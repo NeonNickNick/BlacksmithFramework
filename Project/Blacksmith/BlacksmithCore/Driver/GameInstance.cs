@@ -3,6 +3,7 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Judgement;
 using BlacksmithCore.Infra.Profession;
+using ClapInfra.ClapModels.Components;
 
 namespace BlacksmithCore.Driver
 {
@@ -40,7 +41,7 @@ namespace BlacksmithCore.Driver
         public GameInstance DeepCopy()
         {
             GameInstance res = new();
-            foreach(var pair in History.SkillHistory)
+            foreach (var pair in History.SkillHistory)
             {
                 res.Declare(pair.Item1.SkillName, pair.Item1.Param, pair.Item2.SkillName, pair.Item2.Param);
             }
@@ -56,7 +57,7 @@ namespace BlacksmithCore.Driver
             DefaultSkillContext context = new(skillName, Enemy, param);
             return Enemy.Focus.Get<Skill>().TryDeclare(skillName, context);
         }
-       
+
         public void Declare(string skillName, int param, string esn, int ep)
         {
             var playerContext = new DefaultSkillContext(skillName, Player, param);
@@ -64,7 +65,7 @@ namespace BlacksmithCore.Driver
 
             History.SkillHistory.Add((playerContext, enemyContext));
 
-            var psfs = new List<IDSLSourceFile>(){ Player.Focus.Get<Skill>().Declare(skillName, playerContext) }; 
+            var psfs = new List<IDSLSourceFile>() { Player.Focus.Get<Skill>().Declare(skillName, playerContext) };
             psfs.InsertRange(0, Player.Focus.Get<Skill>().GetPassiveSkill(playerContext));
 
             var esfs = new List<IDSLSourceFile>() { Enemy.Focus.Get<Skill>().Declare(esn, enemyContext) };

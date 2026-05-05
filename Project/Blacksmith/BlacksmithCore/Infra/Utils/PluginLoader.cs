@@ -1,6 +1,5 @@
 using System.Reflection;
 using BlacksmithCore.Infra.Attributes;
-using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Enum;
 using BlacksmithCore.Infra.Profession;
 using ClapInfra.ClapEnum;
@@ -8,7 +7,6 @@ using ClapInfra.ClapProfession;
 using ClapInfra.ClapUtils;
 namespace BlacksmithCore.Infra.Utils
 {
-    using DSL = DSLforSkillLogic;
     public static class PluginLoader
     {
         private static DllLoader dllLoader = new();

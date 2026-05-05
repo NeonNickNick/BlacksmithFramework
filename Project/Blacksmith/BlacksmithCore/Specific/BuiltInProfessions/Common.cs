@@ -162,7 +162,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         private IDSLSourceFile Warlock(ISkillContext sc)
         {
-            sc.Self.Focus.Get<Skill>().AddPackage(new Warlock());
+            sc.Self.Focus.Get<Skill>().AddPackage(new(new Warlock()));
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Iron())
                 .WriteFree(source =>
@@ -178,7 +178,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         private IDSLSourceFile Cannon(ISkillContext sc)
         {
-            sc.Self.Focus.Get<Skill>().AddPackage(new Cannon());
+            sc.Self.Focus.Get<Skill>().AddPackage(new(new Cannon()));
             Pen pen = sf => sf
                 .UseResource(4, ResourceType.Instance.Iron())
                 .WriteDefense(3, new CommonReduction())
@@ -195,7 +195,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         private IDSLSourceFile Driver(ISkillContext sc)
         {
-            sc.Self.Focus.Get<Skill>().AddPackage(new Driver());
+            sc.Self.Focus.Get<Skill>().AddPackage(new(new Driver()));
             Pen pen = sf => sf
                 .UseResource(3, ResourceType.Instance.Iron())
                 .WriteFree(source =>
@@ -211,7 +211,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         private IDSLSourceFile BloodSigil(ISkillContext sc)
         {
-            sc.Self.Focus.Get<Skill>().AddPackage(new BloodSigil());
+            sc.Self.Focus.Get<Skill>().AddPackage(new(new BloodSigil()));
             Pen pen = sf => sf
                 .UseResource(7, ResourceType.Instance.Iron())
                 .WriteFree(source =>
@@ -236,7 +236,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         private IDSLSourceFile Lancer(ISkillContext sc)
         {
-            sc.Self.Focus.Get<Skill>().AddPackage(new Lancer());
+            sc.Self.Focus.Get<Skill>().AddPackage(new(new Lancer()));
             Pen pen = sf => sf
                 .UseResource(4, ResourceType.Instance.Iron())
                 .WriteFree(source =>

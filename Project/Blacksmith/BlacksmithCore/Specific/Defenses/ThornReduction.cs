@@ -7,7 +7,7 @@ namespace BlacksmithCore.Specific.Defenses
     using DSL = DSLforSkillLogic;
     public class ThornReduction : DefenseBase
     {
-        public override DefenseType.BEValue Type { get; set; } = DefenseType.Instance.ThornReduction();
+        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.ThornReduction();
         public override int Power { get; set; } = 0;
         public override bool CanMerge { get; set; } = false;
         public override bool IsDead { get; set; } = false;
@@ -20,7 +20,7 @@ namespace BlacksmithCore.Specific.Defenses
         {
             IsDead = true;
         }
-        public override (int, int) Work(Body source, Body owner, int attack, AttackType.BEValue type)
+        public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
             int res = (int)MathF.Max(0, attack - Power);
             int absorbed = (int)MathF.Min(attack, Power);

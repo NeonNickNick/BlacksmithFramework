@@ -4,7 +4,7 @@ using ClapInfra.ClapProfession;
 namespace BlacksmithCore.Infra.Profession
 {
     using DSL = DSLforSkillLogic;
-    public abstract class SkillPackageBase 
+    public abstract class SkillPackageBase
         : ClapSkillPackage<ISkillContext, IDSLSourceFile>
     {
         protected override void AddModOnInit() => ProfessionRegistry.AddModOnInit(this);

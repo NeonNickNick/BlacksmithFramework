@@ -8,11 +8,11 @@ namespace BlacksmithCore.Infra.Models.Components
     {
         private class ResourceTemplate
         {
-            public ResourceType.BEValue CommonType { get; }
-            public ResourceType.BEValue GoldType { get; }
+            public ResourceType.CEValue CommonType { get; }
+            public ResourceType.CEValue GoldType { get; }
             public float Common { get; set; } = 0;
             public float Gold { get; set; } = 0;
-            public ResourceTemplate(ResourceType.BEValue commonType, ResourceType.BEValue goldType)
+            public ResourceTemplate(ResourceType.CEValue commonType, ResourceType.CEValue goldType)
             {
                 CommonType = commonType;
                 GoldType = goldType;
@@ -49,7 +49,7 @@ namespace BlacksmithCore.Infra.Models.Components
                     Common -= need;
                 }
             }
-            public void Gain(ResourceType.BEValue type, float add)
+            public void Gain(ResourceType.CEValue type, float add)
             {
                 if (type == CommonType)
                 {
@@ -65,7 +65,7 @@ namespace BlacksmithCore.Infra.Models.Components
                 }
             }
         }
-        private Dictionary<ResourceType.BEValue, ResourceTemplate> _resources = new();
+        private Dictionary<ResourceType.CEValue, ResourceTemplate> _resources = new();
         public Resource()
         {
             Type type = ResourceType.Instance.GetType();
@@ -74,7 +74,7 @@ namespace BlacksmithCore.Infra.Models.Components
             {
                 throw new ArgumentException("Unreachable2!");//不应到达这里
             }
-            var dict = field.GetValue(null) as Dictionary<string, ResourceType.BEValue>;
+            var dict = field.GetValue(null) as Dictionary<string, ResourceType.CEValue>;
             if (dict == null)
             {
                 throw new ArgumentException("Unreachable3!");//不应到达这里
@@ -104,19 +104,19 @@ namespace BlacksmithCore.Infra.Models.Components
                 _resources[dict[rest]] = template;
             }
         }
-        public bool Check(ResourceType.BEValue type, float need, bool ifCommonOnly = false)
+        public bool Check(ResourceType.CEValue type, float need, bool ifCommonOnly = false)
         {
             return _resources[type].Check(need, ifCommonOnly);
         }
-        public void Use(ResourceType.BEValue type, float need, bool ifCommonOnly = false)
+        public void Use(ResourceType.CEValue type, float need, bool ifCommonOnly = false)
         {
             _resources[type].Use(need, ifCommonOnly);
         }
-        public void Gain(ResourceType.BEValue type, float need)
+        public void Gain(ResourceType.CEValue type, float need)
         {
             _resources[type].Gain(type, need);
         }
-        public float Query(ResourceType.BEValue type)
+        public float Query(ResourceType.CEValue type)
         {
             if (type == _resources[type].CommonType)
             {
@@ -127,30 +127,30 @@ namespace BlacksmithCore.Infra.Models.Components
                 return _resources[type].Gold;
             }
         }
-        public float QueryAll(ResourceType.BEValue type)
+        public float QueryAll(ResourceType.CEValue type)
         {
             return _resources[type].Gold + _resources[type].Common;
         }
-        public float QuerySpecific(ResourceType.BEValue type)
+        public float QuerySpecific(ResourceType.CEValue type)
         {
             float res = 0;
             foreach (var name in _resources.Keys)
             {
-                if( name == ResourceType.Instance.Iron() ||
+                if (name == ResourceType.Instance.Iron() ||
                     name == ResourceType.Instance.Gold_Iron() ||
                     name == ResourceType.Instance.Space() ||
                     name == ResourceType.Instance.Space())
                 {
                     continue;
                 }
-                res +=  _resources[type].Gold + _resources[type].Common;
+                res += _resources[type].Gold + _resources[type].Common;
             }
             return res;
         }
         public List<(string name, float quantity)> GetView()
         {
             List<(string name, float quantity)> view = new();
-            foreach(var key in _resources.Keys)
+            foreach (var key in _resources.Keys)
             {
                 view.Add((key.ToString(), Query(key)));
             }

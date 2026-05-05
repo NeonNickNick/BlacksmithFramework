@@ -6,8 +6,8 @@ namespace BlacksmithCore.Infra.Models.Core
     public class EffectTargetType : BlacksmithEnum<EffectTargetType>
     {
         [IsBlacksmithEnumMember(0)]
-        public BEValue Self() => GetBEValue();
+        public CEValue Self() => GetBEValue();
         [IsBlacksmithEnumMember(8)]
-        public BEValue Enemy() => GetBEValue();
+        public CEValue Enemy() => GetBEValue();
     }
 }
