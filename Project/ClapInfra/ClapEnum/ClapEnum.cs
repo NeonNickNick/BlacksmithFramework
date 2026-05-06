@@ -4,14 +4,14 @@ namespace ClapInfra.ClapEnum
 {
     public interface IClapEnum
     {
-        public abstract Type GetBEValueType();
+        public abstract Type GetCEValueType();
         public abstract void Create(string name, int priority);
     }
     public abstract class ClapEnum : IClapEnum
     {
         protected static bool _isOpen = true;
         public static void CloseFactory() => _isOpen = false;
-        public abstract Type GetBEValueType();
+        public abstract Type GetCEValueType();
         public abstract void Create(string name, int priority);
     }
     public interface IIsClapEnumMember
@@ -68,7 +68,7 @@ namespace ClapInfra.ClapEnum
                 return base.ToString() ?? "";
             }
         }
-        public override Type GetBEValueType()
+        public override Type GetCEValueType()
         {
             return typeof(CEValue);
         }
@@ -107,7 +107,7 @@ namespace ClapInfra.ClapEnum
             }
         }
         private static Dictionary<string, CEValue> _enumDict = new();
-        public static CEValue GetBEValue([CallerMemberName] string name = "") => _enumDict[name];
+        public static CEValue GetCEValue([CallerMemberName] string name = "") => _enumDict[name];
     }
 
 }

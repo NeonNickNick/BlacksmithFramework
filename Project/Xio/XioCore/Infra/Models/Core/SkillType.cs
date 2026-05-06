@@ -6,20 +6,20 @@ namespace XioCore.Infra.Models.Core
     public class SkillType : XioEnum<SkillType>
     {
         [IsXioEnumMember(0)]
-        public CEValue Attack() => GetBEValue();
+        public CEValue Attack() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Defense() => GetBEValue();
+        public CEValue Defense() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Resource() => GetBEValue();
+        public CEValue Resource() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Xiaoxiao() => GetBEValue();
+        public CEValue Xiaoxiao() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Tan() => GetBEValue();
+        public CEValue Tan() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Taichi() => GetBEValue();
+        public CEValue Taichi() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Shengji() => GetBEValue();
+        public CEValue Shengji() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Zige() => GetBEValue();
+        public CEValue Zige() => GetCEValue();
     }
 }

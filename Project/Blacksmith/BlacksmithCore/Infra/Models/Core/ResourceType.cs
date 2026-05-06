@@ -6,14 +6,14 @@ namespace BlacksmithCore.Infra.Models.Core
     public class ResourceType : BlacksmithEnum<ResourceType>
     {
         [IsBlacksmithEnumMember(0)]
-        public CEValue Iron() => GetBEValue();
+        public CEValue Iron() => GetCEValue();
         [IsBlacksmithEnumMember(1)]
-        public CEValue Gold_Iron() => GetBEValue();
+        public CEValue Gold_Iron() => GetCEValue();
         [IsBlacksmithEnumMember(2)]
-        public CEValue Space() => GetBEValue();
+        public CEValue Space() => GetCEValue();
         [IsBlacksmithEnumMember(3)]
-        public CEValue Time() => GetBEValue();
+        public CEValue Time() => GetCEValue();
         [IsBlacksmithEnumMember(4)]
-        public CEValue Magic() => GetBEValue();
+        public CEValue Magic() => GetCEValue();
     }
 }

@@ -62,7 +62,7 @@ namespace BlacksmithCore.Infra.Utils
         private static void ProcessBlacksmithEnumModifiers(Type type)
         {
             var supportedEnumDict = BlacksmithEnumRegistry.SupportedEnumDict;
-            var eeValueTypeDict = BlacksmithEnumRegistry.BEValueTypeDict;
+            var eeValueTypeDict = BlacksmithEnumRegistry.CEValueTypeDict;
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
             foreach (var method in methods)
             {

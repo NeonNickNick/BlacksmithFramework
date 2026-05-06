@@ -8,8 +8,8 @@ namespace XioCore.Infra.Enum
         private static EnumRegistry<IXioEnum, IsXioEnumMember> _enumRegistry = new();
         public static IReadOnlyDictionary<Type, IXioEnum> SupportedEnumDict
             => _enumRegistry.SupportedEnumDict;
-        public static IReadOnlyDictionary<Type, Type> BEValueTypeDict
-            => _enumRegistry.BEValueTypeDict;
+        public static IReadOnlyDictionary<Type, Type> CEValueTypeDict
+            => _enumRegistry.CEValueTypeDict;
         public static void RegistXioEnum(Type type, IXioEnum instance)
             => _enumRegistry.RegistEnum(type, instance);
         public static void RegistXioEnumModifier(IXioEnum targetEnum, string name, int priority)

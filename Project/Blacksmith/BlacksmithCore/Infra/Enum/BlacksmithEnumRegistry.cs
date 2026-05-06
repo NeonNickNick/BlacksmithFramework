@@ -8,8 +8,8 @@ namespace BlacksmithCore.Infra.Enum
         private static EnumRegistry<IBlacksmithEnum, IsBlacksmithEnumMember> _enumRegistry = new();
         public static IReadOnlyDictionary<Type, IBlacksmithEnum> SupportedEnumDict
             => _enumRegistry.SupportedEnumDict;
-        public static IReadOnlyDictionary<Type, Type> BEValueTypeDict
-            => _enumRegistry.BEValueTypeDict;
+        public static IReadOnlyDictionary<Type, Type> CEValueTypeDict
+            => _enumRegistry.CEValueTypeDict;
         public static void RegistBlacksmithEnum(Type type, IBlacksmithEnum instance)
             => _enumRegistry.RegistEnum(type, instance);
         public static void RegistBlacksmithEnumModifier(IBlacksmithEnum targetEnum, string name, int priority)

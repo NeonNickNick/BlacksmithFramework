@@ -9,27 +9,27 @@ namespace BlacksmithCore.Infra.Models.Judgement
     public class JudgeStage : BlacksmithEnum<JudgeStage>
     {
         [IsBlacksmithEnumMember(0)]
-        public CEValue OnBegin() => GetBEValue();
+        public CEValue OnBegin() => GetCEValue();
         [IsBlacksmithEnumMember(8)]
-        public CEValue OnEffectTaking_AfterResolutionWritten() => GetBEValue();
+        public CEValue OnEffectTaking_AfterResolutionWritten() => GetCEValue();
         [IsBlacksmithEnumMember(16)]
-        public CEValue OnEffectSwaping() => GetBEValue();
+        public CEValue OnEffectSwaping() => GetCEValue();
         [IsBlacksmithEnumMember(32)]
-        public CEValue OnAttackCanceling() => GetBEValue();
+        public CEValue OnAttackCanceling() => GetCEValue();
         [IsBlacksmithEnumMember(64)]
-        public CEValue OnAttackSwaping() => GetBEValue();
+        public CEValue OnAttackSwaping() => GetCEValue();
         [IsBlacksmithEnumMember(128)]
-        public CEValue OnApplyingEffect() => GetBEValue();
+        public CEValue OnApplyingEffect() => GetCEValue();
         [IsBlacksmithEnumMember(256)]
-        public CEValue OnEffectTaking_AfterTransport() => GetBEValue();
+        public CEValue OnEffectTaking_AfterTransport() => GetCEValue();
         [IsBlacksmithEnumMember(512)]
-        public CEValue OnApplyingOthers() => GetBEValue();
+        public CEValue OnApplyingOthers() => GetCEValue();
         [IsBlacksmithEnumMember(1024)]
-        public CEValue OnUpdating() => GetBEValue();
+        public CEValue OnUpdating() => GetCEValue();
         [IsBlacksmithEnumMember(2048)]
-        public CEValue OnEffectTaking_AfterResult() => GetBEValue();
+        public CEValue OnEffectTaking_AfterResult() => GetCEValue();
         [IsBlacksmithEnumMember(4096)]
-        public CEValue OnEnd() => GetBEValue();
+        public CEValue OnEnd() => GetCEValue();
     }
     public enum RuleType
     {

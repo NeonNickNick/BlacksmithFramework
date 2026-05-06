@@ -6,10 +6,10 @@ namespace XioCore.Infra.Models.Core
     public class ResourceType : XioEnum<ResourceType>
     {
         [IsXioEnumMember(0)]
-        public CEValue Xio() => GetBEValue();
+        public CEValue Xio() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue IceShield() => GetBEValue();
+        public CEValue IceShield() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue Light() => GetBEValue();
+        public CEValue Light() => GetCEValue();
     }
 }

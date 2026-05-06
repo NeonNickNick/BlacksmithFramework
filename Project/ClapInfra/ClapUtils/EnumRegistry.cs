@@ -9,16 +9,16 @@ namespace ClapInfra.ClapUtils
         private Dictionary<Type, TIEnum> _supportedEnumDict = new();
         public IReadOnlyDictionary<Type, TIEnum> SupportedEnumDict
             => _supportedEnumDict;
-        private Dictionary<Type, Type>? _BEValueTypeDict = null;
-        public IReadOnlyDictionary<Type, Type> BEValueTypeDict
+        private Dictionary<Type, Type>? _CEValueTypeDict = null;
+        public IReadOnlyDictionary<Type, Type> CEValueTypeDict
         {
             get
             {
-                if (_BEValueTypeDict == null)
+                if (_CEValueTypeDict == null)
                 {
-                    _BEValueTypeDict = SupportedEnumDict.ToDictionary(s => s.Key, s => s.Value.GetBEValueType());
+                    _CEValueTypeDict = SupportedEnumDict.ToDictionary(s => s.Key, s => s.Value.GetCEValueType());
                 }
-                return _BEValueTypeDict;
+                return _CEValueTypeDict;
             }
         }
         private List<string> _names = new();

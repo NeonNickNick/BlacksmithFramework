@@ -49,7 +49,7 @@ namespace XioCore.Infra.Utils
         private static void ProcessXioEnumModifiers(Type type)
         {
             var supportedEnumDict = XioEnumRegistry.SupportedEnumDict;
-            var eeValueTypeDict = XioEnumRegistry.BEValueTypeDict;
+            var eeValueTypeDict = XioEnumRegistry.CEValueTypeDict;
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
             foreach (var method in methods)
             {

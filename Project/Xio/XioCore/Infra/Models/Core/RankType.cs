@@ -6,15 +6,15 @@ namespace XioCore.Infra.Models.Core
     public class RankType : XioEnum<RankType>
     {
         [IsXioEnumMember(4)]
-        public CEValue Default() => GetBEValue();
+        public CEValue Default() => GetCEValue();
         [IsXioEnumMember(3)]
-        public CEValue Golden() => GetBEValue();
+        public CEValue Golden() => GetCEValue();
         [IsXioEnumMember(2)]
-        public CEValue Diamond() => GetBEValue();
+        public CEValue Diamond() => GetCEValue();
         [IsXioEnumMember(1)]
-        public CEValue BlackHole() => GetBEValue();
+        public CEValue BlackHole() => GetCEValue();
         [IsXioEnumMember(0)]
-        public CEValue WanXiang() => GetBEValue();
+        public CEValue WanXiang() => GetCEValue();
         public Dictionary<int, CEValue> RankDict
         {
             get

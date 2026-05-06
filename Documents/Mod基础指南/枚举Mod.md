@@ -51,19 +51,19 @@ using BlacksmithCore.Infra.Enum;
 public class Names : BlacksmithEnum<Names>
 {
     [IsBlacksmithEnumMember(0)]
-    public BEValue Alice() => GetBEValue();
+    public CEValue Alice() => GetCEValue();
 
     [IsBlacksmithEnumMember(1)]
-    public BEValue Bob() => GetBEValue();
+    public CEValue Bob() => GetCEValue();
 
     [IsBlacksmithEnumMember(2)]
-    public BEValue Carol() => GetBEValue();
+    public CEValue Carol() => GetCEValue();
 }
 ```
 
 说明：
 
-- 返回类型必须是当前枚举自己的 `BEValue`。
+- 返回类型必须是当前枚举自己的 `CEValue`。
 - 方法必须是 `public` 实例方法。
 - 方法不能带参数。
 - `[IsBlacksmithEnumMember(priority)]` 中的值决定排序优先级。值越小排在越前面。
@@ -90,10 +90,10 @@ using BlacksmithCore.Infra.Attributes;
 public static class NamesExtension
 {
     [IsBlacksmithEnumMember(-1)]
-    public static Names.BEValue Carol(this Names names) => Names.GetBEValue();
+    public static Names.CEValue Carol(this Names names) => Names.GetCEValue();
 
     [IsBlacksmithEnumMember(3)]
-    public static Names.BEValue Dave(this Names names) => Names.GetBEValue();
+    public static Names.CEValue Dave(this Names names) => Names.GetCEValue();
 }
 ```
 
@@ -101,7 +101,7 @@ public static class NamesExtension
 
 - 必须是 `public static` 方法。
 - 第一个也是唯一一个参数必须是被扩展的枚举类型本身，例如 `this Names names`。
-- 返回类型必须是该枚举的 `BEValue`。
+- 返回类型必须是该枚举的 `CEValue`。
 - 方法名就是最终成员名。
 
 ### 覆盖与追加的区别
@@ -133,8 +133,8 @@ Gold_普通资源名
 public static class ResourceExtension
 {
     [IsBlacksmithEnumMember(0)]
-    public static ResourceType.BEValue Cross(this ResourceType resourceType)
-        => ResourceType.GetBEValue();
+    public static ResourceType.CEValue Cross(this ResourceType resourceType)
+        => ResourceType.GetCEValue();
 }
 ```
 

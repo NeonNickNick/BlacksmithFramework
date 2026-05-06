@@ -1,23 +1,30 @@
 # Blacksmith Framework
 
-Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。程序启动后加载运行目录中的插件 DLL，初始化内置 AI，然后在 `http://localhost:5000` 提供本地 Web 对战服务。
+Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。Xio 是基于同一基础设施（ClapInfra）构建的第二个拍手游戏。程序启动后加载运行目录中的插件 DLL，初始化内置 AI，然后在 `http://localhost:5000` 提供本地 Web 对战服务。
 
 ## 项目结构
 
 | 项目 | 说明 |
 |---|---|
-| `ClapInfra` | 最底层的基础设施库。提供可扩展枚举框架 `ClapEnum<T>`、技能包反射配对机制 `ClapSkillPackage`、通用实体组件模板 `ClapBody`、决议缓冲区模型 `ClapTurnContext`、判定管线骨架 `ClapJudger`/`ClapJudgeRuleManager`/`ClapIntent`、DSL 编译契约 `IClapDSLSourceFile`，以及插件扫描工具 `DllLoader`。不依赖任何 Blacksmith 项目。 |
-| `BlacksmithCore` | 基于 `ClapInfra` 构建的核心引擎。包含领域模型、技能 DSL、判定引擎、动态规则、AI 策略、插件加载器。 |
-| `BlacksmithClient` | 唯一的运行入口。ASP.NET Core 本地站点，托管 `wwwroot` 静态前端，暴露 `/api/*` 最小 API，通过 `WebGameSession` 组装会话与快照。 |
-| `ModExamples` | 示例 Mod 源码。演示扩展枚举 + 新职业 + Common 修改器的组合写法。 |
+| `ClapInfra` | 共享基础设施库。提供可扩展枚举框架 `ClapEnum<T>`、技能包反射配对机制 `ClapSkillPackage`、技能管理 `ClapSkill`、通用实体组件模板 `ClapBody`、决议缓冲区模型 `ClapTurnContext`、判定管线骨架 `ClapJudger`/`ClapJudgeRuleManager`/`ClapIntent`、DSL 编译契约 `IClapDSLSourceFile`、程序集扫描 `DllLoader`、枚举注册 `EnumRegistry`。不依赖任何游戏项目。 |
+| `BlacksmithCore` | Blacksmith 核心引擎。包含领域模型、技能 DSL、判定引擎、动态规则、AI 策略、插件加载器。基于 `ClapInfra`。 |
+| `BlacksmithClient` | Blacksmith 运行入口。ASP.NET Core 本地站点，托管 `wwwroot` 静态前端，暴露 `/api/*` 最小 API。 |
+| `ModExamples` | Blacksmith 示例 Mod 源码。演示扩展枚举 + 新职业 + Common 修改器 + 自定义防御的组合写法。 |
+| `XioCore` | Xio 核心引擎。包含领域模型、技能 DSL、判定引擎、插件加载器。基于 `ClapInfra`。 |
+| `XioClient` | Xio 运行入口。与 BlacksmithClient 架构相同的 ASP.NET Core 本地站点。 |
 
-源代码位于 `Project/` 目录下，解决方案文件为 `Project/Blacksmith.sln`。所有项目目标框架为 `net8.0`。
+源代码位于 `Project/` 目录下，解决方案文件为 `Project/Project.sln`。所有项目目标框架为 `net8.0`。
 
 ## 运行方式
 
 ```powershell
+# 运行 Blacksmith
 cd .\Project
 dotnet run --project .\Blacksmith\BlacksmithClient\BlacksmithClient.csproj
+
+# 运行 Xio
+cd .\Project
+dotnet run --project .\Xio\XioClient\XioClient.csproj
 ```
 
 程序在 `http://localhost:5000` 启动并自动打开浏览器。
@@ -45,7 +52,8 @@ dotnet run --project .\Blacksmith\BlacksmithClient\BlacksmithClient.csproj
 
 ## 文档导航
 
-- [规则说明](./Documents/规则/RuleCN.md)
+- [Blacksmith规则说明](./Documents/规则/BlacksmithRuleCN.md)
+- [Xio规则说明](./Documents/规则/XioRuleCN.md)
 - [项目架构](./Documents/项目架构.md)
 - [Mod 基础指南](./Documents/Mod基础指南/引言.md)
 - [Mod 进阶指南](./Documents/Mod进阶指南/引言.md)
@@ -66,3 +74,7 @@ Blacksmith 的扩展体系是"启动期装配型插件架构"：
 - **技能包**：`MainProfession`（主职业）和 `ProfessionModifier`（挂到已有职业上的技能补丁）
 - **防御类型**：继承 `DefenseBase` 实现新的防御行为
 - **AI 策略**：实现 `IAIStrategy` 接口
+
+## 关于 Xio
+
+Xio 是与 Blacksmith 并行构建的第二个拍手游戏，共享 ClapInfra 基础设施。它的存在验证了 ClapInfra 的"机制不内容"设计——通过继承 ClapInfra 的泛型抽象并注入自己的组件、枚举和规则，Xio 仅用约 30 个源文件就完成了完整的游戏引擎。两个游戏的 DSL、判定管线、职业系统和枚举框架都建立在同一套 ClapInfra 基类之上，但具体实现完全独立。
