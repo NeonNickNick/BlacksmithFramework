@@ -68,7 +68,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
                 _modifiersBefore.ForEach(o => o.TimePass());
                 _modifiersAfter.ForEach(o => o.TimePass());
             }
-            public Action<Community, Community> Build()
+            public void Execute(Community player, Community enemy)
             {
                 Update();
                 Action<Community, Community>? overrideRule = null;
@@ -80,7 +80,6 @@ namespace BlacksmithCore.Infra.Models.Judgement
                         break;
                     }
                 }
-                return (player, enemy) =>
                 {
                     // BEFORE modifiers
                     foreach (var rule in _modifiersBefore)
@@ -159,7 +158,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
             {
                 foreach (var stage in _defaultRuleContainers)
                 {
-                    stage.Value.Build()(a, b);
+                    stage.Value.Execute(a, b);
                 }
             };
         }
@@ -233,11 +232,11 @@ namespace BlacksmithCore.Infra.Models.Judgement
         private static void SwapEffects(List<EffectResolution> playerResolutions,
             List<EffectResolution> enemyResolutions)
         {
-            var playerTemp = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToList();
-            var enemyTemp = enemyResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToList();
+            var playerTemp = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToHashSet();
+            var enemyTemp = enemyResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToHashSet();
 
-            playerResolutions.RemoveAll(e => playerTemp.Contains(e));
-            enemyResolutions.RemoveAll(e => enemyTemp.Contains(e));
+            playerResolutions.RemoveAll(playerTemp.Contains);
+            enemyResolutions.RemoveAll(enemyTemp.Contains);
 
             playerResolutions.AddRange(enemyTemp);
             enemyResolutions.AddRange(playerTemp);
@@ -252,8 +251,8 @@ namespace BlacksmithCore.Infra.Models.Judgement
         private static void CancelAttackResolutions(List<AttackResolution> playerResolutions,
             List<AttackResolution> enemyResolutions)
         {
-            playerResolutions.OrderBy(a => a.Type);
-            enemyResolutions.OrderBy(a => a.Type);
+            playerResolutions = playerResolutions.OrderBy(a => a.Type).ToList();
+            enemyResolutions = enemyResolutions.OrderBy(a => a.Type).ToList();
             int playerIndex = 0;
             int enemyIndex = 0;
 
@@ -333,18 +332,17 @@ namespace BlacksmithCore.Infra.Models.Judgement
         }
 
         #endregion
-        public override Action<Community, Community> GetRule()
+        public override void Judge(Community player, Community enemy)
         {
             if(_notDefaultRounds == 0)
             {
-                return _defaultRule;
+                _defaultRule(player, enemy);
             }
             _notDefaultRounds--;
-            return (a, b) => 
             {
                 foreach (var stage in _ruleContainers)
                 {
-                    stage.Value.Build();
+                    stage.Value.Execute(player, enemy);
                 }
             };
         }

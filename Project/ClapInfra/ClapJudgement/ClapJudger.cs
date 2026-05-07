@@ -25,7 +25,7 @@ namespace ClapInfra.ClapJudgement
             _onJudge = () =>
             {
                 TranslateIntentsToResolutions();
-                JudgeRuleManager.GetRule()(Player, Enemy);
+                JudgeRuleManager.Judge(Player, Enemy);
             };
         }
         protected virtual IEnumerable<TIntent> Compile(List<TIDSLSourceFile> sourceFiles)

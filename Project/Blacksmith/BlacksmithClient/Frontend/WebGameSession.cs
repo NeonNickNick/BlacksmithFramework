@@ -17,6 +17,8 @@ namespace BlacksmithClient.Frontend
         private bool _started;
         private string _modeName = string.Empty;
         private bool _isManual;
+        private Task<(string skillName, int param)>? _pendingAI;
+        private CancellationTokenSource? _cts;
 
         public WebGameSession(List<IAIStrategy> strategies)
         {
@@ -36,6 +38,11 @@ namespace BlacksmithClient.Frontend
 
         public object StartGame(int mode)
         {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+            _pendingAI = null;
+
             var starter = new BackendStarter();
             _game = starter.StartBackend();
             _mode = mode;
@@ -55,10 +62,22 @@ namespace BlacksmithClient.Frontend
                 _modeName = _activeAI.Name;
             }
 
+            StartAIComputation();
+
             return BuildSnapshot();
         }
 
-        public DeclareResult DeclareTurn(string skillName, int param, string esn, int ep)
+        private void StartAIComputation()
+        {
+            if (_isManual || _activeAI == null || _game == null)
+                return;
+
+            _cts = new CancellationTokenSource();
+            var ct = _cts.Token;
+            _pendingAI = Task.Run(() => _activeAI.ChooseSkill(_game.Enemy, _game.Player), ct);
+        }
+
+        public async Task<DeclareResult> DeclareTurnAsync(string skillName, int param, string esn, int ep)
         {
             if (_game == null || !_started)
                 return new DeclareResult { Ok = false, Message = "Game not started.", Snapshot = GetSnapshot() };
@@ -73,7 +92,15 @@ namespace BlacksmithClient.Frontend
             if (!_isManual && _activeAI != null)
             {
                 var sw = Stopwatch.StartNew();
-                (enemySkillName, enemyParam) = _activeAI.ChooseSkill(_game.Enemy, _game.Player);
+                if (_pendingAI == null)
+                {
+                    (enemySkillName, enemyParam) = _activeAI.ChooseSkill(_game.Enemy, _game.Player);
+                }
+                else
+                {
+                    (enemySkillName, enemyParam) = await _pendingAI;
+                    _pendingAI = null;
+                }
                 sw.Stop();
                 _thinkingTimesMs.Add(sw.Elapsed.TotalMilliseconds);
             }
@@ -89,6 +116,8 @@ namespace BlacksmithClient.Frontend
             }
 
             _game.Declare(skillName, param, enemySkillName, enemyParam);
+
+            StartAIComputation();
 
             var snapshot = BuildSnapshot();
             return new DeclareResult { Ok = true, Message = "Turn resolved.", Snapshot = snapshot };
