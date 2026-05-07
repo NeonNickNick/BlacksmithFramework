@@ -16,4 +16,10 @@
     <ProjectReference Include="..\BlacksmithCore\BlacksmithCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\ClapInfra.SourceGenerators\ClapInfra.SourceGenerators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>

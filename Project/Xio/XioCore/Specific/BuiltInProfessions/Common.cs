@@ -2,6 +2,7 @@ using XioCore.Infra.DSL;
 using XioCore.Infra.Models.Components;
 using XioCore.Infra.Models.Components.Resolutions;
 using XioCore.Infra.Models.Core;
+using ClapInfra.ClapProfession;
 using XioCore.Infra.Models.Entities;
 using XioCore.Infra.Profession;
 
@@ -9,7 +10,8 @@ namespace XioCore.Specific.BuiltInProfessions
 {
     using DSL = XioCore.Infra.DSL.DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    public class Common : MainProfession
+    [SkillSource]
+    public partial class Common : MainProfession
     {
         private static int RNeed(ISkillContext sc)
         {

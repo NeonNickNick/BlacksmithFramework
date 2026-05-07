@@ -3,12 +3,14 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defenses;
+using ClapInfra.ClapProfession;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    public class BloodSigil : MainProfession
+    [SkillSource]
+    public partial class BloodSigil : MainProfession
     {
         private float _increase = 1f;
         private int IncreaseAttack(int origin)

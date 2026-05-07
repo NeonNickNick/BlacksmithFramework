@@ -65,11 +65,13 @@ namespace BlacksmithCore.Driver
 
             History.SkillHistory.Add((playerContext, enemyContext));
 
-            var psfs = new List<IDSLSourceFile>() { Player.Focus.Get<Skill>().Declare(skillName, playerContext) };
-            psfs.InsertRange(0, Player.Focus.Get<Skill>().GetPassiveSkill(playerContext));
+            var ps = Player.Focus.Get<Skill>();
+            var psfs = ps.GetPassiveSkill(playerContext);
+            psfs.Add(ps.Declare(skillName, playerContext));
 
-            var esfs = new List<IDSLSourceFile>() { Enemy.Focus.Get<Skill>().Declare(esn, enemyContext) };
-            esfs.InsertRange(0, Enemy.Focus.Get<Skill>().GetPassiveSkill(enemyContext));
+            var es = Enemy.Focus.Get<Skill>();
+            var esfs = es.GetPassiveSkill(enemyContext);
+            esfs.Add(es.Declare(esn, enemyContext));
 
             Judger.Judge(psfs, esfs);
 

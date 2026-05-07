@@ -22,13 +22,18 @@ namespace BlacksmithCore.Infra.Models.Components
         }
         protected override void ExecuteImpl<TResolution>(Community community, List<TResolution> list, Func<TResolution, bool>? ifProcess)
         {
-            var resolutions = list.Where(d => d.DelayRounds == 0).ToList();
-            foreach (var temp in resolutions)
+            for (int i = list.Count - 1; i >= 0; i--)
             {
-                temp.Execute(community);
+                if (list[i].DelayRounds == 0)
+                {
+                    list[i].Execute(community);
+                    list.RemoveAt(i);
+                }
+                else
+                {
+                    list[i].DelayRounds--;
+                }
             }
-            list.RemoveAll(d => resolutions.Contains(d));
-            list.ForEach(d => d.DelayRounds--);
         }
         public List<(string name, int delayRounds, int power)> GetFutureDefenseView()
         {

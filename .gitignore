@@ -62,6 +62,9 @@ build/
 appsettings.Local.json
 appsettings.*.local.json
 
+# Local documentation (not version controlled)
+docs/
+
 # LaTeX build artifacts
 *.aux
 *.bbl

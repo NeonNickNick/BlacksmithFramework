@@ -71,38 +71,98 @@ namespace BlacksmithCore.Infra.Models.Judgement
             public Action<Community, Community> Build()
             {
                 Update();
-                var overrideRules = _overrideRules
-                    .Where(m => m.RemainingRounds == 0)
-                    .Select(m => m.Rule)
-                    .ToList();
-                var modifiersBefore = _modifiersBefore
-                    .Where(m => m.RemainingRounds == 0)
-                    .Select(m => m.Rule)
-                    .ToList();
-                var modifiersAfter = _modifiersAfter
-                    .Where(m => m.RemainingRounds == 0)
-                    .Select(m => m.Rule)
-                    .ToList();
-                var overrideRule = overrideRules.Count > 0 ? overrideRules[^1] : null;
+                Action<Community, Community>? overrideRule = null;
+                for(int i = _overrideRules.Count - 1; i >= 0; i--)
+                {
+                    if(_overrideRules[i].RemainingRounds == 0)
+                    {
+                        overrideRule = _overrideRules[i].Rule;
+                        break;
+                    }
+                }
                 return (player, enemy) =>
                 {
                     // BEFORE modifiers
-                    foreach (var rule in modifiersBefore)
+                    foreach (var rule in _modifiersBefore)
                     {
-                        rule(player, enemy);
+                        if (rule.RemainingRounds == 0)
+                        {
+                            rule.Rule(player, enemy);
+                        }
                     }
                     // 核心规则
                     var core = overrideRule ?? _baseRule;
                     core(player, enemy);
                     // AFTER modifiers
-                    foreach (var rule in modifiersAfter)
+                    foreach (var rule in _modifiersAfter)
                     {
-                        rule(player, enemy);
+                        if (rule.RemainingRounds == 0)
+                        {
+                            rule.Rule(player, enemy);
+                        }
                     }
                 };
             }
         }
-
+        private readonly static SortedDictionary<JudgeStage.CEValue, StageRuleContainer> _defaultRuleContainers = new()
+        {
+            {
+                JudgeStage.Instance.OnBegin(),
+                new((player, enemy) => { })
+            },
+            {
+                JudgeStage.Instance.OnEffectTaking_AfterResolutionWritten(),
+                new((player, enemy) => TakeEffects(EffectType.Instance.AfterResolutionWritten(), player, enemy))
+            },
+            {
+                JudgeStage.Instance.OnEffectSwaping(),
+                new(SwapEffects)
+            },
+            {
+                JudgeStage.Instance.OnAttackCanceling(),
+                new(CancelAttacks)
+            },
+            {
+                JudgeStage.Instance.OnAttackSwaping(),
+                new(SwapAttacks)
+            },
+            {
+                JudgeStage.Instance.OnApplyingEffect(),
+                new(ApplyEffect)
+            },
+            {
+                JudgeStage.Instance.OnEffectTaking_AfterTransport(),
+                new((player, enemy) => TakeEffects(EffectType.Instance.AfterTransport(), player, enemy))
+            },
+            {
+                JudgeStage.Instance.OnApplyingOthers(),
+                new(ApplyOthers)
+            },
+            {
+                JudgeStage.Instance.OnUpdating(),
+                new(Update)
+            },
+            {
+                JudgeStage.Instance.OnEffectTaking_AfterResult(),
+                new((player, enemy) => TakeEffects(EffectType.Instance.AfterResult(), player, enemy))
+            },
+            {
+                JudgeStage.Instance.OnEnd(),
+                new((player, enemy) => { })
+            }
+        };
+        private static Action<Community, Community> _defaultRule;
+        private int _notDefaultRounds = 0;
+        static JudgeRuleManager()
+        {
+            _defaultRule = (a, b) =>
+            {
+                foreach (var stage in _defaultRuleContainers)
+                {
+                    stage.Value.Build()(a, b);
+                }
+            };
+        }
         private readonly SortedDictionary<JudgeStage.CEValue, StageRuleContainer> _ruleContainers = new()
         {
             {
@@ -275,14 +335,18 @@ namespace BlacksmithCore.Infra.Models.Judgement
         #endregion
         public override Action<Community, Community> GetRule()
         {
-            Action<Community, Community> result = (a, b) => { };
-
-            foreach (var stage in _ruleContainers.OrderBy(k => k.Key))
+            if(_notDefaultRounds == 0)
             {
-                result += stage.Value.Build();
+                return _defaultRule;
             }
-
-            return result;
+            _notDefaultRounds--;
+            return (a, b) => 
+            {
+                foreach (var stage in _ruleContainers)
+                {
+                    stage.Value.Build();
+                }
+            };
         }
         public void RegistJudgeRuleDynamic(DynamicJudgeRuleName.CEValue name, List<Mutation> mutations)
         {
@@ -302,6 +366,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
                 {
                     _ruleContainers[mutation.Stage].AddModifier(unit, mutation.ModifierOrder);
                 }
+                _notDefaultRounds = Math.Max(_notDefaultRounds, (mutation.RemainingRounds + mutation.DelayRounds));
             }
         }
     }

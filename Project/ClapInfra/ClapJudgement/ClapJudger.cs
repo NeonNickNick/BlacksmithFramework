@@ -15,8 +15,8 @@ namespace ClapInfra.ClapJudgement
 
         protected readonly Action _onJudge;
 
-        protected List<TIntent> _playerIntents = new();
-        protected List<TIntent> _enemyIntents = new();
+        protected IEnumerable<TIntent> _playerIntents = new List<TIntent>();
+        protected IEnumerable<TIntent> _enemyIntents = new List<TIntent>();
         protected ClapJudger(TCommunity player, TCommunity enemy)
         {
             Player = player;
@@ -28,9 +28,9 @@ namespace ClapInfra.ClapJudgement
                 JudgeRuleManager.GetRule()(Player, Enemy);
             };
         }
-        protected virtual List<TIntent> Compile(List<TIDSLSourceFile> sourceFiles)
+        protected virtual IEnumerable<TIntent> Compile(List<TIDSLSourceFile> sourceFiles)
         {
-            return sourceFiles.Select(s => s.Compile((TJudger)this)).ToList();
+            return sourceFiles.Select(s => s.Compile((TJudger)this));
         }
         public virtual void Judge(List<TIDSLSourceFile> playerSfs, List<TIDSLSourceFile> enemySfs)
         {

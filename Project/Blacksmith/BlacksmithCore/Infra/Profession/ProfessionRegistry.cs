@@ -3,35 +3,34 @@ namespace BlacksmithCore.Infra.Profession
     public static class ProfessionRegistry
     {
         public static readonly List<string> Professions = new();
-        private static Dictionary<string, List<SkillPackageBase>> _modifiers = new();
+        private static readonly Dictionary<string, List<Type>> _modifierTypes = new();
+
         public static void RegistProfessionName(string professionName)
         {
             if (Professions.Contains(professionName))
             {
                 throw new ArgumentException($"Profession \"{professionName}\" already exists! Expansion addition failed!");
             }
-            else
-            {
-                Professions.Add(professionName);
-                Console.WriteLine($"Successfully added the extended profession \"{professionName}\"!");
-            }
+            Professions.Add(professionName);
+            Console.WriteLine($"Successfully added the extended profession \"{professionName}\"!");
         }
+
         public static void RegistProfessionModifier(string targetName, SkillPackageBase modifier)
         {
-            if (!_modifiers.TryGetValue(targetName, out var value))
+            if (!_modifierTypes.TryGetValue(targetName, out var list))
             {
-                _modifiers[targetName] = new();
+                _modifierTypes[targetName] = list = new();
             }
-            _modifiers[targetName].Add(modifier);
+            list.Add(modifier.GetType());
         }
+
         public static void AddModOnInit(SkillPackageBase package)
         {
-            if (_modifiers.TryGetValue(package.GetType().Name, out var modifiers))
+            if (_modifierTypes.TryGetValue(package.GetType().Name, out var types))
             {
-                foreach (var modifierOrigin in modifiers)
+                foreach (var type in types)
                 {
-                    var type = modifierOrigin.GetType();
-                    SkillPackageBase modifier = (SkillPackageBase)Activator.CreateInstance(type)!;
+                    var modifier = (SkillPackageBase)Activator.CreateInstance(type)!;
                     package.AvailableSkillNames.AddRange(modifier.AvailableSkillNames);
                     foreach (var kv in modifier.SkillChecker)
                     {

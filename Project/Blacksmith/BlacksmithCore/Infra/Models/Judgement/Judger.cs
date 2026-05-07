@@ -15,12 +15,17 @@ namespace BlacksmithCore.Infra.Models.Judgement
         {
 
         }
-        protected override List<Intent> Compile(List<IDSLSourceFile> sourceFiles)
+        Action<Community> temp = (a)=>{};
+        protected override IEnumerable<Intent> Compile(List<IDSLSourceFile> sourceFiles)
         {
+            var skillIntents=  new List<Intent>() { new() { Execute = temp} };
             var passive = sourceFiles[0];
-            sourceFiles.RemoveAt(0);
-            var skillIntents = sourceFiles.Select(s => s.Compile(this)).ToList();
-            skillIntents.Insert(0, passive.Compile(this));
+            int n = sourceFiles.Count;
+            for(int i = 1; i < n; ++i)
+            {
+                skillIntents.Add(sourceFiles[i].Compile(this));
+            }
+            skillIntents[0] = passive.Compile(this);
             return skillIntents;
         }
     }
