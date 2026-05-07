@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using BlacksmithCore.AI;
 using BlacksmithCore.Driver;
 using BlacksmithCore.Infra.Models.Components;
@@ -9,6 +10,7 @@ namespace BlacksmithClient.Frontend
     public class WebGameSession
     {
         private readonly List<IAIStrategy> _strategies;
+        private readonly List<double> _thinkingTimesMs = new();
         private GameInstance? _game;
         private IAIStrategy? _activeAI;
         private int _mode;
@@ -38,6 +40,7 @@ namespace BlacksmithClient.Frontend
             _game = starter.StartBackend();
             _mode = mode;
             _started = true;
+            _thinkingTimesMs.Clear();
 
             _isManual = mode >= _strategies.Count;
             if (_isManual)
@@ -69,10 +72,14 @@ namespace BlacksmithClient.Frontend
 
             if (!_isManual && _activeAI != null)
             {
+                var sw = Stopwatch.StartNew();
                 (enemySkillName, enemyParam) = _activeAI.ChooseSkill(_game.Enemy, _game.Player);
+                sw.Stop();
+                _thinkingTimesMs.Add(sw.Elapsed.TotalMilliseconds);
             }
             else
             {
+                _thinkingTimesMs.Add(0);
                 var enemyResult = _game.ETryDeclare(esn, ep);
                 if (enemyResult != SkillDeclareResult.Success)
                     return new DeclareResult { Ok = false, Message = $"Enemy skill '{esn}' {enemyResult}.", Snapshot = GetSnapshot() };
@@ -122,7 +129,8 @@ namespace BlacksmithClient.Frontend
                     playerSkill = pair.Item1.SkillName,
                     playerParam = pair.Item1.Param,
                     enemySkill = pair.Item2.SkillName,
-                    enemyParam = pair.Item2.Param
+                    enemyParam = pair.Item2.Param,
+                    thinkingTimeMs = i < _thinkingTimesMs.Count ? _thinkingTimesMs[i] : 0.0
                 }).ToList(),
                 started = _started,
                 manualMode = _isManual,

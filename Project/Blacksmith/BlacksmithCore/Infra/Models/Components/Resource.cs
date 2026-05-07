@@ -66,7 +66,8 @@ namespace BlacksmithCore.Infra.Models.Components
             }
         }
         private Dictionary<ResourceType.CEValue, ResourceTemplate> _resources = new();
-        public Resource()
+        private static Dictionary<string, ResourceType.CEValue>? _dictRef = new();
+        static Resource()
         {
             Type type = ResourceType.Instance.GetType();
             FieldInfo? field = type.BaseType?.BaseType?.GetField("_enumDict", BindingFlags.NonPublic | BindingFlags.Static);
@@ -74,12 +75,15 @@ namespace BlacksmithCore.Infra.Models.Components
             {
                 throw new ArgumentException("Unreachable2!");//不应到达这里
             }
-            var dict = field.GetValue(null) as Dictionary<string, ResourceType.CEValue>;
-            if (dict == null)
+            _dictRef = field.GetValue(null) as Dictionary<string, ResourceType.CEValue>;
+            if (_dictRef == null)
             {
                 throw new ArgumentException("Unreachable3!");//不应到达这里
             }
-            List<string> enumNames = dict.Keys.ToList();
+        }
+        public Resource()
+        {
+            List<string> enumNames = _dictRef!.Keys.ToList();
             string prefix = "Gold_";
             List<string> golds = enumNames.Where(e => e.StartsWith(prefix)).ToList();
             enumNames.RemoveAll(e => golds.Contains(e));
@@ -88,9 +92,9 @@ namespace BlacksmithCore.Infra.Models.Components
                 string commonName = gold.Remove(0, prefix.Length);
                 if (enumNames.Contains(commonName))
                 {
-                    var shareTemplate = new ResourceTemplate(dict[commonName], dict[gold]);
-                    _resources[dict[commonName]] = shareTemplate;
-                    _resources[dict[gold]] = shareTemplate;
+                    var shareTemplate = new ResourceTemplate(_dictRef[commonName], _dictRef[gold]);
+                    _resources[_dictRef[commonName]] = shareTemplate;
+                    _resources[_dictRef[gold]] = shareTemplate;
                     enumNames.Remove(commonName);
                 }
                 else
@@ -100,8 +104,8 @@ namespace BlacksmithCore.Infra.Models.Components
             }
             foreach (var rest in enumNames)
             {
-                var template = new ResourceTemplate(dict[rest], dict[rest]);
-                _resources[dict[rest]] = template;
+                var template = new ResourceTemplate(_dictRef[rest], _dictRef[rest]);
+                _resources[_dictRef[rest]] = template;
             }
         }
         public bool Check(ResourceType.CEValue type, float need, bool ifCommonOnly = false)

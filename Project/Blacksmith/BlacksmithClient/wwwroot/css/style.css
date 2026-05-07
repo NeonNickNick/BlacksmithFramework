@@ -366,6 +366,59 @@ input:focus, select:focus {
 .nav-row { justify-content: flex-end; }
 .is-hidden { display: none; }
 
+/* ---- AI Think Time Stats ---- */
+
+.ai-stats-bar {
+    margin-bottom: 10px;
+    padding: 10px 16px;
+}
+
+.ai-stats-content {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ai-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-stat-label {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+}
+
+.ai-stat-value {
+    font-family: var(--font-display);
+    font-size: 0.96rem;
+    color: var(--accent-strong);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---- Think time in summaries and history ---- */
+
+.think-time {
+    color: var(--accent-cool);
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.think-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #d8e5d0;
+    background: rgba(143, 166, 125, 0.18);
+    border: 1px solid rgba(143, 166, 125, 0.30);
+    font-variant-numeric: tabular-nums;
+}
+
 /* ---- Responsive ---- */
 
 @media (max-width: 980px) {

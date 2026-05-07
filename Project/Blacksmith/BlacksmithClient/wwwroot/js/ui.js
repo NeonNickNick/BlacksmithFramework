@@ -95,16 +95,28 @@ function renderActor(prefix, actor) {
     );
 }
 
+function formatThinkTime(ms) {
+    if (!ms || ms <= 0) return null;
+    if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`;
+    return `${ms.toFixed(0)}ms`;
+}
+
 function buildTurnSummary(turn) {
     if (!turn) {
         return '<div class="summary-card"><h3>Battle Summary</h3><div class="summary-line">Start a game to see structured turn details.</div></div>';
     }
+
+    const thinkTime = formatThinkTime(turn.thinkingTimeMs);
+    const thinkHtml = thinkTime
+        ? `<div class="summary-line think-time">AI thought for ${thinkTime}</div>`
+        : '';
 
     return `
         <div class="summary-card">
             <h3>Player Action</h3>
             <div class="summary-line">Skill: ${safeText(turn.playerSkill)}</div>
             <div class="summary-line">Param: ${safeText(turn.playerParam, 0)}</div>
+            ${thinkHtml}
         </div>
         <div class="summary-card">
             <h3>Enemy Action</h3>
@@ -123,15 +135,22 @@ function renderHistory() {
         return;
     }
 
-    historyList.innerHTML = State.turns.map((turn, index) => `
+    historyList.innerHTML = State.turns.map((turn, index) => {
+        const thinkTime = formatThinkTime(turn.thinkingTimeMs);
+        const thinkBadge = thinkTime
+            ? `<span class="think-badge">${thinkTime}</span>`
+            : '';
+
+        return `
         <button class="history-item ${index === State.currentTurn ? 'active' : ''}" data-turn-index="${index}" type="button">
             <div class="history-title">
                 <span>Turn ${turn.index}</span>
-                <span>${resultLabel(turn.result)}</span>
+                <span>${resultLabel(turn.result)}${thinkBadge}</span>
             </div>
             <div>You: ${turn.playerSkill} ${turn.playerParam} | Enemy: ${turn.enemySkill} ${turn.enemyParam}</div>
         </button>
-    `).join('');
+        `;
+    }).join('');
 
     historyList.querySelectorAll('[data-turn-index]').forEach(button => {
         button.addEventListener('click', () => {
@@ -176,6 +195,33 @@ function updateHeroVisibility() {
     heroPanel.open = !State.heroCollapsed;
 }
 
+function renderAiStats() {
+    const aiTurns = State.turns.filter(t => t.thinkingTimeMs > 0);
+    const bar = document.getElementById('aiStatsBar');
+    const lastThink = document.getElementById('lastThinkTime');
+    const avgThink = document.getElementById('avgThinkTime');
+    const aiCount = document.getElementById('aiTurnCount');
+
+    if (bar) {
+        bar.classList.toggle('is-hidden', State.isManual || !State.gameStarted);
+    }
+
+    if (!aiTurns.length) {
+        if (lastThink) lastThink.textContent = '--';
+        if (avgThink) avgThink.textContent = '--';
+        if (aiCount) aiCount.textContent = '0';
+        return;
+    }
+
+    const last = aiTurns[aiTurns.length - 1];
+    const total = aiTurns.reduce((sum, t) => sum + t.thinkingTimeMs, 0);
+    const avg = total / aiTurns.length;
+
+    if (lastThink) lastThink.textContent = formatThinkTime(last.thinkingTimeMs) || '--';
+    if (avgThink) avgThink.textContent = formatThinkTime(avg) || '--';
+    if (aiCount) aiCount.textContent = String(aiTurns.length);
+}
+
 function renderSnapshot(snapshot, options = {}) {
     const autoFocusLatest = Boolean(options.autoFocusLatest);
     State.snapshot = snapshot;
@@ -198,6 +244,7 @@ function renderSnapshot(snapshot, options = {}) {
     renderActor('player', snapshot?.player || null);
     renderActor('enemy', snapshot?.enemy || null);
     renderTurn();
+    renderAiStats();
     updateEnemyInputVisibility();
     updateHeroVisibility();
 }
