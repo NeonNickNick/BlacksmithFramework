@@ -10,16 +10,15 @@
 *.suo
 *.userosscache
 *.sln.docstates
+
+# Claude
 CLAUDE.md
-.claude/
-architecture-analysis.md
-optimization-analysis.md
+**/.claude/
 
 # IDE folders
-.vs/
 **/.vs/
-.idea/
-.vscode/
+**/.idea/
+**/.vscode/
 
 # Logs and temp files
 *.log
@@ -29,43 +28,42 @@ optimization-analysis.md
 Thumbs.db
 Desktop.ini
 
-# .NET test and coverage artifacts
-TestResults/
+# .NET test and coverage
 **/TestResults/
 *.trx
 *.coverage
 *.coveragexml
-coverage/
+**/coverage/
 
 # NuGet
 *.nupkg
 *.snupkg
-packages/
+**/packages/
 
-# Frontend dependencies and caches
-node_modules/
-dist/
-build/
-.pnpm-store/
-.npm/
-.yarn/
-.parcel-cache/
-.next/
-.nuxt/
-.svelte-kit/
+# Frontend
+**/node_modules/
+**/dist/
+**/build/
+**/.pnpm-store/
+**/.npm/
+**/.yarn/
+**/.parcel-cache/
+**/.next/
+**/.nuxt/
+**/.svelte-kit/
 
-# Environment files
+# Environment
 .env
 .env.*
 
-# Local-only app configuration overrides
+# Local app settings
 appsettings.Local.json
 appsettings.*.local.json
 
-# Local documentation (not version controlled)
+# Local documentation
 docs/
 
-# LaTeX build artifacts
+# LaTeX
 *.aux
 *.bbl
 *.bcf

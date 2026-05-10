@@ -72,9 +72,9 @@ namespace BlacksmithCore.Infra.Models.Judgement
             {
                 Update();
                 Action<Community, Community>? overrideRule = null;
-                for(int i = _overrideRules.Count - 1; i >= 0; i--)
+                for (int i = _overrideRules.Count - 1; i >= 0; i--)
                 {
-                    if(_overrideRules[i].RemainingRounds == 0)
+                    if (_overrideRules[i].RemainingRounds == 0)
                     {
                         overrideRule = _overrideRules[i].Rule;
                         break;
@@ -100,7 +100,8 @@ namespace BlacksmithCore.Infra.Models.Judgement
                             rule.Rule(player, enemy);
                         }
                     }
-                };
+                }
+                ;
             }
         }
         private readonly static SortedDictionary<JudgeStage.CEValue, StageRuleContainer> _defaultRuleContainers = new()
@@ -334,7 +335,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
         #endregion
         public override void Judge(Community player, Community enemy)
         {
-            if(_notDefaultRounds == 0)
+            if (_notDefaultRounds == 0)
             {
                 _defaultRule(player, enemy);
             }
@@ -344,7 +345,8 @@ namespace BlacksmithCore.Infra.Models.Judgement
                 {
                     stage.Value.Execute(player, enemy);
                 }
-            };
+            }
+            ;
         }
         public void RegistJudgeRuleDynamic(DynamicJudgeRuleName.CEValue name, List<Mutation> mutations)
         {

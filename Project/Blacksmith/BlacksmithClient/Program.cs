@@ -8,7 +8,7 @@ namespace BlacksmithClient
     {
         public static void Main()
         {
-            PluginLoader.Initialize(AppContext.BaseDirectory);
+            ModLoader.Initialize(AppContext.BaseDirectory);
 
             GeneralStrategyParams? param = null;//暂时使用默认参数
             List<IAIStrategy> strategies = new()

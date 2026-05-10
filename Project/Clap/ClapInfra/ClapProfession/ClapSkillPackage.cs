@@ -28,7 +28,7 @@ namespace ClapInfra.ClapProfession
 
         protected ClapSkillPackage(PackageType packageType)
         {
-            RegisterSkills();
+            RegistSkills();
             PackageType = packageType;
             if (PackageType == PackageType.Main)
             {
@@ -36,7 +36,7 @@ namespace ClapInfra.ClapProfession
             }
         }
 
-        protected void RegisterSkill(
+        protected void RegistSkill(
             string skillName,
             Func<TISkillContext, bool> checker,
             Func<TISkillContext, TIDSLSourceFile> generator)
@@ -49,7 +49,7 @@ namespace ClapInfra.ClapProfession
         /// <summary>
         /// Overridden by source-generated partial class to register skills without reflection.
         /// </summary>
-        protected virtual void RegisterSkills() { }
+        protected virtual void RegistSkills() { }
 
         protected abstract void AddModOnInit();
         public abstract TIDSLSourceFile PassiveSkill(TISkillContext sc);

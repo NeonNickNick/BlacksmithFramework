@@ -2,15 +2,13 @@ using XioCore.Infra.DSL;
 using XioCore.Infra.Models.Components;
 using XioCore.Infra.Models.Components.Resolutions;
 using XioCore.Infra.Models.Core;
-using ClapInfra.ClapProfession;
 using XioCore.Infra.Models.Entities;
 using XioCore.Infra.Profession;
 
 namespace XioCore.Specific.BuiltInProfessions
 {
     using DSL = XioCore.Infra.DSL.DSLforSkillLogic;
-    using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    [SkillSource]
+    using Pen = System.Func<XioCore.Infra.DSL.DSLforSkillLogic.SourceFile, XioCore.Infra.DSL.DSLforSkillLogic.SourceFile>;
     public partial class Common : MainProfession
     {
         private static int RNeed(ISkillContext sc)
@@ -310,14 +308,15 @@ namespace XioCore.Specific.BuiltInProfessions
                                 }
                                 else
                                 {
-                                    if(resolution.Power - r.Power >= Level.CycleLength * 2 + 8 - 22)
+                                    if (resolution.Power - r.Power >= Level.CycleLength * 2 + 8 - 22)
                                     {
                                         for (int i = 0; i < RNeed(sc); ++i)
                                         {
                                             body.Get<TurnContext>().Get<UniversalResolution>().Add(r);
                                         }
                                         target.Get<TurnContext>().Get<UniversalResolution>().Remove(r);
-                                    }else if(resolution.Power - r.Power >= Level.CycleLength + 8 - 22)
+                                    }
+                                    else if (resolution.Power - r.Power >= Level.CycleLength + 8 - 22)
                                     {
                                         target.Get<TurnContext>().Get<UniversalResolution>().Remove(r);
                                     }

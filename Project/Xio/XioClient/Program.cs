@@ -7,7 +7,7 @@ namespace XioClient
     {
         public static void Main()
         {
-            PluginLoader.Initialize(AppContext.BaseDirectory);
+            ModLoader.Initialize(AppContext.BaseDirectory);
             Console.WriteLine("Welcome to Xio!\n");
             LocalHost.Start();
         }

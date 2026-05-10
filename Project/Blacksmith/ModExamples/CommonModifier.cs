@@ -4,21 +4,19 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.BuiltInProfessions;
-using ClapInfra.ClapProfession;
 
 namespace ModExamples
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     [IsProfessionModifier(nameof(Common))]
-    [SkillSource]
     public partial class CommonModifier : ProfessionModifier
     {
         private bool HolyBookCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2f);
         }
-        private DSL.SourceFile HolyBook(ISkillContext sc)
+        private IDSLSourceFile HolyBook(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new HolyBook()));
             Pen pen = sf => sf

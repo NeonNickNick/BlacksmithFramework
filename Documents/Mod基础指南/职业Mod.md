@@ -17,8 +17,8 @@
 1. 创建一个 `.NET 8` 类库项目。
 2. 引用 `BlacksmithCore.csproj`，或者引用编译后的 `BlacksmithCore.dll`。
 3. 编写一个 `MainProfession` 或 `ProfessionModifier`。
-4. 把编译产物放到游戏可执行文件所在目录。
-5. 启动游戏，程序会自动扫描并加载该 DLL。
+4. 运行 `Blacksmith.cmd` 发布游戏，脚本会在输出目录下自动创建 `.blacksmith` 配置文件夹和空的 `mod.json`。
+5. 将编译好的 Mod DLL 放入发布目录下的子文件夹（如 `Mods/`），在 `.blacksmith/mod.json` 中声明该路径，启动 `BlacksmithClient.exe` 即可自动加载。
 
 ## 核心类型
 

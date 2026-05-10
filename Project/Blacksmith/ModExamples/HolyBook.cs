@@ -5,13 +5,11 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defenses;
-using ClapInfra.ClapProfession;
 using ModExamples.Defense;
 namespace ModExamples
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    [SkillSource]
     public partial class HolyBook : MainProfession
     {
         private bool CrossCheck(ISkillContext sc)

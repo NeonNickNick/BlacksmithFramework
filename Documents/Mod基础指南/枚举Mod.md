@@ -26,8 +26,9 @@
 1. 创建一个 `.NET 8` 类库项目。
 2. 引用 `BlacksmithCore.csproj`，或者引用编译后的 `BlacksmithCore.dll`。
 3. 编写枚举类或枚举修改类。
-4. 将编译产物放到游戏可执行文件所在目录。
-5. 程序启动时会通过 `DllLoader`（ClapInfra）自动扫描该目录下的 `.dll` 并加载。
+4. 运行 `Blacksmith.cmd` 发布游戏，脚本会在输出目录下自动创建 `.blacksmith` 配置文件夹和空的 `mod.json`。
+5. 将编译好的 Mod DLL 放入发布目录下的子文件夹，在 `.blacksmith/mod.json` 中声明该路径。
+6. 启动 `BlacksmithClient.exe`，`ModLoader` 会根据 `mod.json` 配置扫描指定目录下的 `.dll` 并自动加载。
 
 ## 创建新的可扩展枚举
 

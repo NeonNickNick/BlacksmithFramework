@@ -6,13 +6,11 @@ using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defenses;
-using ClapInfra.ClapProfession;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    [SkillSource]
     public partial class Warlock : MainProfession
     {
         public Warlock()

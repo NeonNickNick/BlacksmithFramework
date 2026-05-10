@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ClapInfra\ClapInfra.csproj" />
-    <ProjectReference Include="..\..\ClapInfra.SourceGenerators\ClapInfra.SourceGenerators.csproj"
+    <ProjectReference Include="..\..\Clap\ClapInfra\ClapInfra.csproj" />
+    <ProjectReference Include="..\..\Clap\ClapSourceGenerators\ClapSourceGenerators.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>

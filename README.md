@@ -1,16 +1,17 @@
 # Blacksmith Framework
 
-Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。Xio 是基于同一基础设施（ClapInfra）构建的第二个拍手游戏。程序启动后加载运行目录中的插件 DLL，初始化内置 AI，然后在 `http://localhost:5000` 提供本地 Web 对战服务。
+Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。Xio 是基于同一基础设施（ClapInfra）构建的第二个拍手游戏。使用 `Blacksmith.cmd`（或 `Xio.cmd`）发布后，配置 Mod 目录并启动，即可在 `http://localhost:5000` 本地 Web 对战。
 
 ## 项目结构
 
 | 项目 | 说明 |
 |---|---|
-| `ClapInfra` | 共享基础设施库。提供可扩展枚举框架 `ClapEnum<T>`、技能包反射配对机制 `ClapSkillPackage`、技能管理 `ClapSkill`、通用实体组件模板 `ClapBody`、决议缓冲区模型 `ClapTurnContext`、判定管线骨架 `ClapJudger`/`ClapJudgeRuleManager`/`ClapIntent`、DSL 编译契约 `IClapDSLSourceFile`、程序集扫描 `DllLoader`、枚举注册 `EnumRegistry`。不依赖任何游戏项目。 |
-| `BlacksmithCore` | Blacksmith 核心引擎。包含领域模型、技能 DSL、判定引擎、动态规则、AI 策略、插件加载器。基于 `ClapInfra`。 |
+| `Clap/ClapInfra` | 共享基础设施库。提供可扩展枚举框架 `ClapEnum<T>`、技能包反射配对机制 `ClapSkillPackage`、技能管理 `ClapSkill`、通用实体组件模板 `ClapBody`、决议缓冲区模型 `ClapTurnContext`、判定管线骨架 `ClapJudger`/`ClapJudgeRuleManager`/`ClapIntent`、DSL 编译契约 `IClapDSLSourceFile`、程序集扫描 `DllLoader`、枚举注册 `EnumRegistry`。不依赖任何游戏项目。 |
+| `Clap/ClapSourceGenerators` | Roslyn 增量源生成器。编译时为 `ClapSkillPackage` 子类预计算技能注册元数据。基于 ClapInfra 的新游戏必须在 Core 项目中引用它。 |
+| `BlacksmithCore` | Blacksmith 核心引擎。包含领域模型、技能 DSL、判定引擎、动态规则、AI 策略、Mod 加载器。基于 `ClapInfra`。 |
 | `BlacksmithClient` | Blacksmith 运行入口。ASP.NET Core 本地站点，托管 `wwwroot` 静态前端，暴露 `/api/*` 最小 API。 |
 | `ModExamples` | Blacksmith 示例 Mod 源码。演示扩展枚举 + 新职业 + Common 修改器 + 自定义防御的组合写法。 |
-| `XioCore` | Xio 核心引擎。包含领域模型、技能 DSL、判定引擎、插件加载器。基于 `ClapInfra`。 |
+| `XioCore` | Xio 核心引擎。包含领域模型、技能 DSL、判定引擎、Mod 加载器。基于 `ClapInfra`。 |
 | `XioClient` | Xio 运行入口。与 BlacksmithClient 架构相同的 ASP.NET Core 本地站点。 |
 
 源代码位于 `Project/` 目录下，解决方案文件为 `Project/Project.sln`。所有项目目标框架为 `net8.0`。
@@ -18,16 +19,23 @@ Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。Xio
 ## 运行方式
 
 ```powershell
-# 运行 Blacksmith
-cd .\Project
-dotnet run --project .\Blacksmith\BlacksmithClient\BlacksmithClient.csproj
+# 发布纯净 Blacksmith（生成独立可执行文件 + .blacksmith 配置目录）
+.\BlacksmithPure.cmd
 
-# 运行 Xio
-cd .\Project
-dotnet run --project .\Xio\XioClient\XioClient.csproj
+# 或发布后附加Mod示例（包含圣书）
+.\BlacksmithWithMods.cmd
+
+# 运行 Blacksmith（发布后）
+.\Blacksmith\BlacksmithClient.exe
+
+# 发布 Xio
+.\Xio.cmd
+
+# 运行 Xio（发布后）
+.\Xio\XioClient.exe
 ```
 
-程序在 `http://localhost:5000` 启动并自动打开浏览器。
+`.cmd` 脚本执行 `dotnet publish` 并将输出写入 `Blacksmith/`（或 `Xio/`），同时自动创建 `.blacksmith/mod.json`（或 `.Xio/mod.json`）配置文件。如无添加mod需求无需关心这些配置。
 
 ## 对战模式
 
@@ -60,12 +68,14 @@ dotnet run --project .\Xio\XioClient\XioClient.csproj
 
 ## 扩展机制概览
 
-Blacksmith 的扩展体系是"启动期装配型插件架构"：
+Blacksmith 的扩展体系是"启动期装配型 Mod 架构"：
 
-1. 程序启动时 `PluginLoader`（基于 ClapInfra 的 `DllLoader`）扫描运行目录全部 `.dll`
-2. 反射发现 `BlacksmithEnum<T>` 子类、`[IsBlacksmithEnumModifier]` 静态类、`MainProfession` / `ProfessionModifier` 子类
-3. 注册扩展枚举成员、职业名和职业修改器
-4. 调用 `ClapEnum.CloseFactory()` 关闭枚举工厂
+1. `Blacksmith.cmd` 发布时自动创建 `.blacksmith/mod.json`（Xio 对应 `.Xio/mod.json`）
+2. 用户将 Mod DLL 放入子目录，在 `mod.json` 中声明路径
+3. 程序启动时 `ModLoader` 读取 `mod.json`，通过 ClapInfra 的 `DllLoader` 扫描指定目录下的全部 `.dll`
+4. 反射发现 `BlacksmithEnum<T>` 子类、`[IsBlacksmithEnumModifier]` 静态类、`MainProfession` / `ProfessionModifier` 子类
+5. 注册扩展枚举成员、职业名和职业修改器
+6. 调用 `ClapEnum.CloseFactory()` 关闭枚举工厂
 
 之后进入运行期，所有装配结果直接可用。不支持运行中热插拔。
 

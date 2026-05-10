@@ -7,13 +7,11 @@ using BlacksmithCore.Infra.Models.Judgement;
 using BlacksmithCore.Infra.Models.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defenses;
-using ClapInfra.ClapProfession;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    [SkillSource]
     public partial class Common : MainProfession
     {
         private static List<string> Professions => ProfessionRegistry.Professions;

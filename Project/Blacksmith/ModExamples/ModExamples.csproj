@@ -7,19 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="BlacksmithCore">
-      <HintPath>..\BlacksmithCore\bin\Debug\net8.0\BlacksmithCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\..\Clap\ClapSourceGenerators\ClapSourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\Clap\ClapInfra\ClapInfra.csproj" />
     <ProjectReference Include="..\BlacksmithCore\BlacksmithCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ClapInfra.SourceGenerators\ClapInfra.SourceGenerators.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

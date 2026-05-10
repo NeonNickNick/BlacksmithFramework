@@ -8,26 +8,21 @@ namespace XioCore.Infra.Models.Judgement
 {
     public class JudgeRuleManager : ClapJudgeRuleManager<Body>
     {
-        private Action<Body, Body> _rule;
-        public JudgeRuleManager()
-        {
-            _rule = (a, b) =>
-            {
-                Tan(a, b);
-                Xiaoxiao(a, b);
-                Zige(a, b);
-                Resource(a, b);
-                Defense(a, b);
-                Taichi(a, b);
-                CancelAttack(a, b);
-                Attack(a, b);
-                Shengji(a, b);
-                End(a, b);
-            };
-        }
         public int Round { get; private set; } = 1;
         public int InnerRound { get; private set; } = 1;
-        public override Action<Body, Body> GetRule() => _rule;
+        public override void Judge(Body a, Body b)
+        {
+            Tan(a, b);
+            Xiaoxiao(a, b);
+            Zige(a, b);
+            Resource(a, b);
+            Defense(a, b);
+            Taichi(a, b);
+            CancelAttack(a, b);
+            Attack(a, b);
+            Shengji(a, b);
+            End(a, b);
+        }
         private static void Default(Body player, Body enemy, SkillType.CEValue skillType)
         {
             if (player.Get<Level>().KilledTimes > 0 || enemy.Get<Level>().KilledTimes > 0)

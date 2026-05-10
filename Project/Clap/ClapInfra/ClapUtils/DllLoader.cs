@@ -5,21 +5,28 @@ namespace ClapInfra.ClapUtils
     public class DllLoader
     {
         private readonly List<Assembly> _cache = new();
-        public void Initialize(string folderPath = ".")
+        public void Initialize(List<string> dirs)
         {
-            if (!Directory.Exists(folderPath))
-                return;
-
-            foreach (var dll in Directory.GetFiles(folderPath, "*.dll"))
+            if (!dirs.Contains(AppContext.BaseDirectory))
             {
-                try
+                dirs.Add(AppContext.BaseDirectory);
+            }
+            foreach (var dir in dirs)
+            {
+                if (!Directory.Exists(dir))
+                    return;
+
+                foreach (var dll in Directory.GetFiles(dir, "*.dll"))
                 {
-                    var assembly = Assembly.LoadFrom(dll);
-                    _cache.Add(assembly);
-                }
-                catch
-                {
-                    Console.WriteLine($"加载 {dll} 失败");
+                    try
+                    {
+                        var assembly = Assembly.LoadFrom(dll);
+                        _cache.Add(assembly);
+                    }
+                    catch
+                    {
+                        Console.WriteLine($"加载 {dll} 失败");
+                    }
                 }
             }
         }
