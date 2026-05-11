@@ -15,6 +15,9 @@
 CLAUDE.md
 **/.claude/
 
+# Codex
+AGENTS.md
+
 # IDE folders
 **/.vs/
 **/.idea/
