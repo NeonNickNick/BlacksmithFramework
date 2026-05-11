@@ -222,6 +222,8 @@ namespace BlacksmithServer.Server
 
                 if (p1Forfeit && p2Forfeit)
                 {
+                    CancelTurnTimer();
+                    ResolveTurn();
                     object? snap1 = null, snap2 = null;
                     try { snap1 = BuildSnapshotForPlayer(1); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot P1 failed: {ex}"); }
                     try { snap2 = BuildSnapshotForPlayer(2); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot P2 failed: {ex}"); }
@@ -231,6 +233,8 @@ namespace BlacksmithServer.Server
                 }
                 if (p1Forfeit)
                 {
+                    CancelTurnTimer();
+                    ResolveTurn();
                     object? wSnap = null, lSnap = null;
                     try { wSnap = BuildSnapshotForPlayer(Player2.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot winner failed: {ex}"); }
                     try { lSnap = BuildSnapshotForPlayer(Player1.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot loser failed: {ex}"); }
@@ -240,6 +244,8 @@ namespace BlacksmithServer.Server
                 }
                 if (p2Forfeit)
                 {
+                    CancelTurnTimer();
+                    ResolveTurn();
                     object? wSnap = null, lSnap = null;
                     try { wSnap = BuildSnapshotForPlayer(Player1.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot winner failed: {ex}"); }
                     try { lSnap = BuildSnapshotForPlayer(Player2.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot loser failed: {ex}"); }
