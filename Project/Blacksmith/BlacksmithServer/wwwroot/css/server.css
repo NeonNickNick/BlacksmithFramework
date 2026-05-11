@@ -92,7 +92,7 @@
 .match-stats-content {
     display: flex;
     gap: 24px;
-    align-items: center;
+    align-items: stretch;
     flex-wrap: wrap;
 }
 
@@ -112,6 +112,41 @@
     font-size: 0.96rem;
     color: var(--accent-strong);
     font-variant-numeric: tabular-nums;
+}
+
+.timer-card {
+    min-width: 220px;
+    flex: 1 1 240px;
+    display: grid;
+    gap: 8px;
+}
+
+.timer-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+}
+
+.timer-bar-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255, 245, 230, 0.08);
+    border: 1px solid rgba(255, 236, 201, 0.10);
+}
+
+.timer-bar-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    transition: width 240ms linear, background 180ms ease;
+    background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+}
+
+.timer-bar-fill.is-urgent {
+    background: linear-gradient(90deg, #b5582f, #f3d19e);
 }
 
 .match-stat-value.is-urgent {

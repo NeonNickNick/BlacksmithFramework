@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/server.css">
 </head>
-<body>
+<body class="auth-only">
     <div class="app-shell">
         <div class="background-orbit orbit-a"></div>
         <div class="background-orbit orbit-b"></div>
 
-        <main class="layout auth-layout" id="authShell">
+        <main class="layout auth-layout">
             <section class="panel auth-screen">
                 <div class="auth-screen-grid">
                     <div class="auth-brand">
@@ -63,203 +63,10 @@
                 </div>
             </section>
         </main>
-
-        <main class="layout battle-layout is-hidden" id="battleShell">
-            <section class="hero panel">
-                <details class="hero-collapsible" id="heroPanel" open>
-                    <summary class="hero-summary">
-                        <div>
-                            <p class="eyebrow">Blacksmith Framework</p>
-                            <h1>Battle Command Deck</h1>
-                        </div>
-                        <div class="hero-summary-meta">
-                            <div class="meta-card compact-meta">
-                                <span class="meta-label">User</span>
-                                <strong id="userBadge">--</strong>
-                            </div>
-                            <div class="meta-card compact-meta">
-                                <span class="meta-label">State</span>
-                                <strong id="stateBadge">Offline</strong>
-                            </div>
-                            <div class="meta-card compact-meta">
-                                <span class="meta-label">Result</span>
-                                <strong id="resultBadge">Ready</strong>
-                            </div>
-                        </div>
-                    </summary>
-                    <div class="hero-content">
-                        <div class="hero-copy-block">
-                            <p class="hero-copy" id="heroCopy">Queue for a live duel, then keep using the familiar `skillName param` input flow from BlacksmithClient.</p>
-                        </div>
-
-                        <div class="hero-controls">
-                            <div class="hero-status-row">
-                                <span class="status-pill muted" id="opponentBadge">No opponent</span>
-                            </div>
-                            <div class="button-row hero-buttons">
-                                <button id="queueBtn" class="primary-btn">Find Match</button>
-                                <button id="cancelQueueBtn" class="ghost-btn">Cancel Queue</button>
-                                <button id="logoutBtn" class="ghost-btn">Logout</button>
-                            </div>
-                            <div class="result-box" id="resultBox">
-                                <div class="result-title" id="resultTitle">No match yet</div>
-                                <div class="result-detail" id="resultDetail">Once a match ends, the battle result and cause will appear here.</div>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-            </section>
-
-            <section class="control-grid">
-                <article class="panel action-panel">
-                    <div class="panel-heading">
-                        <div>
-                            <p class="eyebrow">Turn Input</p>
-                            <h2>Declare Skills</h2>
-                        </div>
-                        <span class="status-pill muted" id="turnCounterPill">Turn 0</span>
-                    </div>
-
-                    <label class="field">
-                        <span>Your skill</span>
-                        <input id="skill" placeholder="iron 0" autocomplete="off" />
-                    </label>
-
-                    <div class="button-row">
-                        <button id="declareBtn" class="primary-btn">Lock Turn</button>
-                    </div>
-
-                    <p class="hint" id="modeHint">Use the same text input pattern as the local client: `skillName param`.</p>
-                    <p class="hint" id="actionHint">Click Find Match to enter the matchmaking queue.</p>
-                </article>
-
-                <article class="panel timeline-panel">
-                    <div class="panel-heading compact">
-                        <div>
-                            <p class="eyebrow">Battlefeed</p>
-                            <h2 id="turnIndex">Turn 0 / 0</h2>
-                        </div>
-                        <div class="button-row nav-row">
-                            <button id="prevBtn" class="ghost-btn small-btn">Previous</button>
-                            <button id="nextBtn" class="ghost-btn small-btn">Next</button>
-                        </div>
-                    </div>
-
-                    <div id="actionText" class="action-banner">No actions recorded yet.</div>
-                    <div id="turnSummary" class="summary-grid battle-summary"></div>
-                </article>
-            </section>
-
-            <section class="panel match-stats-bar">
-                <div class="match-stats-content">
-                    <div class="match-stat">
-                        <span class="match-stat-label">Queue Timer</span>
-                        <strong id="queueCountdown" class="match-stat-value">--</strong>
-                    </div>
-                    <div class="match-stat">
-                        <span class="match-stat-label">Round Timer</span>
-                        <strong id="roundCountdown" class="match-stat-value">--</strong>
-                    </div>
-                    <div class="match-stat">
-                        <span class="match-stat-label">Your Timeouts</span>
-                        <strong id="playerTimeouts" class="match-stat-value">0 / 3</strong>
-                    </div>
-                    <div class="match-stat">
-                        <span class="match-stat-label">Opponent Timeouts</span>
-                        <strong id="enemyTimeouts" class="match-stat-value">0 / 3</strong>
-                    </div>
-                </div>
-            </section>
-
-            <section class="battle-grid">
-                <article class="panel fighter-panel">
-                    <div class="panel-heading compact">
-                        <div>
-                            <p class="eyebrow">Player</p>
-                            <h2 id="playerName">You</h2>
-                        </div>
-                        <strong id="pHP">HP --/--</strong>
-                    </div>
-                    <div class="profession-banner">Profession: <strong id="playerProfession">None</strong></div>
-                    <div class="health-track">
-                        <div class="health-fill player-fill" id="playerHealthFill"></div>
-                    </div>
-                    <details class="actor-section collapsible" open>
-                        <summary>Resources</summary>
-                        <div id="playerResources" class="token-grid empty-state-box">No data yet.</div>
-                    </details>
-                    <details class="actor-section collapsible">
-                        <summary>Defenses</summary>
-                        <div id="playerDefenses" class="token-grid empty-state-box">No active defenses.</div>
-                    </details>
-                    <details class="actor-section collapsible" open>
-                        <summary>Available Skills</summary>
-                        <div id="playerSkills" class="token-grid empty-state-box">No data yet.</div>
-                    </details>
-                    <details class="actor-section collapsible">
-                        <summary>Future Attacks</summary>
-                        <div id="playerFutureAttacks" class="token-grid empty-state-box">No pending attacks.</div>
-                    </details>
-                    <details class="actor-section collapsible">
-                        <summary>Future Defenses</summary>
-                        <div id="playerFutureDefenses" class="token-grid empty-state-box">No pending defenses.</div>
-                    </details>
-                </article>
-
-                <article class="panel fighter-panel">
-                    <div class="panel-heading compact">
-                        <div>
-                            <p class="eyebrow">Opponent</p>
-                            <h2 id="enemyName">Opponent</h2>
-                        </div>
-                        <strong id="eHP">HP --/--</strong>
-                    </div>
-                    <div class="profession-banner">Profession: <strong id="enemyProfession">None</strong></div>
-                    <div class="health-track">
-                        <div class="health-fill enemy-fill" id="enemyHealthFill"></div>
-                    </div>
-                    <details class="actor-section collapsible" open>
-                        <summary>Resources</summary>
-                        <div id="enemyResources" class="token-grid empty-state-box">No data yet.</div>
-                    </details>
-                    <details class="actor-section collapsible">
-                        <summary>Defenses</summary>
-                        <div id="enemyDefenses" class="token-grid empty-state-box">No active defenses.</div>
-                    </details>
-                    <details class="actor-section collapsible" open>
-                        <summary>Available Skills</summary>
-                        <div id="enemySkills" class="token-grid empty-state-box">No data yet.</div>
-                    </details>
-                    <details class="actor-section collapsible">
-                        <summary>Future Attacks</summary>
-                        <div id="enemyFutureAttacks" class="token-grid empty-state-box">No pending attacks.</div>
-                    </details>
-                    <details class="actor-section collapsible">
-                        <summary>Future Defenses</summary>
-                        <div id="enemyFutureDefenses" class="token-grid empty-state-box">No pending defenses.</div>
-                    </details>
-                </article>
-            </section>
-
-            <section class="panel history-panel">
-                <details class="history-collapsible" id="historyPanel">
-                    <summary class="panel-heading compact">
-                        <div>
-                            <p class="eyebrow">History</p>
-                            <h2>Recent Turns</h2>
-                        </div>
-                    </summary>
-                    <div id="historyList" class="history-list">
-                        <div class="history-empty">No turns yet. Once a match starts, each round will be archived here.</div>
-                    </div>
-                </details>
-            </section>
-        </main>
     </div>
 
     <script src="js/state.js"></script>
     <script src="js/net.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>

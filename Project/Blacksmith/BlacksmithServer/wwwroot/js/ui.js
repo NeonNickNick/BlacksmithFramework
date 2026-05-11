@@ -243,14 +243,12 @@ function renderConnectionBits() {
     const opponentBadge = document.getElementById('opponentBadge');
     const resultTitle = document.getElementById('resultTitle');
     const resultDetail = document.getElementById('resultDetail');
-    const authStatusText = document.getElementById('authStatusText');
 
     if (connectionState) connectionState.textContent = State.connectionState;
     if (userBadge) userBadge.textContent = State.authenticated ? safeText(State.username) : 'Guest';
     if (stateBadge) stateBadge.textContent = stateLabel(State.snapshot);
     if (resultBadge) resultBadge.textContent = resultLabel(State.snapshot?.result);
     if (opponentBadge) opponentBadge.textContent = State.snapshot?.opponentName ? `Opponent: ${State.snapshot.opponentName}` : 'No opponent';
-    if (authStatusText) authStatusText.textContent = State.lastBanner || 'Register or log in to connect to the arena.';
 
     if (resultTitle) {
         resultTitle.textContent = State.snapshot?.resultDetail?.title || 'No match yet';
@@ -260,24 +258,27 @@ function renderConnectionBits() {
     }
 }
 
-function renderShells() {
-    const authShell = document.getElementById('authShell');
-    const battleShell = document.getElementById('battleShell');
+function formatCountdown(isoString, totalMs) {
+    if (!isoString) return { text: '--', urgent: false, percent: 0 };
 
-    if (authShell) authShell.classList.toggle('is-hidden', State.authenticated);
-    if (battleShell) battleShell.classList.toggle('is-hidden', !State.authenticated);
-    document.body.classList.toggle('auth-only', !State.authenticated);
-}
+    const remainingMs = new Date(isoString).getTime() - Date.now();
+    const clampedMs = Math.max(0, remainingMs);
+    const seconds = Math.max(0, Math.ceil(clampedMs / 1000));
+    const percent = totalMs > 0 ? Math.max(0, Math.min(100, (clampedMs / totalMs) * 100)) : 0;
 
-function formatCountdown(isoString) {
-    if (!isoString) return { text: '--', urgent: false };
-
-    const ms = new Date(isoString).getTime() - Date.now();
-    const seconds = Math.max(0, Math.ceil(ms / 1000));
     return {
         text: `${seconds}s`,
-        urgent: seconds > 0 && seconds <= 5
+        urgent: seconds > 0 && seconds <= 5,
+        percent
     };
+}
+
+function setTimerBar(elementId, countdown) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    element.style.width = `${countdown.percent}%`;
+    element.classList.toggle('is-urgent', countdown.urgent);
 }
 
 function updateCountdowns() {
@@ -286,8 +287,8 @@ function updateCountdowns() {
     const playerTimeouts = document.getElementById('playerTimeouts');
     const enemyTimeouts = document.getElementById('enemyTimeouts');
 
-    const queue = formatCountdown(State.snapshot?.queueExpiresAtUtc || null);
-    const round = formatCountdown(State.snapshot?.roundDeadlineUtc || null);
+    const queue = formatCountdown(State.snapshot?.queueExpiresAtUtc || null, 30000);
+    const round = formatCountdown(State.snapshot?.roundDeadlineUtc || null, 15000);
 
     if (queueCountdown) {
         queueCountdown.textContent = queue.text;
@@ -297,6 +298,8 @@ function updateCountdowns() {
         roundCountdown.textContent = round.text;
         roundCountdown.classList.toggle('is-urgent', round.urgent);
     }
+    setTimerBar('queueCountdownBar', queue);
+    setTimerBar('roundCountdownBar', round);
     if (playerTimeouts) playerTimeouts.textContent = `${State.snapshot?.playerTimeouts ?? 0} / 3`;
     if (enemyTimeouts) enemyTimeouts.textContent = `${State.snapshot?.enemyTimeouts ?? 0} / 3`;
 }
@@ -327,7 +330,6 @@ function renderSnapshot(snapshot, options = {}) {
 
     renderConnectionBits();
     renderHeroCopy();
-    renderShells();
     renderActor('player', snapshot?.player || null);
     renderActor('enemy', snapshot?.enemy || null);
     renderTurn();
@@ -342,11 +344,10 @@ function renderLoggedOutState() {
     State.currentTurn = -1;
     State.authenticated = false;
     State.connectionState = 'Disconnected';
-    State.lastBanner = 'Register or log in to connect to the arena.';
+    State.lastBanner = 'Your session is no longer valid. Please sign in again.';
 
     renderConnectionBits();
     renderHeroCopy();
-    renderShells();
     renderActor('player', null);
     renderActor('enemy', null);
     renderTurn();

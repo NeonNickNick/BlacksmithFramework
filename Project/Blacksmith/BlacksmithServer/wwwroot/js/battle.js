@@ -1,8 +1,4 @@
 const heroPanel = document.getElementById('heroPanel');
-const usernameInput = document.getElementById('usernameInput');
-const passwordInput = document.getElementById('passwordInput');
-const registerBtn = document.getElementById('registerBtn');
-const loginBtn = document.getElementById('loginBtn');
 const queueBtn = document.getElementById('queueBtn');
 const cancelQueueBtn = document.getElementById('cancelQueueBtn');
 const logoutBtn = document.getElementById('logoutBtn');
@@ -11,37 +7,9 @@ const declareBtn = document.getElementById('declareBtn');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 
-registerBtn?.addEventListener('click', () => withBusy(async () => {
-    const response = await registerAccount(usernameInput?.value || '', passwordInput?.value || '');
-    if (!response.ok) {
-        throw new Error(response.message || 'Registration failed.');
-    }
-
-    persistSession(response.token, response.username);
-    State.authenticated = true;
-    State.connectionState = 'Connecting';
-    State.lastBanner = response.message || 'Registration successful.';
-    renderConnectionBits();
-    renderHeroCopy();
-    renderShells();
-    connectSocket();
-}));
-
-loginBtn?.addEventListener('click', () => withBusy(async () => {
-    const response = await loginAccount(usernameInput?.value || '', passwordInput?.value || '');
-    if (!response.ok) {
-        throw new Error(response.message || 'Login failed.');
-    }
-
-    persistSession(response.token, response.username);
-    State.authenticated = true;
-    State.connectionState = 'Connecting';
-    State.lastBanner = response.message || 'Login successful.';
-    renderConnectionBits();
-    renderHeroCopy();
-    renderShells();
-    connectSocket();
-}));
+function goToLogin() {
+    window.location.href = '/';
+}
 
 queueBtn?.addEventListener('click', () => {
     try {
@@ -61,12 +29,14 @@ cancelQueueBtn?.addEventListener('click', () => {
     }
 });
 
-logoutBtn?.addEventListener('click', () => withBusy(async () => {
-    closeSocket({ expected: true });
-    await logoutAccount().catch(() => null);
-    clearSession();
-    renderLoggedOutState();
-}));
+logoutBtn?.addEventListener('click', () => {
+    void withBusy(async () => {
+        closeSocket({ expected: true });
+        await logoutAccount().catch(() => null);
+        clearSession();
+        goToLogin();
+    });
+});
 
 declareBtn?.addEventListener('click', () => {
     try {
@@ -109,6 +79,7 @@ setInterval(() => {
     renderLoggedOutState();
 
     if (!State.token) {
+        goToLogin();
         return;
     }
 
@@ -116,7 +87,7 @@ setInterval(() => {
         const status = await loadAuthStatus();
         if (!status.ok) {
             clearSession();
-            renderLoggedOutState();
+            goToLogin();
             return;
         }
 
@@ -126,7 +97,6 @@ setInterval(() => {
         State.lastBanner = status.message || 'Authenticated.';
         renderConnectionBits();
         renderHeroCopy();
-        renderShells();
         connectSocket();
     });
 })();
