@@ -18,7 +18,7 @@ function withBusy(task) {
 }
 
 WS.on('queued', (msg) => {
-    State.inQueue = true;
+    State.inQueue = msg.position >= 0;
     State.queuePosition = msg.position;
     Matchmaking.renderQueueUI();
 });
@@ -67,6 +67,8 @@ WS.on('waiting', () => {
 
 WS.on('game_over', (msg) => {
     State.gameOver = true;
+    State.gameStarted = false;
+    State.inQueue = false;
     stopTurnTimer();
     State.snapshot = msg.snapshot;
     State.turns = msg.snapshot?.turns || [];
@@ -78,6 +80,8 @@ WS.on('game_over', (msg) => {
 
 WS.on('opponent_disconnected', (msg) => {
     State.gameOver = true;
+    State.gameStarted = false;
+    State.inQueue = false;
     stopTurnTimer();
     State.lastResult = 'Victory (opponent left)';
     renderTurn();
