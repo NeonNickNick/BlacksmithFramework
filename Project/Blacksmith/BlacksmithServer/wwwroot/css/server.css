@@ -158,6 +158,49 @@
     align-items: flex-start;
 }
 
+/* ---- Skill highlight in summary cards ---- */
+
+.skill-highlight {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent-strong);
+    margin: 2px 0 6px;
+    text-transform: capitalize;
+    letter-spacing: 0.04em;
+}
+
+.summary-card.player-card {
+    border-left: 3px solid rgba(240, 180, 91, 0.45);
+}
+
+.summary-card.opponent-card {
+    border-left: 3px solid rgba(143, 166, 125, 0.45);
+}
+
+/* ---- Skill name in history items ---- */
+
+.history-item .skill-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--accent-strong);
+    font-size: 0.88rem;
+}
+
+/* ---- Enhanced action banner ---- */
+
+.action-banner {
+    font-size: 0.96rem;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+}
+
+.action-banner .skill-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
 body.auth-only .background-orbit {
     opacity: 0.34;
 }

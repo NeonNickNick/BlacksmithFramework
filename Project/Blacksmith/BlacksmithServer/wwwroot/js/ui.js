@@ -149,15 +149,15 @@ function buildTurnSummary(turn) {
         : '';
 
     return `
-        <div class="summary-card">
+        <div class="summary-card player-card">
             <h3>Your Action</h3>
-            <div class="summary-line">Skill: ${safeText(turn.playerSkill)}</div>
+            <div class="skill-highlight">${safeText(turn.playerSkill)}</div>
             <div class="summary-line">Param: ${safeText(turn.playerParam, 0)}</div>
             <div class="summary-line">Timed out: ${turn.playerTimedOut ? 'Yes' : 'No'}</div>
         </div>
-        <div class="summary-card">
+        <div class="summary-card opponent-card">
             <h3>Opponent Action</h3>
-            <div class="summary-line">Skill: ${safeText(turn.enemySkill)}</div>
+            <div class="skill-highlight">${safeText(turn.enemySkill)}</div>
             <div class="summary-line">Param: ${safeText(turn.enemyParam, 0)}</div>
             <div class="summary-line">Timed out: ${turn.enemyTimedOut ? 'Yes' : 'No'}</div>
             ${noteHtml}
@@ -185,7 +185,7 @@ function renderHistory() {
                     <span>Turn ${turn.index}</span>
                     <span>${timeoutBadge}</span>
                 </div>
-                <div>You: ${safeText(turn.playerSkill)} ${safeText(turn.playerParam, 0)} | Opponent: ${safeText(turn.enemySkill)} ${safeText(turn.enemyParam, 0)}</div>
+                <div>You: <strong class="skill-name">${safeText(turn.playerSkill)}</strong> ${safeText(turn.playerParam, 0)} | Opponent: <strong class="skill-name">${safeText(turn.enemySkill)}</strong> ${safeText(turn.enemyParam, 0)}</div>
             </button>
         `;
     }).join('');
@@ -214,7 +214,7 @@ function renderTurn() {
     if (turnCounterPill) turnCounterPill.textContent = turn ? `Turn ${turn.index}` : `Turn ${State.turns.length}`;
     if (actionText) {
         if (turn) {
-            actionText.textContent = `You used ${turn.playerSkill} ${turn.playerParam}. Opponent used ${turn.enemySkill} ${turn.enemyParam}.`;
+            actionText.innerHTML = `You used <strong class="skill-name">${safeText(turn.playerSkill)}</strong> ${safeText(turn.playerParam, 0)}. Opponent used <strong class="skill-name">${safeText(turn.enemySkill)}</strong> ${safeText(turn.enemyParam, 0)}.`;
         } else if (State.snapshot?.resultDetail?.summary) {
             actionText.textContent = State.snapshot.resultDetail.summary;
         } else {

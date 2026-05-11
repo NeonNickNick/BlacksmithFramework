@@ -8,7 +8,7 @@ namespace BlacksmithServer.Web.Realtime
 {
     public sealed class GameRoom
     {
-        private const int RoundTimeoutSeconds = 15;
+        private const int RoundTimeoutSeconds = 30;
         private const int TimeoutLossThreshold = 3;
 
         private readonly SemaphoreSlim _gate = new(1, 1);
