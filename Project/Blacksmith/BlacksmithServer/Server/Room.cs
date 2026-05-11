@@ -132,23 +132,31 @@ namespace BlacksmithServer.Server
             if (result != "next")
             {
                 State = RoomState.Finished;
-                _ = Player1.SendAsync(new
-                {
-                    type = MessageTypes.GameOver,
-                    result = result == "win" ? "win" : result == "lose" ? "lose" : "draw",
-                    snapshot = BuildSnapshotForPlayer(1)
-                });
-                _ = Player2.SendAsync(new
-                {
-                    type = MessageTypes.GameOver,
-                    result = result == "win" ? "lose" : result == "lose" ? "win" : "draw",
-                    snapshot = BuildSnapshotForPlayer(2)
-                });
+                var r1 = result == "win" ? "win" : result == "lose" ? "lose" : "draw";
+                var r2 = result == "win" ? "lose" : result == "lose" ? "win" : "draw";
+
+                object? snap1 = null, snap2 = null;
+                try { snap1 = BuildSnapshotForPlayer(1); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot failed: {ex}"); }
+                try { snap2 = BuildSnapshotForPlayer(2); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot failed: {ex}"); }
+
+                try { _ = Player1.SendAsync(new { type = MessageTypes.GameOver, result = r1, snapshot = snap1! }); }
+                catch (Exception ex) { Console.WriteLine($"[Room] Send game_over P1 failed: {ex.Message}"); TrySendMinimalGameOver(Player1, r1); }
+
+                try { _ = Player2.SendAsync(new { type = MessageTypes.GameOver, result = r2, snapshot = snap2! }); }
+                catch (Exception ex) { Console.WriteLine($"[Room] Send game_over P2 failed: {ex.Message}"); TrySendMinimalGameOver(Player2, r2); }
             }
             else
             {
-                _ = Player1.SendAsync(new { type = MessageTypes.Snapshot, snapshot = BuildSnapshotForPlayer(1) });
-                _ = Player2.SendAsync(new { type = MessageTypes.Snapshot, snapshot = BuildSnapshotForPlayer(2) });
+                object? snap1 = null, snap2 = null;
+                try { snap1 = BuildSnapshotForPlayer(1); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot failed: {ex}"); }
+                try { snap2 = BuildSnapshotForPlayer(2); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot failed: {ex}"); }
+
+                try { _ = Player1.SendAsync(new { type = MessageTypes.Snapshot, snapshot = snap1! }); }
+                catch (Exception ex) { Console.WriteLine($"[Room] Send snapshot P1 failed: {ex.Message}"); }
+
+                try { _ = Player2.SendAsync(new { type = MessageTypes.Snapshot, snapshot = snap2! }); }
+                catch (Exception ex) { Console.WriteLine($"[Room] Send snapshot P2 failed: {ex.Message}"); }
+
                 StartTurnTimer();
             }
         }
@@ -188,6 +196,8 @@ namespace BlacksmithServer.Server
 
         private void HandleTurnTimeout()
         {
+            Action? sendForfeitMessages = null;
+
             lock (_lock)
             {
                 if (State != RoomState.Playing)
@@ -212,65 +222,119 @@ namespace BlacksmithServer.Server
 
                 if (p1Forfeit && p2Forfeit)
                 {
-                    ForfeitDraw();
+                    object? snap1 = null, snap2 = null;
+                    try { snap1 = BuildSnapshotForPlayer(1); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot P1 failed: {ex}"); }
+                    try { snap2 = BuildSnapshotForPlayer(2); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot P2 failed: {ex}"); }
+                    State = RoomState.Finished;
+                    sendForfeitMessages = () => SendForfeitDrawMessages(snap1, snap2, Player1, Player2);
                     return;
                 }
                 if (p1Forfeit)
                 {
-                    ForfeitGame(Player1);
+                    object? wSnap = null, lSnap = null;
+                    try { wSnap = BuildSnapshotForPlayer(Player2.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot winner failed: {ex}"); }
+                    try { lSnap = BuildSnapshotForPlayer(Player1.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot loser failed: {ex}"); }
+                    State = RoomState.Finished;
+                    sendForfeitMessages = () => SendForfeitMessages(Player2, Player1, wSnap, lSnap);
                     return;
                 }
                 if (p2Forfeit)
                 {
-                    ForfeitGame(Player2);
+                    object? wSnap = null, lSnap = null;
+                    try { wSnap = BuildSnapshotForPlayer(Player1.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot winner failed: {ex}"); }
+                    try { lSnap = BuildSnapshotForPlayer(Player2.PlayerNumber); } catch (Exception ex) { Console.WriteLine($"[Room] BuildSnapshot loser failed: {ex}"); }
+                    State = RoomState.Finished;
+                    sendForfeitMessages = () => SendForfeitMessages(Player1, Player2, wSnap, lSnap);
                     return;
                 }
 
                 CancelTurnTimer();
                 ResolveTurn();
             }
+
+            sendForfeitMessages?.Invoke();
         }
 
-        private void ForfeitGame(Player timeoutPlayer)
+        private static void SendForfeitMessages(Player winner, Player loser, object? winnerSnapshot, object? loserSnapshot)
         {
-            State = RoomState.Finished;
-            var winner = timeoutPlayer == Player1 ? Player2 : Player1;
-            var loser = timeoutPlayer;
+            try
+            {
+                _ = winner.SendAsync(new
+                {
+                    type = MessageTypes.GameOver,
+                    result = "win",
+                    message = "Opponent forfeited due to repeated timeouts.",
+                    snapshot = winnerSnapshot!
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Room] Failed to send forfeit win message to {winner.Id}: {ex.Message}");
+                TrySendMinimalGameOver(winner, "win");
+            }
 
-            _ = winner.SendAsync(new
+            try
             {
-                type = MessageTypes.GameOver,
-                result = "win",
-                message = "Opponent forfeited due to repeated timeouts.",
-                snapshot = BuildSnapshotForPlayer(winner.PlayerNumber)
-            });
-            _ = loser.SendAsync(new
+                _ = loser.SendAsync(new
+                {
+                    type = MessageTypes.GameOver,
+                    result = "lose",
+                    message = "You forfeited due to repeated timeouts.",
+                    snapshot = loserSnapshot!
+                });
+            }
+            catch (Exception ex)
             {
-                type = MessageTypes.GameOver,
-                result = "lose",
-                message = "You forfeited due to repeated timeouts.",
-                snapshot = BuildSnapshotForPlayer(loser.PlayerNumber)
-            });
+                Console.WriteLine($"[Room] Failed to send forfeit lose message to {loser.Id}: {ex.Message}");
+                TrySendMinimalGameOver(loser, "lose");
+            }
         }
 
-        private void ForfeitDraw()
+        private static void SendForfeitDrawMessages(object? p1Snapshot, object? p2Snapshot, Player player1, Player player2)
         {
-            State = RoomState.Finished;
+            try
+            {
+                _ = player1.SendAsync(new
+                {
+                    type = MessageTypes.GameOver,
+                    result = "draw",
+                    message = "Both players forfeited due to repeated timeouts.",
+                    snapshot = p1Snapshot!
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Room] Failed to send forfeit draw message to P1 {player1.Id}: {ex.Message}");
+                TrySendMinimalGameOver(player1, "draw");
+            }
 
-            _ = Player1.SendAsync(new
+            try
             {
-                type = MessageTypes.GameOver,
-                result = "draw",
-                message = "Both players forfeited due to repeated timeouts.",
-                snapshot = BuildSnapshotForPlayer(1)
-            });
-            _ = Player2.SendAsync(new
+                _ = player2.SendAsync(new
+                {
+                    type = MessageTypes.GameOver,
+                    result = "draw",
+                    message = "Both players forfeited due to repeated timeouts.",
+                    snapshot = p2Snapshot!
+                });
+            }
+            catch (Exception ex)
             {
-                type = MessageTypes.GameOver,
-                result = "draw",
-                message = "Both players forfeited due to repeated timeouts.",
-                snapshot = BuildSnapshotForPlayer(2)
-            });
+                Console.WriteLine($"[Room] Failed to send forfeit draw message to P2 {player2.Id}: {ex.Message}");
+                TrySendMinimalGameOver(player2, "draw");
+            }
+        }
+
+        private static void TrySendMinimalGameOver(Player player, string result)
+        {
+            try
+            {
+                _ = player.SendAsync(new { type = MessageTypes.GameOver, result });
+            }
+            catch
+            {
+                Console.WriteLine($"[Room] Could not send any game_over to {player.Id}");
+            }
         }
 
         public async Task OnPlayerDisconnected(Player player)

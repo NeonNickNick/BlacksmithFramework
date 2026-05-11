@@ -33,21 +33,27 @@ namespace BlacksmithServer.Server
 
             var ws = await context.WebSockets.AcceptWebSocketAsync();
             var player = new Player(ws);
+            Console.WriteLine($"[WS] Player {player.Id} connected");
 
             try
             {
                 await ReceiveLoop(player);
             }
-            catch (WebSocketException)
+            catch (WebSocketException ex)
             {
-                // Client disconnected abruptly — handled in finally
+                Console.WriteLine($"[WS] Player {player.Id} WebSocket error: {ex.Message}");
             }
             catch (OperationCanceledException)
             {
-                // Connection canceled — handled in finally
+                Console.WriteLine($"[WS] Player {player.Id} connection canceled");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WS] Player {player.Id} unexpected error: {ex}");
             }
             finally
             {
+                Console.WriteLine($"[WS] Player {player.Id} disconnected, cleaning up");
                 await HandleDisconnect(player);
             }
         }
