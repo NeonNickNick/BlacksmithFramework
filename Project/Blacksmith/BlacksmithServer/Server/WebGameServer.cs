@@ -10,7 +10,7 @@ namespace BlacksmithServer.Server
                 ContentRootPath = Directory.GetCurrentDirectory()
             });
 
-            builder.WebHost.UseUrls("http://10.129.241.168:5000");
+            builder.WebHost.UseUrls("http://0.0.0.0:5000");
             var app = builder.Build();
 
             Console.WriteLine($"WebRootPath: {app.Environment.WebRootPath}");
@@ -37,7 +37,7 @@ namespace BlacksmithServer.Server
                 });
             });
 
-            Console.WriteLine("Blacksmith Multiplayer Server at http://10.129.241.168:5000/");
+            Console.WriteLine("Blacksmith Multiplayer Server at http://+:5000/");
 
             app.Run();
         }
