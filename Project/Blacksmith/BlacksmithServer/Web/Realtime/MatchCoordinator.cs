@@ -4,7 +4,8 @@ namespace BlacksmithServer.Web.Realtime
 {
     public sealed class MatchCoordinator
     {
-        private static readonly TimeSpan QueueTimeout = TimeSpan.FromSeconds(30);
+        private const int QueueTimeoutSeconds = 30;
+        private static readonly TimeSpan QueueTimeout = TimeSpan.FromSeconds(QueueTimeoutSeconds);
 
         private readonly ConnectionRegistry _connections;
         private readonly SemaphoreSlim _gate = new(1, 1);
@@ -31,7 +32,7 @@ namespace BlacksmithServer.Web.Realtime
                 }
                 else if (_queueByUser.TryGetValue(username, out var entry))
                 {
-                    snapshot = BuildQueueSnapshot(username, entry.ExpiresAtUtc, "Searching for an opponent. Matchmaking will stop after 30 seconds.");
+                    snapshot = BuildQueueSnapshot(username, entry.ExpiresAtUtc, $"Searching for an opponent. Matchmaking will stop after {QueueTimeoutSeconds} seconds.");
                 }
                 else if (_lastSnapshots.TryGetValue(username, out var lastSnapshot) && lastSnapshot.Status == "finished")
                 {
@@ -108,7 +109,7 @@ namespace BlacksmithServer.Web.Realtime
                 StartQueueTimeout(queueEntry);
                 await RecordAndSendSnapshotAsync(
                     username,
-                    BuildQueueSnapshot(username, queueEntry.ExpiresAtUtc, "Searching for an opponent. Matchmaking will stop after 30 seconds."),
+                    BuildQueueSnapshot(username, queueEntry.ExpiresAtUtc, $"Searching for an opponent. Matchmaking will stop after {QueueTimeoutSeconds} seconds."),
                     "Queue started.");
                 return;
             }
@@ -251,8 +252,8 @@ namespace BlacksmithServer.Web.Realtime
                 {
                     await RecordAndSendSnapshotAsync(
                         entry.Username,
-                        BuildIdleSnapshot(entry.Username, "No opponent was found within 30 seconds. Click Find Match to try again."),
-                        "No opponent found within 30 seconds.");
+                        BuildIdleSnapshot(entry.Username, $"No opponent was found within {QueueTimeoutSeconds} seconds. Click Find Match to try again."),
+                        $"No opponent found within {QueueTimeoutSeconds} seconds.");
                 }
             });
         }

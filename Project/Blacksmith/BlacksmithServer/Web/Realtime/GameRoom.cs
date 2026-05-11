@@ -56,7 +56,7 @@ namespace BlacksmithServer.Web.Realtime
                 _gate.Release();
             }
 
-            await PushSnapshotsAsync(snapshots, "Match found. Submit your skill within 15 seconds.");
+            await PushSnapshotsAsync(snapshots, $"Match found. Submit your skill within {RoundTimeoutSeconds} seconds.");
         }
 
         public BattleSnapshot BuildSnapshot(string username)

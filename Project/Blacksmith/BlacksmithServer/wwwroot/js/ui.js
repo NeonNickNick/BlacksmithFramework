@@ -287,8 +287,8 @@ function updateCountdowns() {
     const playerTimeouts = document.getElementById('playerTimeouts');
     const enemyTimeouts = document.getElementById('enemyTimeouts');
 
-    const queue = formatCountdown(State.snapshot?.queueExpiresAtUtc || null, 30000);
-    const round = formatCountdown(State.snapshot?.roundDeadlineUtc || null, 15000);
+    const queue = formatCountdown(State.snapshot?.queueExpiresAtUtc || null, QUEUE_TIMEOUT_MS);
+    const round = formatCountdown(State.snapshot?.roundDeadlineUtc || null, ROUND_TIMEOUT_MS);
 
     if (queueCountdown) {
         queueCountdown.textContent = queue.text;
@@ -300,8 +300,8 @@ function updateCountdowns() {
     }
     setTimerBar('queueCountdownBar', queue);
     setTimerBar('roundCountdownBar', round);
-    if (playerTimeouts) playerTimeouts.textContent = `${State.snapshot?.playerTimeouts ?? 0} / 3`;
-    if (enemyTimeouts) enemyTimeouts.textContent = `${State.snapshot?.enemyTimeouts ?? 0} / 3`;
+    if (playerTimeouts) playerTimeouts.textContent = `${State.snapshot?.playerTimeouts ?? 0} / ${TIMEOUT_LOSS_THRESHOLD}`;
+    if (enemyTimeouts) enemyTimeouts.textContent = `${State.snapshot?.enemyTimeouts ?? 0} / ${TIMEOUT_LOSS_THRESHOLD}`;
 }
 
 function updateHeroVisibility() {
@@ -385,11 +385,11 @@ function updateBusyState() {
         if (!State.authenticated) {
             actionHint.textContent = 'Log in and connect to a match before submitting a turn.';
         } else if (queued) {
-            actionHint.textContent = 'Queueing for an opponent. If no match is found in 30 seconds, click Find Match again.';
+            actionHint.textContent = `Queueing for an opponent. If no match is found in ${QUEUE_TIMEOUT_SEC} seconds, click Find Match again.`;
         } else if (inMatch && State.snapshot?.hasSubmittedTurn) {
             actionHint.textContent = 'Your turn is locked. Waiting for the opponent or the timer.';
         } else if (inMatch) {
-            actionHint.textContent = 'Submit your action within 15 seconds or the server will default to iron 0.';
+            actionHint.textContent = `Submit your action within ${ROUND_TIMEOUT_SEC} seconds or the server will default to iron 0.`;
         } else if (matchFinished) {
             actionHint.textContent = 'This match has ended. You can queue again for a new duel.';
         } else {

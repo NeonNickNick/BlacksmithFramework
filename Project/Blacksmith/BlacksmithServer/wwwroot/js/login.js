@@ -4,6 +4,11 @@ const registerBtn = document.getElementById('registerBtn');
 const loginBtn = document.getElementById('loginBtn');
 const connectionState = document.getElementById('connectionState');
 const authStatusText = document.getElementById('authStatusText');
+const timeoutRuleDisplay = document.getElementById('timeoutRuleDisplay');
+
+if (timeoutRuleDisplay) {
+    timeoutRuleDisplay.textContent = `${ROUND_TIMEOUT_SEC}s, ${TIMEOUT_LOSS_THRESHOLD} strikes`;
+}
 
 function withLoginBusy(task) {
     if (State.busy) return Promise.resolve();
