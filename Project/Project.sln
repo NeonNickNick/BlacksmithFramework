@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XioCore", "Xio\XioCore\XioC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XioClient", "Xio\XioClient\XioClient.csproj", "{BA4A00FD-2607-4452-9806-88A68D5D17D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlacksmithServer", "Blacksmith\BlacksmithServer\BlacksmithServer.csproj", "{A6D7C8B6-EA76-4586-AA39-6373BEFA8628}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlacksmithCore", "Blacksmit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlacksmithClient", "Blacksmith\BlacksmithClient\BlacksmithClient.csproj", "{BFD79870-84EB-4F9D-896E-0816AEFDAFE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlacksmithServer", "Blacksmith\BlacksmithServer\BlacksmithServer.csproj", "{314E4E22-FA69-4197-962F-66CDEAFD9A0E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
