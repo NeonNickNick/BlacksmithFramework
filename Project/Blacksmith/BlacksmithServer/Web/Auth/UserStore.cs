@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace BlacksmithServer.Frontend.Auth
+namespace BlacksmithServer.Web.Auth
 {
     public sealed class UserStore
     {

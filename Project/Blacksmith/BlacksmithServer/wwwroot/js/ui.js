@@ -241,16 +241,16 @@ function renderConnectionBits() {
     const stateBadge = document.getElementById('stateBadge');
     const resultBadge = document.getElementById('resultBadge');
     const opponentBadge = document.getElementById('opponentBadge');
-    const sessionUser = document.getElementById('sessionUser');
     const resultTitle = document.getElementById('resultTitle');
     const resultDetail = document.getElementById('resultDetail');
+    const authStatusText = document.getElementById('authStatusText');
 
     if (connectionState) connectionState.textContent = State.connectionState;
     if (userBadge) userBadge.textContent = State.authenticated ? safeText(State.username) : 'Guest';
     if (stateBadge) stateBadge.textContent = stateLabel(State.snapshot);
     if (resultBadge) resultBadge.textContent = resultLabel(State.snapshot?.result);
     if (opponentBadge) opponentBadge.textContent = State.snapshot?.opponentName ? `Opponent: ${State.snapshot.opponentName}` : 'No opponent';
-    if (sessionUser) sessionUser.textContent = State.authenticated ? safeText(State.username) : '--';
+    if (authStatusText) authStatusText.textContent = State.lastBanner || 'Register or log in to connect to the arena.';
 
     if (resultTitle) {
         resultTitle.textContent = State.snapshot?.resultDetail?.title || 'No match yet';
@@ -260,12 +260,13 @@ function renderConnectionBits() {
     }
 }
 
-function renderAuthPanels() {
-    const authFields = document.getElementById('authFields');
-    const sessionPanel = document.getElementById('sessionPanel');
+function renderShells() {
+    const authShell = document.getElementById('authShell');
+    const battleShell = document.getElementById('battleShell');
 
-    if (authFields) authFields.classList.toggle('is-hidden', State.authenticated);
-    if (sessionPanel) sessionPanel.classList.toggle('is-hidden', !State.authenticated);
+    if (authShell) authShell.classList.toggle('is-hidden', State.authenticated);
+    if (battleShell) battleShell.classList.toggle('is-hidden', !State.authenticated);
+    document.body.classList.toggle('auth-only', !State.authenticated);
 }
 
 function formatCountdown(isoString) {
@@ -326,7 +327,7 @@ function renderSnapshot(snapshot, options = {}) {
 
     renderConnectionBits();
     renderHeroCopy();
-    renderAuthPanels();
+    renderShells();
     renderActor('player', snapshot?.player || null);
     renderActor('enemy', snapshot?.enemy || null);
     renderTurn();
@@ -345,7 +346,7 @@ function renderLoggedOutState() {
 
     renderConnectionBits();
     renderHeroCopy();
-    renderAuthPanels();
+    renderShells();
     renderActor('player', null);
     renderActor('enemy', null);
     renderTurn();

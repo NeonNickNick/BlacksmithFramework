@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
-namespace BlacksmithServer.Frontend.Auth
+namespace BlacksmithServer.Web.Auth
 {
     public sealed class AuthService
     {

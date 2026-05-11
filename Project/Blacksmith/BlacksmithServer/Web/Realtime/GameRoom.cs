@@ -1,10 +1,10 @@
 using BlacksmithCore.Driver;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithServer.Frontend;
+using BlacksmithServer.Web;
 using ClapInfra.ClapModels.Components;
 
-namespace BlacksmithServer.Frontend.Realtime
+namespace BlacksmithServer.Web.Realtime
 {
     public sealed class GameRoom
     {

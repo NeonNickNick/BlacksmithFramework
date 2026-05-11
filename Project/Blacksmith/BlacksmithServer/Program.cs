@@ -2,9 +2,9 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using BlacksmithCore.Infra.Utils;
-using BlacksmithServer.Frontend;
-using BlacksmithServer.Frontend.Auth;
-using BlacksmithServer.Frontend.Realtime;
+using BlacksmithServer.Web;
+using BlacksmithServer.Web.Auth;
+using BlacksmithServer.Web.Realtime;
 
 ModLoader.Initialize(AppContext.BaseDirectory);
 

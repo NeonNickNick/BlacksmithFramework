@@ -15,18 +15,67 @@
         <div class="background-orbit orbit-a"></div>
         <div class="background-orbit orbit-b"></div>
 
-        <main class="layout">
+        <main class="layout auth-layout" id="authShell">
+            <section class="panel auth-screen">
+                <div class="auth-screen-grid">
+                    <div class="auth-brand">
+                        <p class="eyebrow">Blacksmith Framework</p>
+                        <h1>Blacksmith Online Arena</h1>
+                        <p class="auth-copy">Log in first, then the battle deck opens. Matchmaking, turn input, and battle state all stay on the live server.</p>
+                        <div class="auth-notes">
+                            <div class="meta-card">
+                                <span class="meta-label">Transport</span>
+                                <strong>WebSocket Match</strong>
+                            </div>
+                            <div class="meta-card">
+                                <span class="meta-label">Timeout Rule</span>
+                                <strong>15s, 3 strikes</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auth-form-block">
+                        <div class="panel-heading compact auth-heading">
+                            <div>
+                                <p class="eyebrow">Account</p>
+                                <h2>Login Or Register</h2>
+                            </div>
+                        </div>
+
+                        <label class="field">
+                            <span>Username</span>
+                            <input id="usernameInput" placeholder="player_one" autocomplete="username" />
+                        </label>
+                        <label class="field">
+                            <span>Password</span>
+                            <input id="passwordInput" type="password" placeholder="At least 6 characters" autocomplete="current-password" />
+                        </label>
+                        <div class="button-row auth-buttons">
+                            <button id="loginBtn" class="primary-btn">Login</button>
+                            <button id="registerBtn" class="ghost-btn">Register</button>
+                        </div>
+                        <p class="hint" id="authHint">If you do not have an account yet, register here and enter the arena immediately.</p>
+                        <div class="auth-status-box">
+                            <span class="status-pill" id="connectionState">Disconnected</span>
+                            <div class="result-detail" id="authStatusText">Register or log in to connect to the arena.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <main class="layout battle-layout is-hidden" id="battleShell">
             <section class="hero panel">
                 <details class="hero-collapsible" id="heroPanel" open>
                     <summary class="hero-summary">
                         <div>
                             <p class="eyebrow">Blacksmith Framework</p>
-                            <h1>Online Battle Arena</h1>
+                            <h1>Battle Command Deck</h1>
                         </div>
                         <div class="hero-summary-meta">
                             <div class="meta-card compact-meta">
                                 <span class="meta-label">User</span>
-                                <strong id="userBadge">Guest</strong>
+                                <strong id="userBadge">--</strong>
                             </div>
                             <div class="meta-card compact-meta">
                                 <span class="meta-label">State</span>
@@ -40,13 +89,17 @@
                     </summary>
                     <div class="hero-content">
                         <div class="hero-copy-block">
-                            <p class="hero-copy" id="heroCopy">Register or log in, connect to the arena, and queue for a live Blacksmith duel over WebSocket.</p>
+                            <p class="hero-copy" id="heroCopy">Queue for a live duel, then keep using the familiar `skillName param` input flow from BlacksmithClient.</p>
                         </div>
 
                         <div class="hero-controls">
                             <div class="hero-status-row">
-                                <span class="status-pill" id="connectionState">Disconnected</span>
                                 <span class="status-pill muted" id="opponentBadge">No opponent</span>
+                            </div>
+                            <div class="button-row hero-buttons">
+                                <button id="queueBtn" class="primary-btn">Find Match</button>
+                                <button id="cancelQueueBtn" class="ghost-btn">Cancel Queue</button>
+                                <button id="logoutBtn" class="ghost-btn">Logout</button>
                             </div>
                             <div class="result-box" id="resultBox">
                                 <div class="result-title" id="resultTitle">No match yet</div>
@@ -61,37 +114,10 @@
                 <article class="panel action-panel">
                     <div class="panel-heading">
                         <div>
-                            <p class="eyebrow">Account & Match</p>
-                            <h2>Command Console</h2>
+                            <p class="eyebrow">Turn Input</p>
+                            <h2>Declare Skills</h2>
                         </div>
                         <span class="status-pill muted" id="turnCounterPill">Turn 0</span>
-                    </div>
-
-                    <div id="authFields" class="auth-stack">
-                        <label class="field">
-                            <span>Username</span>
-                            <input id="usernameInput" placeholder="player_one" autocomplete="username" />
-                        </label>
-                        <label class="field">
-                            <span>Password</span>
-                            <input id="passwordInput" type="password" placeholder="At least 6 characters" autocomplete="current-password" />
-                        </label>
-                        <div class="button-row">
-                            <button id="registerBtn" class="primary-btn">Register</button>
-                            <button id="loginBtn" class="ghost-btn">Login</button>
-                        </div>
-                    </div>
-
-                    <div id="sessionPanel" class="auth-stack is-hidden">
-                        <div class="field session-card">
-                            <span>Signed in as</span>
-                            <strong id="sessionUser">--</strong>
-                        </div>
-                        <div class="button-row">
-                            <button id="queueBtn" class="primary-btn">Find Match</button>
-                            <button id="cancelQueueBtn" class="ghost-btn">Cancel Queue</button>
-                            <button id="logoutBtn" class="ghost-btn">Logout</button>
-                        </div>
                     </div>
 
                     <label class="field">
@@ -104,7 +130,7 @@
                     </div>
 
                     <p class="hint" id="modeHint">Use the same text input pattern as the local client: `skillName param`.</p>
-                    <p class="hint" id="actionHint">Log in and connect to a match before submitting a turn.</p>
+                    <p class="hint" id="actionHint">Click Find Match to enter the matchmaking queue.</p>
                 </article>
 
                 <article class="panel timeline-panel">

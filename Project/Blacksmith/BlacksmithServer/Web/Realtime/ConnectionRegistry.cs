@@ -1,10 +1,10 @@
-using BlacksmithServer.Frontend;
+using BlacksmithServer.Web;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
-namespace BlacksmithServer.Frontend.Realtime
+namespace BlacksmithServer.Web.Realtime
 {
     public sealed class ConnectionRegistry
     {

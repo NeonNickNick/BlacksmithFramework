@@ -23,7 +23,7 @@ registerBtn?.addEventListener('click', () => withBusy(async () => {
     State.lastBanner = response.message || 'Registration successful.';
     renderConnectionBits();
     renderHeroCopy();
-    renderAuthPanels();
+    renderShells();
     connectSocket();
 }));
 
@@ -39,7 +39,7 @@ loginBtn?.addEventListener('click', () => withBusy(async () => {
     State.lastBanner = response.message || 'Login successful.';
     renderConnectionBits();
     renderHeroCopy();
-    renderAuthPanels();
+    renderShells();
     connectSocket();
 }));
 
@@ -126,7 +126,7 @@ setInterval(() => {
         State.lastBanner = status.message || 'Authenticated.';
         renderConnectionBits();
         renderHeroCopy();
-        renderAuthPanels();
+        renderShells();
         connectSocket();
     });
 })();

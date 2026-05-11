@@ -1,4 +1,4 @@
-namespace BlacksmithServer.Frontend
+namespace BlacksmithServer.Web
 {
     public sealed class AuthRequest
     {

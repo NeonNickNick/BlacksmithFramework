@@ -14,8 +14,4 @@
     <ProjectReference Include="..\BlacksmithCore\BlacksmithCore.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="..\BlacksmithClient\wwwroot\css\style.css" Link="wwwroot\css\style.css" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
 </Project>

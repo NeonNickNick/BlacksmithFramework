@@ -1,6 +1,6 @@
-using BlacksmithServer.Frontend;
+using BlacksmithServer.Web;
 
-namespace BlacksmithServer.Frontend.Realtime
+namespace BlacksmithServer.Web.Realtime
 {
     public sealed class MatchCoordinator
     {
