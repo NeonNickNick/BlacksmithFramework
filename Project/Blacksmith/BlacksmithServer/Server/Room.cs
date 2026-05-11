@@ -425,10 +425,10 @@ namespace BlacksmithServer.Server
             };
         }
 
-        private static string DetermineResult(BodyView player, BodyView enemy)
+        private string DetermineResult(BodyView player, BodyView enemy)
         {
-            bool playerDead = player.HP <= 0;
-            bool enemyDead = enemy.HP <= 0;
+            bool playerDead = player.HP <= 0 || Player1.ConsecutiveTimeouts >= MaxConsecutiveTimeouts;
+            bool enemyDead = enemy.HP <= 0 || Player2.ConsecutiveTimeouts >= MaxConsecutiveTimeouts;
             if (playerDead && enemyDead) return "draw";
             if (playerDead) return "lose";
             if (enemyDead) return "win";
