@@ -67,13 +67,13 @@ WS.on('waiting', () => {
 
 WS.on('game_over', (msg) => {
     State.gameOver = true;
-    State.gameStarted = false;
-    State.inQueue = false;
     stopTurnTimer();
     State.snapshot = msg.snapshot;
     State.turns = msg.snapshot?.turns || [];
     State.lastResult = resultLabel(msg.result);
     renderSnapshot(State.snapshot, { autoFocusLatest: true });
+    State.gameStarted = false;
+    State.inQueue = false;
     updateBusyState();
     renderWaitingState();
 });
