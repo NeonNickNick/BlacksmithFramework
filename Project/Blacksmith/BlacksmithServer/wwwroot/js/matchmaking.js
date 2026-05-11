@@ -1,5 +1,6 @@
 const Matchmaking = (() => {
     function joinQueue() {
+        console.log('[Matchmaking] joinQueue: inQueue=' + State.inQueue + ' gameStarted=' + State.gameStarted + ' connected=' + State.connected);
         if (State.inQueue || State.gameStarted) return;
         if (!State.connected) {
             alert('Not connected to server. Please wait for reconnection.');

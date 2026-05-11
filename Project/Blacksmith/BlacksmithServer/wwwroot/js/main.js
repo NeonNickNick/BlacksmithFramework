@@ -66,6 +66,7 @@ WS.on('waiting', () => {
 });
 
 WS.on('game_over', (msg) => {
+    console.log('[WS] game_over received', msg.result);
     State.gameOver = true;
     stopTurnTimer();
     State.snapshot = msg.snapshot;
@@ -74,18 +75,22 @@ WS.on('game_over', (msg) => {
     renderSnapshot(State.snapshot, { autoFocusLatest: true });
     State.gameStarted = false;
     State.inQueue = false;
+    State.playerNumber = 0;
     updateBusyState();
     renderWaitingState();
+    Matchmaking.renderQueueUI();
 });
 
 WS.on('opponent_disconnected', (msg) => {
     State.gameOver = true;
     State.gameStarted = false;
     State.inQueue = false;
+    State.playerNumber = 0;
     stopTurnTimer();
     State.lastResult = 'Victory (opponent left)';
     renderTurn();
     updateBusyState();
+    Matchmaking.renderQueueUI();
     alert(msg.message || 'Opponent disconnected.');
 });
 

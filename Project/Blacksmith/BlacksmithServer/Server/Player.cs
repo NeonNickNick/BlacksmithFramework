@@ -19,9 +19,17 @@ namespace BlacksmithServer.Server
 
         public async Task SendAsync(object message)
         {
-            var json = JsonSerializer.Serialize(message);
-            var bytes = Encoding.UTF8.GetBytes(json);
-            await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+            try
+            {
+                var json = JsonSerializer.Serialize(message);
+                var bytes = Encoding.UTF8.GetBytes(json);
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Player {Id}] SendAsync failed: {ex.Message}");
+            }
         }
     }
 }
