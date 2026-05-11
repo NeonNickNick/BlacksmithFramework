@@ -196,11 +196,6 @@ namespace BlacksmithServer.Server
                 if (_p1Pending == null)
                 {
                     Player1.ConsecutiveTimeouts++;
-                    if (Player1.ConsecutiveTimeouts >= MaxConsecutiveTimeouts)
-                    {
-                        ForfeitGame(Player1);
-                        return;
-                    }
                     _p1Pending = ("iron", 0);
                     _ = Player1.SendAsync(new { type = MessageTypes.Error, message = "Turn timeout. Auto-passing with 'iron'." });
                 }
@@ -208,20 +203,31 @@ namespace BlacksmithServer.Server
                 if (_p2Pending == null)
                 {
                     Player2.ConsecutiveTimeouts++;
-                    if (Player2.ConsecutiveTimeouts >= MaxConsecutiveTimeouts)
-                    {
-                        ForfeitGame(Player2);
-                        return;
-                    }
                     _p2Pending = ("iron", 0);
                     _ = Player2.SendAsync(new { type = MessageTypes.Error, message = "Turn timeout. Auto-passing with 'iron'." });
                 }
 
-                if (_p1Pending != null && _p2Pending != null)
+                bool p1Forfeit = Player1.ConsecutiveTimeouts >= MaxConsecutiveTimeouts;
+                bool p2Forfeit = Player2.ConsecutiveTimeouts >= MaxConsecutiveTimeouts;
+
+                if (p1Forfeit && p2Forfeit)
                 {
-                    CancelTurnTimer();
-                    ResolveTurn();
+                    ForfeitDraw();
+                    return;
                 }
+                if (p1Forfeit)
+                {
+                    ForfeitGame(Player1);
+                    return;
+                }
+                if (p2Forfeit)
+                {
+                    ForfeitGame(Player2);
+                    return;
+                }
+
+                CancelTurnTimer();
+                ResolveTurn();
             }
         }
 
@@ -244,6 +250,26 @@ namespace BlacksmithServer.Server
                 result = "lose",
                 message = "You forfeited due to repeated timeouts.",
                 snapshot = BuildSnapshotForPlayer(loser.PlayerNumber)
+            });
+        }
+
+        private void ForfeitDraw()
+        {
+            State = RoomState.Finished;
+
+            _ = Player1.SendAsync(new
+            {
+                type = MessageTypes.GameOver,
+                result = "draw",
+                message = "Both players forfeited due to repeated timeouts.",
+                snapshot = BuildSnapshotForPlayer(1)
+            });
+            _ = Player2.SendAsync(new
+            {
+                type = MessageTypes.GameOver,
+                result = "draw",
+                message = "Both players forfeited due to repeated timeouts.",
+                snapshot = BuildSnapshotForPlayer(2)
             });
         }
 

@@ -27,5 +27,8 @@ function resetGameState() {
     State.snapshot = null;
     State.waitingForOpponent = false;
     State.gameOver = false;
+    State.playerNumber = 0;
+    State.roomId = null;
+    State.inQueue = false;
     stopTurnTimer();
 }

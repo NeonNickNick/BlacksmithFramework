@@ -1,6 +1,10 @@
 const Matchmaking = (() => {
     function joinQueue() {
         if (State.inQueue || State.gameStarted) return;
+        if (!State.connected) {
+            alert('Not connected to server. Please wait for reconnection.');
+            return;
+        }
         WS.send('join_queue');
     }
 
