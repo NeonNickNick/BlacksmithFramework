@@ -3,6 +3,7 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defenses;
+using ClapInfra.ClapUtils;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
@@ -10,11 +11,11 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class BloodSigil : MainProfession
     {
-        private float _increase = 1f;
+        private ClapStateVar<float> _increase = new(1f);
         private int IncreaseAttack(int origin)
         {
-            var res = (int)MathF.Ceiling(origin * _increase);
-            _increase = 1f;
+            var res = (int)MathF.Ceiling(origin * _increase.Value);
+            _increase.Reset();
             return res;
         }
         private bool BloodBladeCheck(ISkillContext sc)
@@ -42,7 +43,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .WriteFree(source =>
                 {
                     source.Focus.Get<Health>().LoseHP(2);
-                    _increase = 1.5f;
+                    _increase.Set(1.5f);
                 });
             return DSL.Create(sc.Self, pen);
         }
