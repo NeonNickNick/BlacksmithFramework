@@ -201,6 +201,39 @@
     font-size: 1rem;
 }
 
+/* ---- Hero queue timer ---- */
+
+.hero-timer {
+    display: grid;
+    gap: 8px;
+}
+
+.hero-timer .timer-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+}
+
+/* ---- Action panel timers ---- */
+
+.action-timers {
+    margin-top: 10px;
+    display: grid;
+    gap: 10px;
+}
+
+.action-timer-card {
+    min-width: unset;
+    flex: unset;
+}
+
+.action-timeout-row {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
 body.auth-only .background-orbit {
     opacity: 0.34;
 }

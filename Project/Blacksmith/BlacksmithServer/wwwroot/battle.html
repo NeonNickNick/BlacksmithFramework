@@ -53,6 +53,15 @@
                                 <button id="cancelQueueBtn" class="ghost-btn">Cancel Queue</button>
                                 <button id="logoutBtn" class="ghost-btn">Logout</button>
                             </div>
+                            <div class="hero-timer">
+                                <div class="timer-head">
+                                    <span class="match-stat-label">Queue Timer</span>
+                                    <strong id="queueCountdown" class="match-stat-value">--</strong>
+                                </div>
+                                <div class="timer-bar-track">
+                                    <div id="queueCountdownBar" class="timer-bar-fill"></div>
+                                </div>
+                            </div>
                             <div class="result-box" id="resultBox">
                                 <div class="result-title" id="resultTitle">No match yet</div>
                                 <div class="result-detail" id="resultDetail">Once a match ends, the battle result and cause will appear here.</div>
@@ -83,6 +92,28 @@
 
                     <p class="hint" id="modeHint">Use the same text input pattern as the local client: `skillName param`.</p>
                     <p class="hint" id="actionHint">Click Find Match to enter the matchmaking queue.</p>
+
+                    <div class="action-timers">
+                        <div class="timer-card action-timer-card">
+                            <div class="timer-head">
+                                <span class="match-stat-label">Round Timer</span>
+                                <strong id="roundCountdown" class="match-stat-value">--</strong>
+                            </div>
+                            <div class="timer-bar-track">
+                                <div id="roundCountdownBar" class="timer-bar-fill"></div>
+                            </div>
+                        </div>
+                        <div class="action-timeout-row">
+                            <div class="match-stat">
+                                <span class="match-stat-label">Your Timeouts</span>
+                                <strong id="playerTimeouts" class="match-stat-value">0 / 3</strong>
+                            </div>
+                            <div class="match-stat">
+                                <span class="match-stat-label">Opponent Timeouts</span>
+                                <strong id="enemyTimeouts" class="match-stat-value">0 / 3</strong>
+                            </div>
+                        </div>
+                    </div>
                 </article>
 
                 <article class="panel timeline-panel">
@@ -100,37 +131,6 @@
                     <div id="actionText" class="action-banner">No actions recorded yet.</div>
                     <div id="turnSummary" class="summary-grid battle-summary"></div>
                 </article>
-            </section>
-
-            <section class="panel match-stats-bar">
-                <div class="match-stats-content">
-                    <div class="timer-card">
-                        <div class="timer-head">
-                            <span class="match-stat-label">Queue Timer</span>
-                            <strong id="queueCountdown" class="match-stat-value">--</strong>
-                        </div>
-                        <div class="timer-bar-track">
-                            <div id="queueCountdownBar" class="timer-bar-fill"></div>
-                        </div>
-                    </div>
-                    <div class="timer-card">
-                        <div class="timer-head">
-                            <span class="match-stat-label">Round Timer</span>
-                            <strong id="roundCountdown" class="match-stat-value">--</strong>
-                        </div>
-                        <div class="timer-bar-track">
-                            <div id="roundCountdownBar" class="timer-bar-fill"></div>
-                        </div>
-                    </div>
-                    <div class="match-stat">
-                        <span class="match-stat-label">Your Timeouts</span>
-                        <strong id="playerTimeouts" class="match-stat-value">0 / 3</strong>
-                    </div>
-                    <div class="match-stat">
-                        <span class="match-stat-label">Opponent Timeouts</span>
-                        <strong id="enemyTimeouts" class="match-stat-value">0 / 3</strong>
-                    </div>
-                </div>
             </section>
 
             <section class="battle-grid">
