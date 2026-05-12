@@ -26,7 +26,7 @@ Blacksmith 是一个围绕《打铁》规则构建的可扩展对战框架。Xio
 .\BlacksmithWithMods.cmd
 
 # 运行 Blacksmith（发布后）
-.\Blacksmith\BlacksmithClient.exe
+BlacksmithClient.exe
 
 # 发布 Xio
 .\Xio.cmd

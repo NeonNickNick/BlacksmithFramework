@@ -165,7 +165,7 @@ namespace BlacksmithCore.Infra.DSL
                 return new(this);
             }
 
-            public SourceFile WriteRecovery(int power)
+            public RecoveryFile WriteRecovery(int power)
             {
                 _sentences.Add(new((source) =>
                 {
@@ -173,7 +173,7 @@ namespace BlacksmithCore.Infra.DSL
                 }, SentenceType.Recovery, StructureType.Main));
                 return new(this);
             }
-            public SourceFile WriteDefense(
+            public DefenseFile WriteDefense(
                 float power,
                 DefenseBase defense,
                 int delayRounds = 0
@@ -196,7 +196,7 @@ namespace BlacksmithCore.Infra.DSL
                 }, SentenceType.Defense, StructureType.Main));
                 return new(this);
             }
-            public SourceFile WriteResource(
+            public ResourceFile WriteResource(
                 float power,
                 ResourceType.CEValue type,
                 int delayRounds = 0
@@ -218,7 +218,7 @@ namespace BlacksmithCore.Infra.DSL
                 }, SentenceType.Resource, StructureType.Main));
                 return new(this);
             }
-            public SourceFile WriteEffect(
+            public EffectFile WriteEffect(
                 EffectType.CEValue type,
                 EffectTargetType.CEValue targetType,
                 float power,
