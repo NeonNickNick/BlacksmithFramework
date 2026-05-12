@@ -12,11 +12,11 @@ namespace BlacksmithCore.Infra.Utils
     {
         private static readonly DllLoader _dllLoader = new();
         private static readonly string _modConfigName = "mod.json";
-        private static string _configDirectory = ".blacksmith\\";
+        private static string _configDirectory = ".blacksmith";
         public static void Initialize(string basePath)
         {
-            _configDirectory = basePath + _configDirectory;
-            var configPath = _configDirectory + _modConfigName;
+            _configDirectory = Path.Combine(basePath, _configDirectory);
+            var configPath = Path.Combine(_configDirectory, _modConfigName);
             var dict = new Dictionary<string, object>();
 
             if (!Directory.Exists(_configDirectory))
@@ -55,16 +55,16 @@ namespace BlacksmithCore.Infra.Utils
                 switch (dict[key])
                 {
                     case string dir:
-                        res.Add(AppContext.BaseDirectory + dir.TrimStart('\\'));
+                        res.Add(Path.Combine(AppContext.BaseDirectory, dir.TrimStart('\\', '/')));
                         break;
                     case JsonElement je when je.ValueKind == JsonValueKind.String:
-                        res.Add(AppContext.BaseDirectory + je.GetString()!.TrimStart('\\'));
+                        res.Add(Path.Combine(AppContext.BaseDirectory, je.GetString()!.TrimStart('\\', '/')));
                         break;
                     case JsonElement je when je.ValueKind == JsonValueKind.Array:
                         foreach (var item in je.EnumerateArray())
                         {
                             if (item.ValueKind == JsonValueKind.String)
-                                res.Add(AppContext.BaseDirectory + item.GetString()!.TrimStart('\\'));
+                                res.Add(Path.Combine(AppContext.BaseDirectory, item.GetString()!.TrimStart('\\', '/')));
                         }
                         break;
                     default:
