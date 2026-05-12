@@ -32,7 +32,7 @@ EOF
 fi
 
 # Publish Blacksmith server (overwrites built artifacts only)
-dotnet publish "./Project/Blacksmith/BlacksmithClient/BlacksmithClient.csproj" \
+dotnet publish "./Project/Blacksmith/BlacksmithServer/BlacksmithServer.csproj" \
     -c Release -o "$OUTPUT_DIR"
 
 # Publish and update ModExamples DLL
@@ -44,4 +44,4 @@ mv "$TEMP_DIR/ModExamples.dll" "$OUTPUT_DIR/ModExamples/"
 rm -rf "$TEMP_DIR"
 
 echo "BlacksmithServer build complete. Output: $OUTPUT_DIR"
-echo "Run with: dotnet $OUTPUT_DIR/BlacksmithClient.dll"
+echo "Run with: dotnet $OUTPUT_DIR/BlacksmithServer.dll"

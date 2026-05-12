@@ -3,6 +3,10 @@
 **/obj/
 **/out/
 **/publish/
+**/BlacksmithServer/
+**/BlacksmithPure/
+**/BlacksmithWithMods/
+**/Xio/
 
 # User-specific files
 *.user
