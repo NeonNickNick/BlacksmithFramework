@@ -14,7 +14,7 @@ namespace ClapSourceGenerators.SkillRegistration
             title: "Skill generator must return IDSLSourceFile",
             messageFormat: "'{0}' appears to be the generator for '{0}Check', but returns '{1}' instead of '{2}'. Change the return type to '{2}'.",
             category: "ClapSkillRegistration",
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
         private static readonly DiagnosticDescriptor MissingGeneratorRule = new(
@@ -22,7 +22,7 @@ namespace ClapSourceGenerators.SkillRegistration
             title: "Skill checker has no matching generator",
             messageFormat: "'{0}' has no matching generator method '{1}'. Add a private '{1}' method returning '{2}' with a single '{3}' parameter.",
             category: "ClapSkillRegistration",
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -172,7 +172,7 @@ namespace ClapSourceGenerators.SkillRegistration
                 if (info.Skills.Count > 0)
                 {
                     ctx.AddSource(
-                        $"{info.ClassName}.SkillRegistration.g.cs",
+                        $"{info.Namespace}.{info.ClassName}.SkillRegistration.g.cs",
                         GeneratePartialClass(info));
                 }
             }

@@ -16,24 +16,24 @@ namespace BlacksmithCore.AI.Strategies
         {
 
         }
-        public (string skillName, int param) ChooseSkill(
+        public (string skillName, int param, string stringParam) ChooseSkill(
             Community self,
             Community opponent)
         {
             _turn++;
 
             if (_turn <= 7)
-                return ("iron", 0);
+                return ("iron", 0, "");
 
             if (_turn == 8)
-                return ("bloodsigil", 0);
+                return ("bloodsigil", 0, "");
 
             int hp = self.Focus.Get<Health>().HP;
 
             if (hp <= 1)
-                return ("bloodrecovery", 0);
+                return ("bloodrecovery", 0, "");
             if (hp <= 5)
-                return ("bloodrage", 0);
+                return ("bloodrage", 0, "");
 
             var packages = opponent.Focus.Get<Skill>().GetActivePackageNames();
             string profession = packages.FirstOrDefault(p => p != nameof(Common)) ?? nameof(Common);
@@ -50,14 +50,14 @@ namespace BlacksmithCore.AI.Strategies
         }
 
         // 0.7 bloodblade / 0.3 bloodlust, no recovery
-        private (string, int) ChooseBase()
+        private (string, int, string) ChooseBase()
         {
             return _random.NextDouble() < 0.70
-                ? ("bloodblade", 0)
-                : ("bloodlust", 0);
+                ? ("bloodblade", 0, "")
+                : ("bloodlust", 0, "");
         }
 
-        private (string, int) ChooseVsCannon(int hp, int maxDmg, bool killable)
+        private (string, int, string) ChooseVsCannon(int hp, int maxDmg, bool killable)
         {
             if (killable)
             {
@@ -68,25 +68,25 @@ namespace BlacksmithCore.AI.Strategies
                 if (advanceKillable)
                 {
                     double roll = _random.NextDouble();
-                    if (roll < 0.4) return ("bloodshield", 0);
-                    if (roll < 0.8) return ("bloodblade", 0);
-                    return ("bloodrecovery", 0);
+                    if (roll < 0.4) return ("bloodshield", 0, "");
+                    if (roll < 0.8) return ("bloodblade", 0, "");
+                    return ("bloodrecovery", 0, "");
                 }
-                return ("bloodblade", 0);
+                return ("bloodblade", 0, "");
             }
 
             if (maxDmg == hp)
             {
                 double roll = _random.NextDouble();
-                if (roll < 0.8) return ("bloodrecovery", 0);
-                if (roll < 0.9) return ("bloodblade", 0);
-                return ("bloodshield", 0);
+                if (roll < 0.8) return ("bloodrecovery", 0, "");
+                if (roll < 0.9) return ("bloodblade", 0, "");
+                return ("bloodshield", 0, "");
             }
 
             return ChooseBase();
         }
 
-        private (string, int) ChooseVsDriver(int hp, int maxDmg, bool killable)
+        private (string, int, string) ChooseVsDriver(int hp, int maxDmg, bool killable)
         {
             if (killable)
             {
@@ -98,15 +98,15 @@ namespace BlacksmithCore.AI.Strategies
                     // cannon: 0.4 shield / 0.4 blade / 0.2 recovery
                     // driver: shift 0.1 blade -> lust
                     double roll = _random.NextDouble();
-                    if (roll < 0.4) return ("bloodshield", 0);
-                    if (roll < 0.7) return ("bloodblade", 0);
-                    if (roll < 0.8) return ("bloodlust", 0);
-                    return ("bloodrecovery", 0);
+                    if (roll < 0.4) return ("bloodshield", 0, "");
+                    if (roll < 0.7) return ("bloodblade", 0, "");
+                    if (roll < 0.8) return ("bloodlust", 0, "");
+                    return ("bloodrecovery", 0, "");
                 }
                 // cannon: 1.0 blade -> driver: 0.9 blade / 0.1 lust
                 return _random.NextDouble() < 0.9
-                    ? ("bloodblade", 0)
-                    : ("bloodlust", 0);
+                    ? ("bloodblade", 0, "")
+                    : ("bloodlust", 0, "");
             }
 
             if (maxDmg == hp)
@@ -114,15 +114,15 @@ namespace BlacksmithCore.AI.Strategies
                 // cannon: 0.8 recovery / 0.1 blade / 0.1 shield
                 // driver: blade 0.1 -> 0.0, +0.1 lust
                 double roll = _random.NextDouble();
-                if (roll < 0.8) return ("bloodrecovery", 0);
-                if (roll < 0.9) return ("bloodlust", 0);
-                return ("bloodshield", 0);
+                if (roll < 0.8) return ("bloodrecovery", 0, "");
+                if (roll < 0.9) return ("bloodlust", 0, "");
+                return ("bloodshield", 0, "");
             }
 
             // cannon base: 0.7 blade / 0.3 lust -> driver: 0.6 blade / 0.4 lust
             return _random.NextDouble() < 0.6
-                ? ("bloodblade", 0)
-                : ("bloodlust", 0);
+                ? ("bloodblade", 0, "")
+                : ("bloodlust", 0, "");
         }
 
         private int GetMaxSingleTurnDamage(Community opponent)

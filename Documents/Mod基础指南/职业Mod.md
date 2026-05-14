@@ -29,9 +29,15 @@
 ```csharp
 public interface ISkillContext
 {
+    ISudoOperations SudoOperations { get; }
     string SkillName { get; }
     Community Self { get; }
     int Param { get; }
+    string StringParam { get; }
+}
+public interface ISudoOperations
+{
+    GameInstance DeepCopy(int preRounds = 0);
 }
 ```
 
@@ -39,7 +45,9 @@ public interface ISkillContext
 
 - `sc.Self`：当前施放技能的一方（`Community` 类型）
 - `sc.Self.Focus`：当前施放者的主体 `Body`
-- `sc.Param`：技能参数
+- `sc.Param`：技能数值参数（前端 `-p` 标志）
+- `sc.StringParam`：技能字符串参数（前端 `-s` 标志，如 `association -s stick`）
+- `sc.SudoOperations`：越权操作接口，提供 `DeepCopy()` 用于检查对手状态。这是实现 Association（复制别人技能）等高级模式的基础
 
 ### `Community` 与 `Body`
 
@@ -114,7 +122,7 @@ private IDSLSourceFile SomeSkill(ISkillContext sc)
 - `WriteResource(power, resourceType, delayRounds = 0)`
 - `WriteRecovery(power)`
 - `WriteEffect(...)`
-- `WriteFree(action)`
+- `WriteFree(action, canMove = true)` — 执行任意代码。`canMove` 是关键安全参数（见下文"WriteFree 与所有权转移"）
 - `UseResource(need, resourceType, ifCommonOnly = false)`
 - `WithBloodSuck(percent)`
 - `WithInterupt()`
@@ -123,6 +131,27 @@ private IDSLSourceFile SomeSkill(ISkillContext sc)
 
 - `WithBloodSuck` 和 `WithInterupt` 都是接在最近一条攻击后面的攻击修辞，只修饰前一条攻击。
 - `AttackType`、`ResourceType` 等都应通过 `Instance` 访问，例如 `AttackType.Instance.Physical()`。
+
+### WriteFree 与所有权转移（`Move()`）
+
+`WriteFree(action, canMove)` 的第二个参数是重要的安全机制。理解它需要先了解 `IDSLSourceFile.Move(Community newOwner)`：
+
+```csharp
+// SourceFile.Move() 的核心逻辑：
+_owner = newOwner;
+_sentences.RemoveAll(s => !s.CanMove);  // 剥离所有 canMove:false 的句子
+```
+
+**`canMove` 参数决定该自由句子在 DSL 所有权转移时是否保留：**
+
+- **`canMove: true`**（默认）— 句子随 DSL 一起转移到新主人。适用于应随技能转移的可复用逻辑。
+- **`canMove: false`** — 句子在 `Move()` 时被剥离。适用于**消耗类动作**（资源消耗、HP 损失），这些是"原主人"的事，不应转移。
+
+**快捷方法：** `UseResource()`、`LoseHP()`、`LoseMHP()` 内部都是 `WriteFree(..., canMove: false)`，自动在所有权转移时剥离。
+
+**为什么需要这个机制？** `ISudoOperations` 赋予了技能越权操作的能力——技能可以通过 `DeepCopy` 检查对手状态、复制别人的技能。这种越权能力需要配套的安全机制：当技能 DSL 被 `Move()` 转移所有权时，消耗类句子不应跟着转移，只保留攻击、防御、效果和明确标记为可转移的自由逻辑。
+
+**简单原则：** 消耗资源/HP 的副作用用 `canMove: false`（或直接用 `UseResource` / `LoseHP` / `LoseMHP`），可复用的增益逻辑用 `canMove: true`。
 
 ## 示例一：编写一个新职业
 
@@ -155,7 +184,7 @@ public class MyProfession : MainProfession
             {
                 source.Focus.Get<Health>().LoseHP(1);
                 source.Focus.Get<Health>().LoseMHP(1);
-            })
+            }, canMove: false)  // 消耗类副作用，不应随技能所有权转移
             .WriteRecovery(1)
             .WriteAttack(3, AttackType.Instance.Physical())
             .WriteAttack(3, AttackType.Instance.Magical())
@@ -206,7 +235,7 @@ public class CommonModifier : ProfessionModifier
             .WriteFree(source =>
             {
                 Common.ExcludeAllProfessions(source);
-            });
+            }, canMove: false);  // 转职副作用，不应随技能所有权转移
 
         return DSL.Create(sc.Self, pen);
     }
@@ -246,15 +275,17 @@ public class CommonModifier : ProfessionModifier
 
 仓库中的示例 Mod 位于：
 
-- `Project/Blacksmith/ModExamples/HolyBook.cs`
-- `Project/Blacksmith/ModExamples/CommonModifier.cs`
-- `Project/Blacksmith/ModExamples/EnumExtension.cs`
+- `Project/Blacksmith/ModExamples/HolyBookMod/HolyBook.cs`
+- `Project/Blacksmith/ModExamples/HolyBookMod/CommonModifier.cs`
+- `Project/Blacksmith/ModExamples/HolyBookMod/EnumExtension.cs`
+- `Project/Blacksmith/ModExamples/PhantomBookMod/` — Association 模式（越权复制技能 + Move 所有权转移）
 
 它展示了：
 
 - 如何新增职业
 - 如何为 `Common` 添加转职入口
 - 如何扩展资源与防御枚举
+- 如何利用 `ISudoOperations` 越权接口实现跨职业技能复制（PhantomBook）
 
 ## 温馨提示
 

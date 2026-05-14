@@ -1,12 +1,26 @@
 function parseSkill(text) {
     const raw = (text || '').trim();
-    if (!raw) return { name: 'iron', param: 0 };
+    if (!raw) return { name: 'iron', param: 0, stringParam: '' };
 
-    const parts = raw.split(/\s+/, 2);
-    const name = parts[0] || 'iron';
-    const parsed = Number.parseInt(parts[1], 10);
+    const tokens = raw.split(/\s+/);
+    const name = tokens[0] || 'iron';
+    let param = 0;
+    let stringParam = '';
 
-    return { name, param: Number.isFinite(parsed) ? parsed : 0 };
+    for (let i = 1; i < tokens.length; i++) {
+        if (tokens[i] === '-p' && i + 1 < tokens.length) {
+            const parsed = Number.parseInt(tokens[i + 1], 10);
+            if (Number.isFinite(parsed) && parsed >= 0) {
+                param = parsed;
+            }
+            i++;
+        } else if (tokens[i] === '-s' && i + 1 < tokens.length) {
+            stringParam = tokens[i + 1];
+            i++;
+        }
+    }
+
+    return { name, param, stringParam };
 }
 
 async function withBusy(task) {
@@ -65,7 +79,9 @@ declareBtn?.addEventListener('click', () => withBusy(async () => {
         skillName: skill.name,
         param: skill.param,
         esn: enemySkill.name,
-        ep: enemySkill.param
+        ep: enemySkill.param,
+        stringParam: skill.stringParam,
+        esp: enemySkill.stringParam
     });
 
     if (!response.ok) {

@@ -62,11 +62,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         private IDSLSourceFile Sacrifice(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .WriteFree(source =>
-                {
-                    source.Focus.Get<Health>().LoseHP(1);
-                    source.Focus.Get<Health>().LoseMHP(1);
-                })
+                .LoseHP(1)
+                .LoseMHP(1)
                 .WriteDefense(7, new RealReduction())
                 .WriteResource(1.5f, ResourceType.Instance.Iron());
             return DSL.Create(sc.Self, pen);
@@ -84,7 +81,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 {
                     source.Focus.Get<Skill>().AddSkill("Warlock", "midastouch");
                     source.Focus.Get<Skill>().RemoveSkill("Warlock", "alchemy");
-                });
+                }, false);
             return DSL.Create(sc.Self, pen);
         }
 

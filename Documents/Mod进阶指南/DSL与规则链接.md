@@ -171,3 +171,12 @@ new Mutation(
 2. 如果你只是要制造一个即时攻击，推荐在规则里再调用一次简短的 DSL。
 3. 如果规则依赖技能类的字段状态，务必控制好字段重置时机。
 4. 优先先写最小可运行版本，再补持续回合和延迟回合。
+
+## 另一个进阶 DSL 机制：WriteFree 与 Move()
+
+`LinkJudgeRuleDynamic` 解决的是"在判定阶段插入逻辑"。另一个进阶机制 `WriteFree(action, canMove)` + `SourceFile.Move()` 解决的是"DSL 所有权转移"——即 PhantomBook Association 模式。
+
+如果你需要实现跨职业技能复制（在运行时"窃取"另一个职业的 DSL），请参考：
+
+- `Project/Blacksmith/ModExamples/PhantomBookMod/`
+- [职业Mod](../Mod基础指南/职业Mod.md) 中的"WriteFree 与所有权转移"章节

@@ -145,7 +145,7 @@ namespace BlacksmithServer.Web.Realtime
             }
         }
 
-        public async Task SubmitTurnAsync(string username, string skillName, int param)
+        public async Task SubmitTurnAsync(string username, string skillName, int param, string stringParam = "")
         {
             GameRoom? room;
 
@@ -165,7 +165,7 @@ namespace BlacksmithServer.Web.Realtime
                 return;
             }
 
-            await room.SubmitTurnAsync(username, skillName, param);
+            await room.SubmitTurnAsync(username, skillName, param, stringParam);
         }
 
         public async Task HandleDisconnectedAsync(string username)

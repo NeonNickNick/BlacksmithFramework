@@ -1,7 +1,7 @@
 using BlacksmithCore.Infra.Attributes;
 using BlacksmithCore.Infra.Models.Core;
 
-namespace ModExamples
+namespace ModExamples.HolyBookMod
 {
     [IsBlacksmithEnumModifier]
     public static class ResourceExtension

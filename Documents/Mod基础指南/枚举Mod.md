@@ -127,7 +127,7 @@ Gold_普通资源名
 
 ## 来自示例项目的真实写法
 
-仓库中的 `Project/Blacksmith/ModExamples/EnumExtension.cs` 提供了一个实际例子：
+仓库中的 `Project/Blacksmith/ModExamples/HolyBookMod/EnumExtension.cs` 提供了一个实际例子：
 
 ```csharp
 [IsBlacksmithEnumModifier]

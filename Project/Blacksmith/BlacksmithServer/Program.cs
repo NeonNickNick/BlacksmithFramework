@@ -194,7 +194,8 @@ namespace BlacksmithServer
                     case "submitTurn":
                         var skillName = ReadString(root, "skillName") ?? "iron";
                         var param = ReadInt(root, "param");
-                        await coordinator.SubmitTurnAsync(username, skillName, param);
+                        var stringParam = ReadString(root, "stringParam") ?? "";
+                        await coordinator.SubmitTurnAsync(username, skillName, param, stringParam);
                         break;
                     case "requestSnapshot":
                         await coordinator.SendCurrentStateAsync(username);

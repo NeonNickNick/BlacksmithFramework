@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Entites;
 using ClapInfra.ClapModels.Components;
@@ -11,6 +12,7 @@ namespace BlacksmithCore.Infra.Models.Components
     }
     public class TurnContext : ClapTurnContext<IResolution, Community>
     {
+        private Dictionary<Type, Action<IResolution>> _preprocesses = new();
         public TurnContext() : base(new()
         {
             typeof(AttackResolution),
@@ -19,6 +21,25 @@ namespace BlacksmithCore.Infra.Models.Components
             typeof(EffectResolution)
         })
         {
+            foreach(var key in _resolutionLists.Keys)
+            {
+                _preprocesses[key] = _ => { };
+            }
+        }
+        public void AddPreprocess<TResolution>(Action<TResolution> preprocess)
+            where TResolution : IResolution
+        {
+            var temp = (IResolution resolution) =>
+            {
+                preprocess((TResolution)resolution);
+            };
+            _preprocesses[typeof(TResolution)] += temp;
+        }
+        public override void WriteResolution(IResolution resolution)
+        {
+            var pp = _preprocesses[resolution.GetType()];
+            pp(resolution);
+            base.WriteResolution(resolution);
         }
         protected override void ExecuteImpl<TResolution>(Community community, List<TResolution> list, Func<TResolution, bool>? ifProcess)
         {

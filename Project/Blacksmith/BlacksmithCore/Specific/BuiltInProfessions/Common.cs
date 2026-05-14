@@ -168,7 +168,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .WriteFree(source =>
                 {
                     ExcludeAllProfessions(source);
-                });
+                }, false);
             return DSL.Create(sc.Self, pen);
         }
 
@@ -185,7 +185,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .WriteFree(source =>
                 {
                     ExcludeAllProfessions(source);
-                });
+                }, false);
             return DSL.Create(sc.Self, pen);
         }
 
@@ -201,7 +201,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .WriteFree(source =>
                 {
                     ExcludeAllProfessions(source);
-                });
+                }, false);
             return DSL.Create(sc.Self, pen);
         }
 
@@ -227,7 +227,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                     addition.ForEach(a => source.Focus.Get<Skill>().RemoveSkill(nameof(Common), a));
                     source.Focus.Get<Health>().GainMHP(3);
                     source.Focus.Get<Health>().GainHP(3);
-                });
+                }, false);
             return DSL.Create(sc.Self, pen);
         }
         private bool LancerCheck(ISkillContext sc)
@@ -242,7 +242,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .WriteFree(source =>
                 {
                     ExcludeAllProfessions(source);
-                });
+                }, false);
             return DSL.Create(sc.Self, pen);
         }
         public static void ExcludeAllProfessions(Community source)

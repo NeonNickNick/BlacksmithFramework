@@ -5,7 +5,8 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defenses;
-using ModExamples.Defense;
+using ModExamples.HolyBookMod;
+using ModExamples.HolyBookMod.Defense;
 namespace ModExamples
 {
     using DSL = DSLforSkillLogic;
@@ -53,7 +54,7 @@ namespace ModExamples
                 .UseResource(1, ResourceType.Instance.Cross())
                 .WriteAttack(2, AttackType.Instance.Real())
                 .WriteDefense(2 + (int)MathF.Ceiling(_blasphemyCount / 3), new GreyHP())
-                .WriteFree(a => _blasphemyCount++);
+                .WriteFree(a => _blasphemyCount++, true);
             return DSL.Create(sc.Self, pen);
         }
         private bool RebirthCheck(ISkillContext sc)
@@ -76,7 +77,7 @@ namespace ModExamples
                         body.Get<Health>().GainHP(3);
                     };
                     source.Focus.Get<Effect>().Add(entity);
-                })
+                }, true)
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 0)
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 1)
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 2);

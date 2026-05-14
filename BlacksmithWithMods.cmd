@@ -7,22 +7,27 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-if exist BlacksmithWithMods rmdir /s /q BlacksmithWithMods
+set OUTPUT_DIR=BlacksmithWithMods
 
-dotnet publish "./Project/Blacksmith/BlacksmithClient/BlacksmithClient.csproj" -c Release -o BlacksmithWithMods
+if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
+if not exist "%OUTPUT_DIR%\.blacksmith" mkdir "%OUTPUT_DIR%\.blacksmith"
+if not exist "%OUTPUT_DIR%\ModExamples" mkdir "%OUTPUT_DIR%\ModExamples"
 
-mkdir BlacksmithWithMods\.blacksmith
+if not exist "%OUTPUT_DIR%\.blacksmith\mod.json" (
+    (
+        echo {
+        echo   "modexamples": "ModExamples"
+        echo }
+    ) > "%OUTPUT_DIR%\.blacksmith\mod.json"
+)
 
-mkdir BlacksmithWithMods\ModExamples
+dotnet publish "./Project/Blacksmith/BlacksmithClient/BlacksmithClient.csproj" -c Release -o "%OUTPUT_DIR%"
 
-(
-echo {
-echo "modexamples" : "ModExamples"
-echo }
-) > BlacksmithWithMods\.blacksmith\mod.json
+set TEMP_DIR=%TEMP%\BlacksmithModExamples_%RANDOM%
+dotnet publish "./Project/Blacksmith/ModExamples/ModExamples.csproj" -c Release -o "%TEMP_DIR%"
 
-dotnet publish "./Project/Blacksmith/ModExamples/ModExamples.csproj" -c Release -o Temp
+move /Y "%TEMP_DIR%\ModExamples.dll" "%OUTPUT_DIR%\ModExamples\"
+rmdir /S /Q "%TEMP_DIR%"
 
-move Temp\ModExamples.dll BlacksmithWithMods\ModExamples
-
-rmdir /S /Q Temp
+echo BlacksmithWithMods build complete. Output: %OUTPUT_DIR%
+echo Run with: %OUTPUT_DIR%\BlacksmithClient.exe

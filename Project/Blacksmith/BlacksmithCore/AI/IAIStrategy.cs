@@ -7,7 +7,7 @@ namespace BlacksmithCore.AI
     {
         string Name { get; }
         public void Init(GameInstance gameInstance);
-        (string skillName, int param) ChooseSkill(
+        (string skillName, int param, string stringParam) ChooseSkill(
             Community self,
             Community opponent);
     }
