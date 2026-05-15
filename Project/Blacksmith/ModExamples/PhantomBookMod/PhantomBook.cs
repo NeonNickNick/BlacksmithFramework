@@ -1,4 +1,5 @@
 using BlacksmithCore.Driver;
+using BlacksmithCore.Infra.Attributes.MarkOnly;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
@@ -7,12 +8,12 @@ using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
 using ClapInfra.ClapModels.Components;
-using ModExamples.HolyBookMod;
 
 namespace ModExamples.PhantomBookMod
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
+    [IsExperimental]
     public partial class PhantomBook : MainProfession
     {
         private bool FantasiaCheck(ISkillContext sc)
@@ -32,21 +33,22 @@ namespace ModExamples.PhantomBookMod
             string expectedSkill = sc.StringParam;
             var swapInstance = sc.SudoOperations.DeepCopy();
             swapInstance.Swap();
-            var fakeSelf = swapInstance.Player;
+            var fakeSelf = sc.SudoOperations.IsPlayer(sc.Self) ? swapInstance.Player : swapInstance.Enemy;
             var fakeSkill = fakeSelf.Focus.Get<Skill>();
             var fsc = new DefaultSkillContext(swapInstance, expectedSkill, fakeSelf, sc.Param, sc.StringParam);
-            if(expectedSkill == $"{nameof(Association).ToLower()}" || fakeSkill.TryDeclare(fsc.SkillName, fsc) != SkillDeclareResult.Success)
+            if (expectedSkill == $"{nameof(Association).ToLower()}" || fakeSkill.TryDeclare(fsc.SkillName, fsc) != SkillDeclareResult.Success)
             {
                 return false;
             }
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 2f);
         }
+        [IsExperimental]
         private IDSLSourceFile Association(ISkillContext sc)
         {
             string expectedSkill = sc.StringParam;
             var swapInstance = sc.SudoOperations.DeepCopy();
             swapInstance.Swap();
-            var fakeSelf = swapInstance.Player;
+            var fakeSelf = sc.SudoOperations.IsPlayer(sc.Self) ? swapInstance.Player : swapInstance.Enemy;
             var fakeSkill = fakeSelf.Focus.Get<Skill>();
             var fsc = new DefaultSkillContext(swapInstance, expectedSkill, fakeSelf, sc.Param, sc.StringParam);
             var stolenSF = fakeSkill.Declare(fsc.SkillName, fsc);
@@ -58,16 +60,45 @@ namespace ModExamples.PhantomBookMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 2f);
         }
-        private IDSLSourceFile Hallucinate(ISkillContext sc) 
+        [IsExperimental]
+        private IDSLSourceFile Hallucinate(ISkillContext sc)
         {
             Pen pen = sf => sf
-               .WriteEffect(EffectType.Instance.AfterTransport(), EffectTargetType.Instance.Enemy(), 0, 1,
+               .WriteEffect(EffectType.Instance.AfterResolutionWritten(), EffectTargetType.Instance.Enemy(), 0, 1,
                (Community source, Body main, EffectEntity effectEntity) =>
                {
-                   main.Get<TurnContext>().Get<ResourceResolution>().RemoveAll(r => r.Type == ResourceType.Instance.Space() || r.Type == ResourceType.Instance.Time());
+                   var tc = main.Get<TurnContext>();
+                   tc.Get<AttackResolution>().ForEach(a => a.DelayRounds++);
+                   tc.AddPreprocess<AttackResolution>(a => a.DelayRounds++);
                });
             return DSL.Create(sc.Self, pen);
         }
+        private bool AwakeningCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 2f);
+        }
+        [IsExperimental]
+        [IsHighCost]
+        private IDSLSourceFile Awakening(ISkillContext sc)
+        {
+            var sandBoxInstance = sc.SudoOperations.DeepCopy(preRounds: 2);
+            Body copiedBody = sc.SudoOperations.IsPlayer(sc.Self) ? sandBoxInstance.Player.Focus : sandBoxInstance.Enemy.Focus;
+            var resource = copiedBody.Get<Resource>();
+            float m = MathF.Min(2f, resource.QueryAll(ResourceType.Instance.Dream()));
+            resource.Use(ResourceType.Instance.Dream(), m);
+            sc.Self.ReplaceDelayed(copiedBody);
+            return DSL.Create(sc.Self, _ => _);
+        }
+        private bool IllusionCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 1f);
+        }
+        private IDSLSourceFile Illusion(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .UseResource(1f, ResourceType.Instance.Dream())
+                .WriteRecovery(5);
+            return DSL.Create(sc.Self, pen);
+        }
     }
-
 }

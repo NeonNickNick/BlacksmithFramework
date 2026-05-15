@@ -1,5 +1,3 @@
-using BlacksmithServer.Web;
-
 namespace BlacksmithServer.Web.Realtime
 {
     public sealed class MatchCoordinator

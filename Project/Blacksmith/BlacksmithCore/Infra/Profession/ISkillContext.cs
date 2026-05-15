@@ -14,5 +14,6 @@ namespace BlacksmithCore.Infra.Profession
     public interface ISudoOperations
     {
         public GameInstance DeepCopy(int preRounds = 0);
+        public bool IsPlayer(Community community);
     }
 }

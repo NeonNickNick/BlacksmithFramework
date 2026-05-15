@@ -148,7 +148,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
             },
             {
                 JudgeStage.Instance.OnEnd(),
-                new((player, enemy) => { })
+                new(UpdateCommunity)
             }
         };
         private static Action<Community, Community> _defaultRule;
@@ -207,18 +207,18 @@ namespace BlacksmithCore.Infra.Models.Judgement
             },
             {
                 JudgeStage.Instance.OnEnd(),
-                new((player, enemy) => { })
+                new(UpdateCommunity)
             }
         };
         #region Default Rules（原有逻辑）
         private static void TakeEffects(EffectType.CEValue type, Community player, Community enemy)
         {
-            foreach (var temp in player.ActorList)
+            foreach (var temp in player.BodyList)
             {
                 temp.Get<Effect>().Execute(type, temp);
             }
 
-            foreach (var temp in enemy.ActorList)
+            foreach (var temp in enemy.BodyList)
             {
                 temp.Get<Effect>().Execute(type, temp);
             }
@@ -325,13 +325,17 @@ namespace BlacksmithCore.Infra.Models.Judgement
 
         private static void Update(Community player, Community enemy)
         {
-            foreach (var temp in player.ActorList)
+            foreach (var temp in player.BodyList)
                 temp.Update();
 
-            foreach (var temp in enemy.ActorList)
+            foreach (var temp in enemy.BodyList)
                 temp.Update();
         }
-
+        private static void UpdateCommunity(Community player, Community enemy)
+        {
+            player.Update();
+            enemy.Update();
+        }
         #endregion
         public override void Judge(Community player, Community enemy)
         {

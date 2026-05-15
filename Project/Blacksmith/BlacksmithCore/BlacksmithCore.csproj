@@ -2,9 +2,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Clap\ClapInfra\ClapInfra.csproj" />
-		<ProjectReference Include="..\..\Clap\ClapSourceGenerators\ClapSourceGenerators.csproj"
-						  OutputItemType="Analyzer"
-						  ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Clap\ClapSourceGenerators\ClapSourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 	<PropertyGroup>

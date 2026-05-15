@@ -11,6 +11,7 @@ namespace ModExamples
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
+    [IsExperimental]
     public partial class HolyBook : MainProfession
     {
         private bool CrossCheck(ISkillContext sc)

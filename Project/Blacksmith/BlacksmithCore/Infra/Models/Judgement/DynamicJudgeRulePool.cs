@@ -11,9 +11,9 @@ namespace BlacksmithCore.Infra.Models.Judgement
         [IsBlacksmithEnumMember(0)]
         public CEValue OnBegin() => GetCEValue();
         [IsBlacksmithEnumMember(8)]
-        public CEValue OnEffectTaking_AfterResolutionWritten() => GetCEValue();
-        [IsBlacksmithEnumMember(16)]
         public CEValue OnEffectSwaping() => GetCEValue();
+        [IsBlacksmithEnumMember(16)]
+        public CEValue OnEffectTaking_AfterResolutionWritten() => GetCEValue();
         [IsBlacksmithEnumMember(32)]
         public CEValue OnAttackCanceling() => GetCEValue();
         [IsBlacksmithEnumMember(64)]

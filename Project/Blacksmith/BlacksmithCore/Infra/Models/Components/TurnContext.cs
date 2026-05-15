@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Entites;
 using ClapInfra.ClapModels.Components;
@@ -21,7 +20,7 @@ namespace BlacksmithCore.Infra.Models.Components
             typeof(EffectResolution)
         })
         {
-            foreach(var key in _resolutionLists.Keys)
+            foreach (var key in _resolutionLists.Keys)
             {
                 _preprocesses[key] = _ => { };
             }

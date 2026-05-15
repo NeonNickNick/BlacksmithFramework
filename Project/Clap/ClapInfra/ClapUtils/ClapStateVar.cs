@@ -5,10 +5,10 @@ namespace ClapInfra.ClapUtils
     {
         private readonly T _initialValue;
         public T Value { get; private set; }
-        public ClapStateVar(T value) 
-        { 
+        public ClapStateVar(T value)
+        {
             _initialValue = value;
-            Value = value; 
+            Value = value;
         }
         public void Reset()
         {

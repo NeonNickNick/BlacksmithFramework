@@ -47,7 +47,7 @@ public interface ISudoOperations
 - `sc.Self.Focus`：当前施放者的主体 `Body`
 - `sc.Param`：技能数值参数（前端 `-p` 标志）
 - `sc.StringParam`：技能字符串参数（前端 `-s` 标志，如 `association -s stick`）
-- `sc.SudoOperations`：越权操作接口，提供 `DeepCopy()` 用于检查对手状态。这是实现 Association（复制别人技能）等高级模式的基础
+- `sc.SudoOperations`：越权操作接口，提供 `DeepCopy()` 获取整局游戏的完整拷贝。这是实现 Association等高级技能的基础。如无必要不要使用，使用时务必仔细斟酌，尽管它是无污染的。后面会意识到它可以用于进一步复用已有技能逻辑，减少代码行数，但是不推荐这么做。
 
 ### `Community` 与 `Body`
 

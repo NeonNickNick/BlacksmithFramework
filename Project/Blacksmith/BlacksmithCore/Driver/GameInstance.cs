@@ -41,11 +41,15 @@ namespace BlacksmithCore.Driver
             Judger = new(Player, Enemy);
             History = new();
         }
+        public bool IsPlayer(Community community)
+        {
+            return community == Player;
+        }
         public GameInstance DeepCopy(int preRounds = 0)
         {
             GameInstance res = new();
             int n = History.SkillHistory.Count - preRounds;
-            if(n < 0)
+            if (n < 0)
             {
                 throw new ArgumentException("PreRounds out of limit!");
             }

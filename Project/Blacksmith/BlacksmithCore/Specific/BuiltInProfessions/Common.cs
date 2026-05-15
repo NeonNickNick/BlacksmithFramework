@@ -267,7 +267,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         public static void AttackSwaping_Modifier_After(Community player, Community enemy)
         {
-            var playerResolutions = player.Focus.Get<TurnContext>().Get<AttackResolution>();
+            var tc = player.Focus.Get<TurnContext>();
+            var playerResolutions = tc.Get<AttackResolution>();
 
             var reflect = playerResolutions.Where(a => a.DelayRounds == 0).ToList();
 
@@ -278,8 +279,10 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 a.DelayRounds = 1;
                 a.Source = player;
             });
-
-            playerResolutions.AddRange(reflect);
+            foreach (var res in reflect)
+            {
+                tc.WriteResolution(res);
+            }
         }
     }
 }
