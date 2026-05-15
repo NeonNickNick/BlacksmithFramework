@@ -8,17 +8,21 @@ namespace BlacksmithCore.Driver
 {
     public class DefaultSkillContext : ISkillContext
     {
+        public ISudoOperations SudoOperations { get; }
         public string SkillName { get; }
         public Community Self { get; }
         public int Param { get; }
-        public DefaultSkillContext(string skillName, Community self, int param)
+        public string StringParam { get; }
+        public DefaultSkillContext(ISudoOperations sudoOperations, string skillName, Community self, int param, string stringParam)
         {
+            SudoOperations = sudoOperations;
             SkillName = skillName;
             Self = self;
             Param = param;
+            StringParam = stringParam;
         }
     }
-    public class GameInstance
+    public class GameInstance : ISudoOperations
     {
         public Community Player { get; private set; }
         public Community Enemy { get; private set; }
@@ -37,32 +41,46 @@ namespace BlacksmithCore.Driver
             Judger = new(Player, Enemy);
             History = new();
         }
-        public GameInstance DeepCopy()
+        public GameInstance DeepCopy(int preRounds = 0)
         {
             GameInstance res = new();
-            foreach (var pair in History.SkillHistory)
+            int n = History.SkillHistory.Count - preRounds;
+            if(n < 0)
             {
-                res.Declare(pair.Item1.SkillName, pair.Item1.Param, pair.Item2.SkillName, pair.Item2.Param);
+                throw new ArgumentException("PreRounds out of limit!");
+            }
+            for (int i = 0; i < n; ++i)
+            {
+                var pair = History.SkillHistory[i];
+                res.Declare(pair.Item1.SkillName, pair.Item1.Param,
+                            pair.Item2.SkillName, pair.Item2.Param,
+                            pair.Item1.StringParam, pair.Item2.StringParam);
             }
             return res;
         }
-        public SkillDeclareResult TryDeclare(string skillName, int param)
+        public Community GetEnemyDeepCopy(int preRounds = 0)
         {
-            DefaultSkillContext context = new(skillName, Player, param);
+            return DeepCopy().Enemy;
+        }
+        public Community GetSelfDeepCopy(int preRounds = 0)
+        {
+            return DeepCopy().Player;
+        }
+        public SkillDeclareResult TryDeclare(string skillName, int param, string stringParam = "")
+        {
+            DefaultSkillContext context = new(this, skillName, Player, param, stringParam);
             return Player.Focus.Get<Skill>().TryDeclare(skillName, context);
         }
-        public SkillDeclareResult ETryDeclare(string skillName, int param)
+        public SkillDeclareResult ETryDeclare(string skillName, int param, string stringParam = "")
         {
-            DefaultSkillContext context = new(skillName, Enemy, param);
+            DefaultSkillContext context = new(this, skillName, Enemy, param, stringParam);
             return Enemy.Focus.Get<Skill>().TryDeclare(skillName, context);
         }
 
-        public void Declare(string skillName, int param, string esn, int ep)
+        public void Declare(string skillName, int param, string esn, int ep, string stringParam = "", string esp = "")
         {
-            var playerContext = new DefaultSkillContext(skillName, Player, param);
-            var enemyContext = new DefaultSkillContext(esn, Enemy, ep);
-
-            History.SkillHistory.Add((playerContext, enemyContext));
+            var playerContext = new DefaultSkillContext(this, skillName, Player, param, stringParam);
+            var enemyContext = new DefaultSkillContext(this, esn, Enemy, ep, esp);
 
             var ps = Player.Focus.Get<Skill>();
             var psfs = ps.GetPassiveSkill(playerContext);
@@ -73,7 +91,7 @@ namespace BlacksmithCore.Driver
             esfs.Add(es.Declare(esn, enemyContext));
 
             Judger.Judge(psfs, esfs);
-
+            History.SkillHistory.Add((playerContext, enemyContext));
         }
     }
 }

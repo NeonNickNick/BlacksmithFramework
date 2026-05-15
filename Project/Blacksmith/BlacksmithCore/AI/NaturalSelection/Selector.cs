@@ -51,7 +51,7 @@ namespace BlacksmithCore.AI.NaturalSelection
                 gameInstance.Swap();
                 var btuple = bstrategy.ChooseSkill(gameInstance.Player, gameInstance.Enemy);
                 gameInstance.Swap();
-                gameInstance.Declare(btuple.Item1, btuple.Item2, atuple.Item1, atuple.Item2);
+                gameInstance.Declare(btuple.Item1, btuple.Item2, atuple.Item1, atuple.Item2, btuple.Item3, atuple.Item3);
             }
             if (End(gameInstance) == 1)
             {

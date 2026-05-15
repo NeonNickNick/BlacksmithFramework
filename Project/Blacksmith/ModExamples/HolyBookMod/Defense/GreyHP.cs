@@ -1,7 +1,7 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 
-namespace ModExamples.Defense
+namespace ModExamples.HolyBookMod.Defense
 {
     public class GreyHP : DefenseBase
     {

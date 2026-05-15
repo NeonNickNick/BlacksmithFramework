@@ -1,38 +1,30 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 
-namespace ModExamples.Defense
+namespace ModExamples.HolyBookMod.Defense
 {
-    public class PercentageReduction : DefenseBase
+    public class PermanentRealReduction : DefenseBase
     {
-        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.PercentageReduction();
+        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.RealReduction();
         public override int Power { get; set; } = 0;
         public int Baseline { get; set; } = 1;
         public override bool CanMerge { get; set; } = false;
         public override bool IsDead { get; set; } = false;
-        public PercentageReduction(int baseline)
-        {
-            if (baseline <= 0)
-            {
-                throw new ArgumentException("百分比伤减的参考值必须大于0！");
-            }
-            Baseline = baseline;
-        }
-
         public override void Merge(DefenseBase addition)
         {
             //不会执行
         }
-
         public override void Update()
         {
-            IsDead = true;
+            if (Power <= 0)
+            {
+                IsDead = true;
+            }
         }
 
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
-            float percent = 1.0f * Power / Baseline;
-            return ((int)(attack * percent), attack - (int)(attack * percent));
+            return ((int)MathF.Max(0, attack - Power), (int)MathF.Min(attack, Power));
         }
     }
 }

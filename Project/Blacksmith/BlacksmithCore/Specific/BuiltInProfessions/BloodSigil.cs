@@ -25,10 +25,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         private IDSLSourceFile BloodBlade(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .WriteFree(source =>
-                {
-                    source.Focus.Get<Health>().LoseHP(4);
-                })
+                .LoseHP(4)
                 .WriteAttack(IncreaseAttack(6), AttackType.Instance.Physical())
                     .WithBloodSuck(0.66f);
             return DSL.Create(sc.Self, pen);
@@ -40,11 +37,11 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         private IDSLSourceFile BloodLust(ISkillContext sc)
         {
             Pen pen = sf => sf
+                .LoseHP(2)
                 .WriteFree(source =>
                 {
-                    source.Focus.Get<Health>().LoseHP(2);
                     _increase.Set(1.5f);
-                });
+                }, true);
             return DSL.Create(sc.Self, pen);
         }
         private bool BloodRecoveryCheck(ISkillContext sc) => true;
@@ -62,10 +59,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             int power = (int)MathF.Ceiling(0.4f * sc.Self.Focus.Get<Health>().HP);
             Pen pen = sf => sf
-                .WriteFree(source =>
-                {
-                    source.Focus.Get<Health>().LoseHP(1);
-                })
+                .LoseHP(1)
                 .WriteDefense(power, new CommonReduction());
             return DSL.Create(sc.Self, pen);
         }
@@ -76,10 +70,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         private IDSLSourceFile BloodRage(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .WriteFree(source =>
-                {
-                    source.Focus.Get<Health>().LoseHP(1);
-                })
+                .LoseHP(1)
                 .WriteAttack(IncreaseAttack(5), AttackType.Instance.Physical())
                     .WithBloodSuck(1.5f);
             return DSL.Create(sc.Self, pen);

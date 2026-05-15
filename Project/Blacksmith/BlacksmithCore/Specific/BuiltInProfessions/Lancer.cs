@@ -24,7 +24,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             .WriteRecovery(2);
         private ClapStateVar<bool> _dark = new(false);
         private Pen _darkPen = sf => sf
-            .WriteFree(source => source.Focus.Get<Health>().LoseMHP(1))
+            .LoseMHP(1)
             .WriteAttack(1, AttackType.Instance.Real(), delayRounds: 0)
             .WriteAttack(1, AttackType.Instance.Real(), delayRounds: 1);
 
@@ -169,8 +169,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             int chargeCountThis = _chargeCount.Value + 1;
             Pen pen = sf => sf
                 .UseResource(_chargeCost.Value, ResourceType.Instance.Iron())
-                .WriteFree(a => _chargeCount.Increment())
-                .WriteFree(a => _chargeCost.Set(0))
+                .WriteFree(a => _chargeCount.Increment(), true)
+                .WriteFree(a => _chargeCost.Set(0), true)
                 .LinkJudgeRuleDynamic(DynamicJudgeRuleName.Instance.Charge(), new()
                 {
                     new(AttackCanceling_Modifier_Before,
@@ -202,8 +202,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             _wasPassive.Set(true);
             Pen pen = sf => sf
                 .WriteAttack(10 + _chargeCount.Value * 4 + Fire(), AttackType.Instance.Magical())
-                .WriteFree(a => _chargeCount.Reset())
-                .WriteFree(a => _chargeCost.Reset());
+                .WriteFree(a => _chargeCount.Reset(), true)
+                .WriteFree(a => _chargeCost.Reset(), true);
             DSL.Create(player, Others(pen)).Compile().Execute(player);
 
         }

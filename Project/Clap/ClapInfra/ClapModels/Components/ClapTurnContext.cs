@@ -43,7 +43,7 @@ namespace ClapInfra.ClapModels.Components
                     $"Resolution type {typeof(TResolution).Name} is not registered in the context.");
             }
         }
-        public void WriteResolution(TIResolution resolution)
+        public virtual void WriteResolution(TIResolution resolution)
         {
             if (resolution == null)
             {

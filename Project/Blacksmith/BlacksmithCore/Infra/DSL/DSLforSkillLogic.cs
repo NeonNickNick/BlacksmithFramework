@@ -32,16 +32,18 @@ namespace BlacksmithCore.Infra.DSL
                 public SentenceType SentenceType { get; }
                 public StructureType StructureType { get; }
                 public Sentence? BindSentence { get; }
-                public Sentence(Action<Community> structure, SentenceType sentenceType, StructureType structureType, Sentence? bindSentence = null)
+                public bool CanMove { get; } = true;
+                public Sentence(Action<Community> structure, SentenceType sentenceType, StructureType structureType, Sentence? bindSentence = null, bool canMove = true)
                 {
                     Structure = structure;
                     SentenceType = sentenceType;
                     StructureType = structureType;
                     BindSentence = bindSentence;
+                    CanMove = canMove;
                 }
             }
 
-            protected readonly Community _owner;
+            protected Community _owner;
             protected List<Sentence> _sentences = new();
             protected Stack<Sentence> _rhetoricCache = new();
             protected Dictionary<DynamicJudgeRuleName.CEValue, List<Mutation>> _mutationsOnCompile = new();
@@ -56,6 +58,11 @@ namespace BlacksmithCore.Infra.DSL
             {
                 _owner = owner;
             }
+            public void Move(Community newOwner)
+            {
+                _owner = newOwner;
+                _sentences.RemoveAll(s => !s.CanMove);
+            }
             public Intent Compile(Judger? judger = null)
             {
                 List<Sentence> sentences = new(_sentences);
@@ -64,7 +71,10 @@ namespace BlacksmithCore.Infra.DSL
                 {
                     var rhetoric = _rhetoricCache.Pop();
                     int index = sentences.IndexOf(rhetoric.BindSentence!) + 1;
-                    sentences.Insert(index, new(rhetoric.Structure, rhetoric.SentenceType, StructureType.Rhetoric));
+                    if (index > 0)
+                    {
+                        sentences.Insert(index, new(rhetoric.Structure, rhetoric.SentenceType, StructureType.Rhetoric));
+                    }
                 }
                 Action<Community> result = (a) => { };
                 if (judger != null)
@@ -81,9 +91,9 @@ namespace BlacksmithCore.Infra.DSL
                 }
                 return new Intent() { Execute = result };
             }
-            public SourceFile WriteFree(Action<Community> action)
+            public SourceFile WriteFree(Action<Community> action, bool canMove)
             {
-                _sentences.Add(new(action, SentenceType.Free, StructureType.Main));
+                _sentences.Add(new(action, SentenceType.Free, StructureType.Main, canMove: canMove));
                 return this;
             }
             public AttackFile WriteAttack(
@@ -241,7 +251,15 @@ namespace BlacksmithCore.Infra.DSL
             }
             public SourceFile UseResource(float need, ResourceType.CEValue type, bool ifCommonOnly = false)
             {
-                return WriteFree(source => source.Focus.Get<Resource>().Use(type, need, ifCommonOnly));
+                return WriteFree(source => source.Focus.Get<Resource>().Use(type, need, ifCommonOnly), false);
+            }
+            public SourceFile LoseHP(int loss)
+            {
+                return WriteFree(source => source.Focus.Get<Health>().LoseHP(loss), false);
+            }
+            public SourceFile LoseMHP(int loss)
+            {
+                return WriteFree(source => source.Focus.Get<Health>().LoseMHP(loss), false);
             }
             public SourceFile LinkJudgeRuleDynamic(
                 DynamicJudgeRuleName.CEValue ruleKey,

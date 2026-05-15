@@ -7,5 +7,6 @@ namespace BlacksmithCore.Infra.DSL
 {
     public interface IDSLSourceFile : IClapDSLSourceFile<Community, Judger, JudgeRuleManager, Intent, IDSLSourceFile>
     {
+        public void Move(Community newOwner);
     }
 }

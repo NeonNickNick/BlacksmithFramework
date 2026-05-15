@@ -43,7 +43,7 @@ namespace BlacksmithClient.Frontend
                     return Results.Json(new { ok = false, message = "Invalid input", snapshot = webGameSession.GetSnapshot() });
                 }
 
-                var result = await webGameSession.DeclareTurnAsync(dto.skillName ?? string.Empty, dto.param, dto.esn ?? "iron", dto.ep);
+                var result = await webGameSession.DeclareTurnAsync(dto.skillName ?? string.Empty, dto.param, dto.esn ?? "iron", dto.ep, dto.stringParam ?? "", dto.esp ?? "");
                 return Results.Json(new { ok = result.Ok, message = result.Message, snapshot = result.Snapshot });
             });
 
@@ -74,6 +74,8 @@ namespace BlacksmithClient.Frontend
             public int param { get; set; }
             public string? esn { get; set; }
             public int ep { get; set; }
+            public string? stringParam { get; set; }
+            public string? esp { get; set; }
         }
     }
 }

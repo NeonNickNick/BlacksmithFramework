@@ -5,7 +5,7 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.BuiltInProfessions;
 
-namespace ModExamples
+namespace ModExamples.HolyBookMod
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
@@ -24,7 +24,7 @@ namespace ModExamples
                 .WriteFree(source =>
                 {
                     Common.ExcludeAllProfessions(source);
-                });
+                }, false);
             return DSL.Create(sc.Self, pen);
         }
     }

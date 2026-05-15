@@ -10,6 +10,5 @@ namespace BlacksmithCore.Infra.Profession
         {
 
         }
-
     }
 }
