@@ -232,13 +232,13 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         private bool LancerCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 4);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         private IDSLSourceFile Lancer(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Lancer()));
             Pen pen = sf => sf
-                .UseResource(4, ResourceType.Instance.Iron())
+                .UseResource(3, ResourceType.Instance.Iron())
                 .WriteFree(source =>
                 {
                     ExcludeAllProfessions(source);

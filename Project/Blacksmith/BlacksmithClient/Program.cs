@@ -14,7 +14,8 @@ namespace BlacksmithClient
             List<IAIStrategy> strategies = new()
             {
                 new BloodSigilStrategy(),
-                new GeneralStrategy(param)
+                new GeneralStrategy(param),
+                new AdversarialStrategy()
             };
             Console.WriteLine("Welcome!\n");
             LocalHost.Start(strategies);
