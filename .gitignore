@@ -33,6 +33,7 @@ SERVER_ARCHITECTURE.md
 *.tmp
 *.temp
 *.cache
+*.lscache
 Thumbs.db
 Desktop.ini
 
