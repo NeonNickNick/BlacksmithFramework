@@ -220,7 +220,7 @@ namespace BlacksmithCore.AI.Strategies
             _main = gameInstance;
         }
 
-        public (string skillName, int param) ChooseSkill(Community self, Community opponent)
+        public (string skillName, int param, string stringParam) ChooseSkill(Community self, Community opponent)
         {
             var sw = Stopwatch.StartNew();
 
@@ -240,7 +240,7 @@ namespace BlacksmithCore.AI.Strategies
             Task.WaitAll(tasks.ToArray());
 
             // 根并行：把各线程 root 的孩子按 (skill, param) 聚合
-            var merged = new Dictionary<(string, int), (double wins, int visits)>();
+            var merged = new Dictionary<(string, int, string), (double wins, int visits)>();
             foreach (var task in tasks)
             {
                 foreach (var child in task.Result)
@@ -256,7 +256,7 @@ namespace BlacksmithCore.AI.Strategies
                 }
             }
 
-            var finalChildren = merged.Select(kv => new MCTSNode(null!, null!, new List<(string, int)>())
+            var finalChildren = merged.Select(kv => new MCTSNode(null!, null!, new List<(string, int, string)>())
             {
                 Action = kv.Key,
                 Wins = kv.Value.wins,
@@ -268,7 +268,7 @@ namespace BlacksmithCore.AI.Strategies
             sw.Stop();
             Console.WriteLine(
                 $"[Adversarial] depth={_params.OpponentDepth} iter={_params.MctsIterations} "
-                + $"耗时={sw.ElapsedMilliseconds}ms 选择={result.Item1}/{result.Item2}");
+                + $"耗时={sw.ElapsedMilliseconds}ms 选择={result.Item1}/{result.Item2}/{result.Item3}");
 
             return result;
         }
@@ -298,7 +298,8 @@ namespace BlacksmithCore.AI.Strategies
                     var playerAction = HeuristicAction(nextState.Player, nextState, _params.OpponentDepth);
                     nextState.Declare(
                         playerAction.Item1, playerAction.Item2,
-                        action.Item1, action.Item2
+                        action.Item1, action.Item2,
+                        playerAction.Item3, action.Item3
                     );
 
                     var nextActions = GetAllAvailable(nextState.Enemy, nextState);
@@ -316,7 +317,7 @@ namespace BlacksmithCore.AI.Strategies
 
                     var p = HeuristicAction(simState.Player, simState, _params.OpponentDepth);
                     var e = HeuristicAction(simState.Enemy, simState, _params.OpponentDepth);
-                    simState.Declare(p.Item1, p.Item2, e.Item1, e.Item2);
+                    simState.Declare(p.Item1, p.Item2, e.Item1, e.Item2, p.Item3, e.Item3);
                 }
 
                 double result = Evaluate(simState);
@@ -339,7 +340,7 @@ namespace BlacksmithCore.AI.Strategies
         /// 然后用同一份 Evaluate 给结果局面打分。
         /// 视角对齐：Evaluate 是 Enemy 视角，actor=Player 时取负。
         /// </summary>
-        private (string, int) HeuristicAction(Community actor, GameInstance instance, int depth)
+        private (string, int, string) HeuristicAction(Community actor, GameInstance instance, int depth)
         {
             if (depth <= 0)
                 return RandomAction(actor, instance);
@@ -349,11 +350,11 @@ namespace BlacksmithCore.AI.Strategies
 
             var actions = GetAllAvailable(actor, instance);
             if (actions.Count == 0)
-                return ("", 0);
+                return ("", 0, "");
 
             bool actorIsEnemy = (actor == instance.Enemy);
             double bestScore = double.NegativeInfinity;
-            (string, int) bestAction = actions[0];
+            (string, int, string) bestAction = actions[0];
 
             foreach (var a in actions)
             {
@@ -374,9 +375,9 @@ namespace BlacksmithCore.AI.Strategies
                 try
                 {
                     if (actorIsEnemy)
-                        sim.Declare(oppAction.Item1, oppAction.Item2, a.Item1, a.Item2);
+                        sim.Declare(oppAction.Item1, oppAction.Item2, a.Item1, a.Item2, oppAction.Item3, a.Item3);
                     else
-                        sim.Declare(a.Item1, a.Item2, oppAction.Item1, oppAction.Item2);
+                        sim.Declare(a.Item1, a.Item2, oppAction.Item1, oppAction.Item2, a.Item3, oppAction.Item3);
                 }
                 catch
                 {
@@ -395,10 +396,10 @@ namespace BlacksmithCore.AI.Strategies
             return bestAction;
         }
 
-        private (string, int) SampleFromTopK(List<MCTSNode> children, int round)
+        private (string, int, string) SampleFromTopK(List<MCTSNode> children, int round)
         {
             if (children.Count == 0)
-                return ("", 0);
+                return ("", 0, "");
 
             int k = Math.Min(2, children.Count);
             double temperature = Math.Max(0, _params.TemperatureCoefficient * round);
@@ -436,16 +437,16 @@ namespace BlacksmithCore.AI.Strategies
             public GameInstance State;
             public MCTSNode? Parent;
             public List<MCTSNode> Children = new();
-            public (string skill, int param)? Action;
+            public (string skill, int param, string stringParam)? Action;
             public int Visits = 0;
             public double Wins = 0;
-            public List<(string, int)> UntriedActions;
+            public List<(string, int, string)> UntriedActions;
 
-            public MCTSNode(GameInstance state, MCTSNode? parent, List<(string, int)> actions)
+            public MCTSNode(GameInstance state, MCTSNode? parent, List<(string, int, string)> actions)
             {
                 State = state;
                 Parent = parent;
-                UntriedActions = new List<(string, int)>(actions);
+                UntriedActions = new List<(string, int, string)>(actions);
             }
         }
 
@@ -576,17 +577,17 @@ namespace BlacksmithCore.AI.Strategies
                     state.Player.Focus.Get<Health>().HP <= 0;
         }
 
-        private (string, int) RandomAction(Community actor, GameInstance instance)
+        private (string, int, string) RandomAction(Community actor, GameInstance instance)
         {
             var actions = GetAllAvailable(actor, instance);
             if (actions.Count == 0)
-                return ("", 0);
+                return ("", 0, "");
             return actions[_random.Value!.Next(actions.Count)];
         }
 
-        private List<(string, int)> GetAllAvailable(Community actor, GameInstance instance)
+        private List<(string, int, string)> GetAllAvailable(Community actor, GameInstance instance)
         {
-            List<(string, int)> res = new();
+            List<(string, int, string)> res = new();
             var names = actor.Focus.Get<Skill>().GetAvailableSkillNames();
 
             foreach (var name in names)
@@ -605,7 +606,7 @@ namespace BlacksmithCore.AI.Strategies
                         : instance.ETryDeclare(name, i);
 
                     if (r == SkillDeclareResult.Success)
-                        res.Add((name, i));
+                        res.Add((name, i, ""));
                     else if (i > 0)
                         break;
                 }
