@@ -1,0 +1,6 @@
+*.md text working-tree-encoding=UTF-8 eol=lf
+*.cs text working-tree-encoding=UTF-8 eol=crlf
+*.csproj text working-tree-encoding=UTF-8 eol=crlf
+*.sln text working-tree-encoding=UTF-8 eol=crlf
+*.json text working-tree-encoding=UTF-8 eol=lf
+*.cmd text working-tree-encoding=UTF-8 eol=crlf
