@@ -255,7 +255,6 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             foreach (var name in ProfessionSkillNames)
             {
-                Console.WriteLine(name);
                 source.Focus.Get<Skill>().RemoveSkill(nameof(Common), name);
             }
         }

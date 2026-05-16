@@ -8,11 +8,15 @@ namespace ModExamples.PhantomBookMod
     {
         [IsBlacksmithEnumMember(0)]
         public static ResourceType.CEValue Dream(this ResourceType resourceType) => ResourceType.GetCEValue();
+        [IsBlacksmithEnumMember(0)]
+        public static ResourceType.CEValue Spirit(this ResourceType resourceType) => ResourceType.GetCEValue();
     }
     [IsBlacksmithEnumModifier]
     public static class DefenseExtension
     {
         [IsBlacksmithEnumMember(-16)]
         public static DefenseType.CEValue PhysicalImmunity(this DefenseType defenseType) => DefenseType.GetCEValue();
+        [IsBlacksmithEnumMember(-16)]
+        public static DefenseType.CEValue MagicalImmunity(this DefenseType defenseType) => DefenseType.GetCEValue();
     }
 }

@@ -8,6 +8,7 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
+using BlacksmithCore.Specific.Defenses;
 using ClapInfra.ClapModels.Components;
 using ModExamples.PhantomBookMod.Defense;
 
@@ -20,7 +21,10 @@ namespace ModExamples.PhantomBookMod
     {
         private static HashSet<string> _nightmareExclusive = new()
         {
-
+            nameof(DreamDive).ToLower(),
+            nameof(Materialize).ToLower(),
+            nameof(ClingingHaunt).ToLower(),
+            nameof(Channeling).ToLower()
         };
         public PhantomBook()
         {
@@ -80,6 +84,7 @@ namespace ModExamples.PhantomBookMod
         private IDSLSourceFile Hallucinate(ISkillContext sc)
         {
             Pen pen = sf => sf
+               .UseResource(2f, ResourceType.Instance.Dream())
                .WriteEffect(EffectType.Instance.AfterResolutionWritten(), EffectTargetType.Instance.Enemy(), 0, 1,
                (Community source, Body main, EffectEntity effectEntity) =>
                {
@@ -121,6 +126,7 @@ namespace ModExamples.PhantomBookMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 3f)
                 && sc.Self.Focus.Get<Health>().HP > 1;
         }
+        [IsExperimental]
         [IsEquipmentSkill]
         private IDSLSourceFile Nightmare(ISkillContext sc)
         {
@@ -144,6 +150,62 @@ namespace ModExamples.PhantomBookMod
                     }
                     source.Focus.Get<Skill>().RemoveSkill(nameof(PhantomBook), nameof(Nightmare).ToLower());
                 }, false);
+            return DSL.Create(sc.Self, pen);
+        }
+        private bool DreamDiveCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 1f);
+        }
+        private IDSLSourceFile DreamDive(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .UseResource(1f, ResourceType.Instance.Dream())
+                .WriteAttack(2f, AttackType.Instance.Real())
+                .WriteDefense(5f, new CommonReduction())
+                .WriteRecovery(1)
+                .WriteResource(1f, ResourceType.Instance.Spirit())
+                .WriteDefense(0f, new MagicalImmunity());
+            return DSL.Create(sc.Self, pen);
+        }
+        private bool MaterializeCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 1f)
+                && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Spirit(), 2f);
+        }
+        private IDSLSourceFile Materialize(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .UseResource(1f, ResourceType.Instance.Dream())
+                .UseResource(2f, ResourceType.Instance.Spirit())
+                .WriteAttack(4f, AttackType.Instance.Physical())
+                .WriteAttack(4f, AttackType.Instance.Real())
+                .WriteDefense(4f, new CommonReduction());
+            return DSL.Create(sc.Self, pen);
+        }
+        private bool ClingingHauntCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Spirit(), 1f);
+        }
+        private IDSLSourceFile ClingingHaunt(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .UseResource(1f, ResourceType.Instance.Spirit())
+                .WriteAttack(2f, AttackType.Instance.Magical(), delayRounds: 0)
+                .WriteAttack(2f, AttackType.Instance.Magical(), delayRounds: 1)
+                .WriteAttack(1f, AttackType.Instance.Magical(), delayRounds: 2);
+            return DSL.Create(sc.Self, pen);
+        }
+        private bool ChannelingCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Spirit(), 1f);
+        }
+        private IDSLSourceFile Channeling(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .UseResource(1f, ResourceType.Instance.Spirit())
+                .WriteRecovery(3)
+                .WriteDefense(2f, new CommonReduction())
+                .WriteDefense(0f, new MagicalImmunity());
             return DSL.Create(sc.Self, pen);
         }
     }
