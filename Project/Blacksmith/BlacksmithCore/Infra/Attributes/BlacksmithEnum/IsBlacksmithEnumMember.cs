@@ -1,6 +1,6 @@
 using ClapInfra.ClapEnum;
 
-namespace BlacksmithCore.Infra.Attributes
+namespace BlacksmithCore.Infra.Attributes.BlacksmithEnum
 {
     [AttributeUsage(AttributeTargets.Method,
         AllowMultiple = false, Inherited = false)]

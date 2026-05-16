@@ -13,6 +13,11 @@ if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
 
 dotnet publish "./Project/Xio/XioClient/XioClient.csproj" -c Release -o "%OUTPUT_DIR%"
+if %ERRORLEVEL% NEQ 0 (
+    echo Build failed!
+    pause
+    exit /b 1
+)
 
 echo Xio build complete. Output: %OUTPUT_DIR%
 echo Run with: %OUTPUT_DIR%\XioClient.exe

@@ -1,5 +1,5 @@
 using System.Data;
-using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using BlacksmithCore.Infra.Enum;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Judgement.Core;

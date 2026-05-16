@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
-using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
+using BlacksmithCore.Infra.Attributes.Profession;
 using BlacksmithCore.Infra.Enum;
 using BlacksmithCore.Infra.Profession;
 using ClapInfra.ClapEnum;
@@ -89,7 +90,7 @@ namespace BlacksmithCore.Infra.Utils
         }
         private static void LoadProfessions()
         {
-            //先注册Mod包名
+            //先注册Mod包名，然后从里面收集关于职业和装备技能的信息
             var ModProfessionPlugins = _dllLoader.LoadByType<SkillPackageBase>();
             foreach (var plugin in ModProfessionPlugins)
             {
@@ -97,6 +98,7 @@ namespace BlacksmithCore.Infra.Utils
                 {
                     ProfessionRegistry.RegistProfessionName(plugin.GetType().Name);
                 }
+                ProfessionRegistry.RegistProfessionEquipmentSkillName(plugin);
             }
             //接下来记录Mod对已有包的修改，最重要的是给Common包扩展技能，否则无法使用Mod职业
             foreach (var plugin in ModProfessionPlugins)
@@ -106,7 +108,7 @@ namespace BlacksmithCore.Infra.Utils
                     var metaData = plugin.GetType().GetCustomAttribute<IsProfessionModifier>();
                     if (metaData == null)
                     {
-                        return;
+                        continue;
                     }
                     ProfessionRegistry.RegistProfessionModifier(metaData.TargetName, plugin);
                 }

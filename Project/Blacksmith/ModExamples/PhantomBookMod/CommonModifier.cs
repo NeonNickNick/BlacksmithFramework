@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Attributes.Profession;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
@@ -16,6 +16,7 @@ namespace ModExamples.PhantomBookMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2.5f);
         }
+        [IsProfessionSkill]
         private IDSLSourceFile PhantomBook(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new PhantomBook()));

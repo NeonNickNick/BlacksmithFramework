@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using BlacksmithCore.Infra.Enum;
 
 namespace BlacksmithCore.Infra.Models.Core
@@ -14,7 +14,7 @@ namespace BlacksmithCore.Infra.Models.Core
         [IsBlacksmithEnumMember(32)]
         public CEValue RockArmor() => GetCEValue();
         [IsBlacksmithEnumMember(64)]
-        public CEValue ReadlArmor() => GetCEValue();
+        public CEValue RealArmor() => GetCEValue();
         [IsBlacksmithEnumMember(128)]
         public CEValue CommonArmor() => GetCEValue();
     }

@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using BlacksmithCore.Infra.Enum;
 
 namespace BlacksmithCore.Infra.Models.Core

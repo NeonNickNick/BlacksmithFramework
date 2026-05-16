@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Attributes.Profession;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
@@ -14,7 +15,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class Common : MainProfession
     {
-        private static List<string> Professions => ProfessionRegistry.Professions;
+        private static HashSet<string> ProfessionSkillNames => ProfessionRegistry.ProfessionSkillNames;
 
         private bool IronCheck(ISkillContext sc) => true;
         private IDSLSourceFile Iron(ISkillContext sc)
@@ -160,6 +161,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1f);
         }
+        [IsProfessionSkill]
         private IDSLSourceFile Warlock(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Warlock()));
@@ -176,6 +178,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 4);
         }
+        [IsProfessionSkill]
         private IDSLSourceFile Cannon(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Cannon()));
@@ -193,6 +196,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
+        [IsProfessionSkill]
         private IDSLSourceFile Driver(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Driver()));
@@ -209,6 +213,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 7);
         }
+        [IsProfessionSkill]
         private IDSLSourceFile BloodSigil(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new BloodSigil()));
@@ -219,10 +224,10 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                     ExcludeAllProfessions(source);
                     List<string> addition = new()
                     {
-                        "stick",
-                        "drill",
-                        "slash",
-                        "tear"
+                        nameof(Stick).ToLower(),
+                        nameof(Drill).ToLower(),
+                        nameof(Slash).ToLower(),
+                        nameof(Tear).ToLower()
                     };
                     addition.ForEach(a => source.Focus.Get<Skill>().RemoveSkill(nameof(Common), a));
                     source.Focus.Get<Health>().GainMHP(3);
@@ -234,6 +239,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
+        [IsProfessionSkill]
         private IDSLSourceFile Lancer(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Lancer()));
@@ -247,8 +253,11 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         public static void ExcludeAllProfessions(Community source)
         {
-
-            Professions.ForEach(p => source.Focus.Get<Skill>().RemoveSkill(nameof(Common), p.ToLower()));
+            foreach (var name in ProfessionSkillNames)
+            {
+                Console.WriteLine(name);
+                source.Focus.Get<Skill>().RemoveSkill(nameof(Common), name);
+            }
         }
     }
     public static class ReflectRule

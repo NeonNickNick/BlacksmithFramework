@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using BlacksmithCore.Infra.Models.Core;
 
 namespace ModExamples.HolyBookMod
@@ -12,9 +12,9 @@ namespace ModExamples.HolyBookMod
     [IsBlacksmithEnumModifier]
     public static class DefenseExtension
     {
-        [IsBlacksmithEnumMember(-8)]//百分比在最外面
+        [IsBlacksmithEnumMember(-8)]
         public static DefenseType.CEValue PercentageReduction(this DefenseType defenseType) => DefenseType.GetCEValue();
-        [IsBlacksmithEnumMember(32768)]//灰血贴身给一个很大的数值
+        [IsBlacksmithEnumMember(32768)]
         public static DefenseType.CEValue GreyHP(this DefenseType defenseType) => DefenseType.GetCEValue();
     }
 }

@@ -1,4 +1,4 @@
-namespace BlacksmithCore.Infra.Attributes
+namespace BlacksmithCore.Infra.Attributes.Profession
 {
     [AttributeUsage(AttributeTargets.Class,
         AllowMultiple = false, Inherited = false)]

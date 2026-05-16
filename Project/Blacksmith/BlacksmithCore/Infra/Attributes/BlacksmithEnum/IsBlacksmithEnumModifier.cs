@@ -1,4 +1,4 @@
-namespace BlacksmithCore.Infra.Attributes
+namespace BlacksmithCore.Infra.Attributes.BlacksmithEnum
 {
     [AttributeUsage(AttributeTargets.Class,
         AllowMultiple = false, Inherited = false)]

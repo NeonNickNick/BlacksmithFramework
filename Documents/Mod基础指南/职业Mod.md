@@ -1,30 +1,17 @@
 # 职业Mod
 [返回](./引言.md)
 
-本文档面向希望添加新职业、扩展已有职业技能，或者编写职业获得方式的开发者。
-
-当前项目支持：
-
-- 添加新的主职业
-- 给内置职业添加或覆盖技能
-- 给 Mod 职业添加或覆盖技能
-- 通过修改 `Common` 职业，为玩家提供"获得新职业"的入口技能
-
-如果你需要理解动态规则、阶段判定和 `Mutation`，请阅读 [Mod进阶指南](../Mod进阶指南/引言.md)。
+面向希望添加新职业、扩展已有职业技能或编写职业获得方式的开发者。
 
 ## 总体流程
 
-1. 创建一个 `.NET 8` 类库项目。
-2. 引用 `BlacksmithCore.csproj`，或者引用编译后的 `BlacksmithCore.dll`。
-3. 编写一个 `MainProfession` 或 `ProfessionModifier`。
-4. 运行 `Blacksmith.cmd` 发布游戏，脚本会在输出目录下自动创建 `.blacksmith` 配置文件夹和空的 `mod.json`。
-5. 将编译好的 Mod DLL 放入发布目录下的子文件夹（如 `Mods/`），在 `.blacksmith/mod.json` 中声明该路径，启动 `BlacksmithClient.exe` 即可自动加载。
+1. 创建 `.NET 8` 类库项目，引用 `BlacksmithCore`
+2. 编写 `MainProfession` 或 `ProfessionModifier`
+3. `Blacksmith.cmd` 发布 → 编译好的 DLL 放入子目录 → `mod.json` 声明路径 → 启动
 
 ## 核心类型
 
-### `ISkillContext`
-
-技能检查函数和技能实现函数都使用 `ISkillContext`：
+### ISkillContext
 
 ```csharp
 public interface ISkillContext
@@ -32,79 +19,59 @@ public interface ISkillContext
     ISudoOperations SudoOperations { get; }
     string SkillName { get; }
     Community Self { get; }
-    int Param { get; }
-    string StringParam { get; }
+    int Param { get; }        // 前端 -p 标志
+    string StringParam { get; }  // 前端 -s 标志
 }
 public interface ISudoOperations
 {
     GameInstance DeepCopy(int preRounds = 0);
+    bool IsPlayer(Community community);
+    IReadOnlySet<string> ProfessionSkillNames { get; }
+    IReadOnlySet<string> EquipmentSkillNames { get; }
 }
 ```
 
-你最常用的是：
+常用：`sc.Self`（`Community`）、`sc.Self.Focus`（`Body`）、`sc.Param`、`sc.StringParam`、`sc.SudoOperations`。
 
-- `sc.Self`：当前施放技能的一方（`Community` 类型）
-- `sc.Self.Focus`：当前施放者的主体 `Body`
-- `sc.Param`：技能数值参数（前端 `-p` 标志）
-- `sc.StringParam`：技能字符串参数（前端 `-s` 标志，如 `association -s stick`）
-- `sc.SudoOperations`：越权操作接口，提供 `DeepCopy()` 获取整局游戏的完整拷贝。这是实现 Association等高级技能的基础。如无必要不要使用，使用时务必仔细斟酌，尽管它是无污染的。后面会意识到它可以用于进一步复用已有技能逻辑，减少代码行数，但是不推荐这么做。
+### Community 与 Body
 
-### `Community` 与 `Body`
+`Body` 通过 `Get<T>()` 访问各组件（详见[项目架构 - 组件一览](../项目架构.md#组件一览)）：
 
-当前游戏主要使用 `Community.Focus` 作为主角色。`Body` 继承自 `ClapBody`，通过组件模式管理各部分数据。常见访问方式：
+- `Get<Health>().HP` / `.MHP` / `.GainHP()` / `.LoseHP()`
+- `Get<Resource>().Check(type, need)` / `.Use()` / `.Gain()` / `.Query()` / `.QueryAll()`
+- `Get<Skill>().AddPackage()` / `.AddSkill()` / `.RemoveSkill()`
+
+## 技能配对规则
+
+系统自动收集 `private` 实例方法配对：
+
+- `XxxCheck(ISkillContext)` → `bool`
+- `Xxx(ISkillContext)` → `IDSLSourceFile`
+
+技能名转小写。**必须返回 `IDSLSourceFile`，不能返回具体类 `DSL.SourceFile`**——否则编译报错。
+
+## [IsProfessionSkill] 与 [IsEquipmentSkill]
+
+标记技能分类，启动时 `ProfessionRegistry` 扫描注册到全局集合（见[项目架构 - ProfessionRegistry](../项目架构.md#professionregistry)），通过 `ISudoOperations` 暴露：
 
 ```csharp
-var self = sc.Self;
-var body = sc.Self.Focus;
+[IsProfessionSkill]  // 标记为职业技能——通常是转职入口
+private IDSLSourceFile HolyBook(ISkillContext sc) { ... }
+
+[IsEquipmentSkill]   // 标记为装备技能
+private IDSLSourceFile StarRifle(ISkillContext sc) { ... }
 ```
 
-常用信息通过 `Get<T>()` 获取组件：
-
-- `body.Get<Health>().HP`：当前生命值
-- `body.Get<Health>().MHP`：最大生命值
-- `body.Get<Resource>().Check(...)`：检查资源是否足够
-- `body.Get<Resource>().Query(...)`：查询某种资源（仅 Common 部分）
-- `body.Get<Resource>().QueryAll(...)`：查询某种资源的 Common + Gold 总和
-- `body.Get<Skill>().AddPackage(...)`：添加技能包（转职）
-- `body.Get<Skill>().AddSkill(...)`：动态添加技能名
-- `body.Get<Skill>().RemoveSkill(...)`：动态移除技能名
-
-注意：
-
-- 生命值修改是通过 `body.Get<Health>().GainHP(...)` / `LoseHP(...)` 等完成的。
-- 不是 `Body.LoseHP(...)`，而是通过 `Get<Health>()` 访问 Health 组件。
-
-## 技能是如何被识别的
-
-职业包和修改包都继承自 `SkillPackageBase`（其底层反射配对来自 `ClapInfra.ClapProfession.ClapSkillPackage`）。系统会通过反射自动收集：
-
-- 名为 `XxxCheck` 的私有实例方法，签名必须是 `bool (ISkillContext)`
-- 名为 `Xxx` 的私有实例方法，签名必须是 `IDSLSourceFile (ISkillContext)`
-
-两者配对后，技能名会被自动转换为小写，例如：
-
-- `HolyBookCheck` + `HolyBook` -> 技能名 `holybook`
-- `SpaceAttackCheck` + `SpaceAttack` -> 技能名 `spaceattack`
-
-因此：
-
-- 技能方法必须是实例方法
-- 必须使用 `private`
-- 技能方法名与检查方法名必须严格对应
-- **技能方法必须返回接口 `IDSLSourceFile`，不能返回具体类 `DSL.SourceFile`**——返回具体类会导致反射配对失败，技能静默不可用
+- 新增职业的转职入口 → `[IsProfessionSkill]`
+- 装备提供的技能 → `[IsEquipmentSkill]`
+- 普通技能无需标注
 
 ## DSL 基础用法
-
-推荐先写上这两个别名：
 
 ```csharp
 using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
 using DSL = DSLforSkillLogic;
-```
 
-标准写法通常是：
-
-```csharp
 private IDSLSourceFile SomeSkill(ISkillContext sc)
 {
     Pen pen = sf => sf
@@ -115,59 +82,35 @@ private IDSLSourceFile SomeSkill(ISkillContext sc)
 }
 ```
 
-常用 DSL 语句：
+常用语句：
 
-- `WriteAttack(power, attackType, APFactor = 1, delayRounds = 0)`
-- `WriteDefense(power, defense, delayRounds = 0)`
-- `WriteResource(power, resourceType, delayRounds = 0)`
-- `WriteRecovery(power)`
-- `WriteEffect(...)`
-- `WriteFree(action, canMove = true)` — 执行任意代码。`canMove` 是关键安全参数（见下文"WriteFree 与所有权转移"）
-- `UseResource(need, resourceType, ifCommonOnly = false)`
-- `WithBloodSuck(percent)`
-- `WithInterupt()`
+| 语句 | 说明 |
+|---|---|
+| `WriteAttack(power, type, apFactor, delay)` | 攻击 |
+| `WriteDefense(power, defense, delay)` | 防御 |
+| `WriteResource(power, type, delay)` | 资源 |
+| `WriteRecovery(power)` | 回复 HP |
+| `WriteEffect(...)` | 效果 |
+| `WriteFree(action, canMove: true)` | 可转移的自由逻辑 |
+| `UseResource(need, type)` | 消耗资源（不可转移） |
+| `LoseHP(loss)` / `LoseMHP(loss)` | 扣血（不可转移） |
+| `WithBloodSuck(percent)` | 攻击吸血 |
+| `WithInterupt()` | 攻击打断（移除铁/金铁/魔力资源决议） |
 
-说明：
+### WriteFree 与 Move()
 
-- `WithBloodSuck` 和 `WithInterupt` 都是接在最近一条攻击后面的攻击修辞，只修饰前一条攻击。
-- `AttackType`、`ResourceType` 等都应通过 `Instance` 访问，例如 `AttackType.Instance.Physical()`。
+`WriteFree(action, canMove)` 的 `canMove` 决定该句子在 `Move()` 所有权转移时是否保留：
 
-### WriteFree 与所有权转移（`Move()`）
+- `true` → 随 DSL 转移（可复用增益逻辑）
+- `false` → 剥离（消耗类动作）
 
-`WriteFree(action, canMove)` 的第二个参数是重要的安全机制。理解它需要先了解 `IDSLSourceFile.Move(Community newOwner)`：
+`UseResource`、`LoseHP`、`LoseMHP` 内部是 `WriteFree(..., false)`。
 
-```csharp
-// SourceFile.Move() 的核心逻辑：
-_owner = newOwner;
-_sentences.RemoveAll(s => !s.CanMove);  // 剥离所有 canMove:false 的句子
-```
+`Move()` 的完整机制和 Association 模式见[高级技能模式 - 联想](../高级技能模式.md#7-联想-deepcopy--swap--move)。
 
-**`canMove` 参数决定该自由句子在 DSL 所有权转移时是否保留：**
-
-- **`canMove: true`**（默认）— 句子随 DSL 一起转移到新主人。适用于应随技能转移的可复用逻辑。
-- **`canMove: false`** — 句子在 `Move()` 时被剥离。适用于**消耗类动作**（资源消耗、HP 损失），这些是"原主人"的事，不应转移。
-
-**快捷方法：** `UseResource()`、`LoseHP()`、`LoseMHP()` 内部都是 `WriteFree(..., canMove: false)`，自动在所有权转移时剥离。
-
-**为什么需要这个机制？** `ISudoOperations` 赋予了技能越权操作的能力——技能可以通过 `DeepCopy` 检查对手状态、复制别人的技能。这种越权能力需要配套的安全机制：当技能 DSL 被 `Move()` 转移所有权时，消耗类句子不应跟着转移，只保留攻击、防御、效果和明确标记为可转移的自由逻辑。
-
-**简单原则：** 消耗资源/HP 的副作用用 `canMove: false`（或直接用 `UseResource` / `LoseHP` / `LoseMHP`），可复用的增益逻辑用 `canMove: true`。
-
-## 示例一：编写一个新职业
-
-下面是一个最小主职业示例：
+## 示例一：最小主职业
 
 ```csharp
-using BlacksmithCore.Infra.DSL;
-using BlacksmithCore.Infra.Models.Components;
-using BlacksmithCore.Infra.Models.Core;
-using BlacksmithCore.Infra.Profession;
-
-namespace Example.Mod;
-
-using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-using DSL = DSLforSkillLogic;
-
 public class MyProfession : MainProfession
 {
     private bool JokeCheck(ISkillContext sc)
@@ -180,11 +123,6 @@ public class MyProfession : MainProfession
     {
         Pen pen = sf => sf
             .UseResource(1, ResourceType.Instance.Iron())
-            .WriteFree(source =>
-            {
-                source.Focus.Get<Health>().LoseHP(1);
-                source.Focus.Get<Health>().LoseMHP(1);
-            }, canMove: false)  // 消耗类副作用，不应随技能所有权转移
             .WriteRecovery(1)
             .WriteAttack(3, AttackType.Instance.Physical())
             .WriteAttack(3, AttackType.Instance.Magical())
@@ -195,29 +133,9 @@ public class MyProfession : MainProfession
 }
 ```
 
-要点：
-
-- 新职业继承 `MainProfession`
-- 职业名默认就是类名 `MyProfession`
-- 被动技能可选，重写 `PassiveSkill(ISkillContext sc)` 即可
-
-## 示例二：让 `Common` 提供一个"转职技能"
-
-如果你只写了 `MainProfession`，游戏并不会自动给玩家一个获得该职业的技能。常见做法是给 `Common` 写一个修改器：
+## 示例二：Common 修改器提供转职入口
 
 ```csharp
-using BlacksmithCore.Infra.DSL;
-using BlacksmithCore.Infra.Attributes;
-using BlacksmithCore.Infra.Models.Components;
-using BlacksmithCore.Infra.Models.Core;
-using BlacksmithCore.Infra.Profession;
-using BlacksmithCore.Specific.BuiltInProfessions;
-
-namespace Example.Mod;
-
-using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-using DSL = DSLforSkillLogic;
-
 [IsProfessionModifier(nameof(Common))]
 public class CommonModifier : ProfessionModifier
 {
@@ -226,69 +144,35 @@ public class CommonModifier : ProfessionModifier
         return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2);
     }
 
+    [IsProfessionSkill]
     private IDSLSourceFile MyProfession(ISkillContext sc)
     {
         sc.Self.Focus.Get<Skill>().AddPackage(new MyProfession());
 
         Pen pen = sf => sf
             .UseResource(2, ResourceType.Instance.Iron())
-            .WriteFree(source =>
-            {
-                Common.ExcludeAllProfessions(source);
-            }, canMove: false);  // 转职副作用，不应随技能所有权转移
+            .WriteFree(source => Common.ExcludeAllProfessions(source), canMove: false);
 
         return DSL.Create(sc.Self, pen);
     }
 }
 ```
 
-这里有两个关键点：
+## 被动技能
 
-- `[IsProfessionModifier(nameof(Common))]` 表示这个修改器要挂到 `Common` 包上。
-- `Common.ExcludeAllProfessions(source)` 用于保证同一局里只保留一个主职业入口。
+重写 `MainProfession` 的 `PassiveSkill(ISkillContext sc)` 方法。
 
-## 修改已有职业技能
+## 注意事项
 
-如果你想给现有职业增加技能或覆盖技能：
+1. `AttackType` 法术攻击是 `Magical()`，不是 `Magic()`
+2. 通过 `body.Get<Health>()` 操作生命值，不是直接在 Body 上调用
+3. 资源和攻击类型通过 `Instance` 获取
+4. 技能名全小写，手动 `AddSkill`/`RemoveSkill` 也用全小写
+5. 多个 Mod 同名技能 → 后写覆盖；同名职业 → 抛异常
+6. `Common` 是真实职业包，修改它是提供转职入口的最常见方式
 
-- 继承 `ProfessionModifier`
-- 用 `[IsProfessionModifier("目标职业名")]` 指向目标职业
-- 在修改器里写新的 `SkillCheck` / `Skill` 方法
+## 参考
 
-当前加载逻辑会把修改器中的技能追加到目标职业包；如果技能名重复，对应的检查器和生成器会被覆盖。
-
-## 关于被动技能
-
-- `MainProfession` 可以重写 `PassiveSkill`。
-- `ProfessionModifier` 的主要职责是给目标包补技能，不应把它当成独立职业来设计。
-- 如果你想写一个职业自己的被动，请优先写在 `MainProfession` 中。
-
-## 与当前代码对齐的注意事项
-
-1. `AttackType` 里法术攻击名是 `Magical()`，不是 `Magic()`。
-2. `Body` 上没有直接的 `LoseHP` / `GainHP`；应通过 `body.Get<Health>()` 调用。
-3. 资源和攻击类型应使用 `Instance` 获取，例如 `ResourceType.Instance.Iron()`。
-4. 技能名最终会转成全小写，手动调用 `AddSkill/RemoveSkill` 时也要使用全小写技能名。
-5. `Common` 是一个真实职业包，修改 `Common` 是提供转职入口最常见的方式。
-
-## 参考示例
-
-仓库中的示例 Mod 位于：
-
-- `Project/Blacksmith/ModExamples/HolyBookMod/HolyBook.cs`
-- `Project/Blacksmith/ModExamples/HolyBookMod/CommonModifier.cs`
-- `Project/Blacksmith/ModExamples/HolyBookMod/EnumExtension.cs`
-- `Project/Blacksmith/ModExamples/PhantomBookMod/` — Association 模式（越权复制技能 + Move 所有权转移）
-
-它展示了：
-
-- 如何新增职业
-- 如何为 `Common` 添加转职入口
-- 如何扩展资源与防御枚举
-- 如何利用 `ISudoOperations` 越权接口实现跨职业技能复制（PhantomBook）
-
-## 温馨提示
-
-1. 多个 Mod 如果声明了同名技能，后写入字典的实现会覆盖前者；实际覆盖顺序取决于 DLL 扫描顺序。
-2. 如果两个 Mod 定义了同名职业，程序会抛出异常。
-3. 职业 Mod 往往会同时依赖枚举扩展与 DSL，建议先读完基础指南，再进入进阶指南。
+- `Project/Blacksmith/ModExamples/HolyBookMod/`
+- `Project/Blacksmith/ModExamples/PhantomBookMod/` — Association 模式（逐行拆解见[高级技能模式 - 联想](../高级技能模式.md#7-联想-deepcopy--swap--move)）
+- [高级技能模式](../高级技能模式.md) — 所有技巧性写法的实战案例

@@ -1,54 +1,21 @@
 # 枚举Mod
 [返回](./引言.md)
 
-本文档介绍如何扩展项目中的"可扩展枚举"系统，包括：
-
-- 新建一个可被继续扩展的枚举类型
-- 为现有枚举添加新成员
-- 调整成员排序优先级
+介绍如何扩展"可扩展枚举"系统：新建可扩展枚举类型、为现有枚举添加成员、调整优先级。
 
 ## 适用范围
 
-项目中的很多核心类型并没有直接使用 C# 原生 `enum`，而是使用继承自 `ClapInfra.ClapEnum.ClapEnum<T>` 的 `BlacksmithEnum<T>` 来模拟可扩展枚举，例如：
-
-- `ResourceType`
-- `AttackType`
-- `DefenseType`
-- `EffectType`
-- `EffectTargetType`
-- `DynamicJudgeRuleName`
-- `JudgeStage`
-
-这样做的好处是：内置内容和外部 Mod 都可以向同一个类型继续追加成员。
+项目核心类型使用继承自 `BlacksmithEnum<T>` 的可扩展枚举：`ResourceType`、`AttackType`、`DefenseType`、`EffectType`、`EffectTargetType`、`DynamicJudgeRuleName`、`JudgeStage`。机制原理见[项目架构](../项目架构.md#可扩展枚举-clapenumt-tmemberattribute)。
 
 ## 总体流程
 
-1. 创建一个 `.NET 8` 类库项目。
-2. 引用 `BlacksmithCore.csproj`，或者引用编译后的 `BlacksmithCore.dll`。
-3. 编写枚举类或枚举修改类。
-4. 运行 `Blacksmith.cmd` 发布游戏，脚本会在输出目录下自动创建 `.blacksmith` 配置文件夹和空的 `mod.json`。
-5. 将编译好的 Mod DLL 放入发布目录下的子文件夹，在 `.blacksmith/mod.json` 中声明该路径。
-6. 启动 `BlacksmithClient.exe`，`ModLoader` 会根据 `mod.json` 配置扫描指定目录下的 `.dll` 并自动加载。
+1. 创建 `.NET 8` 类库，引用 `BlacksmithCore`
+2. 编写枚举类或枚举扩展类
+3. `Blacksmith.cmd` 发布，DLL 放入子目录，`mod.json` 声明路径
 
 ## 创建新的可扩展枚举
 
-假设你想创建一个名字枚举。如果直接写成原生 `enum`：
-
 ```csharp
-public enum Names
-{
-    Alice = 0,
-    Bob = 1,
-    Carol = 2
-}
-```
-
-它本身不能被其他 Mod 继续扩展。正确做法是继承 `BlacksmithEnum<T>`：
-
-```csharp
-using BlacksmithCore.Infra.Attributes;
-using BlacksmithCore.Infra.Enum;
-
 public class Names : BlacksmithEnum<Names>
 {
     [IsBlacksmithEnumMember(0)]
@@ -56,37 +23,16 @@ public class Names : BlacksmithEnum<Names>
 
     [IsBlacksmithEnumMember(1)]
     public CEValue Bob() => GetCEValue();
-
-    [IsBlacksmithEnumMember(2)]
-    public CEValue Carol() => GetCEValue();
 }
 ```
 
-说明：
-
-- 返回类型必须是当前枚举自己的 `CEValue`。
-- 方法必须是 `public` 实例方法。
-- 方法不能带参数。
-- `[IsBlacksmithEnumMember(priority)]` 中的值决定排序优先级。值越小排在越前面。
-
-## 比较与排序行为
-
-```csharp
-Names.Instance.Alice() == Names.Instance.Alice(); // true
-Names.Instance.Alice() == Names.Instance.Bob();   // false
-```
-
-不同枚举类型之间不能互相比较。
-
-排序时使用的是 `priority`。如果 `priority` 更小，就会排在更前面；这也是 `JudgeStage` 和部分防御类型能被扩展排序的基础。
+- 返回类型必须是 `CEValue`，方法为 `public` 无参实例方法
+- `[IsBlacksmithEnumMember(priority)]` 值越小排越前面
+- `==` 比较唯一 ID，类型正确则相同成员相等
 
 ## 修改现有枚举
 
-如果你希望为已有枚举添加新成员，或者调整现有成员的排序优先级，需要写一个静态类，并加上 `[IsBlacksmithEnumModifier]`：
-
 ```csharp
-using BlacksmithCore.Infra.Attributes;
-
 [IsBlacksmithEnumModifier]
 public static class NamesExtension
 {
@@ -98,36 +44,15 @@ public static class NamesExtension
 }
 ```
 
-约定如下：
+- `public static` 方法，第一个参数是 `this EnumType`
+- 返回 `CEValue`，方法名即成员名
+- 方法名与已有成员同名 → 覆盖优先级；否则追加
 
-- 必须是 `public static` 方法。
-- 第一个也是唯一一个参数必须是被扩展的枚举类型本身，例如 `this Names names`。
-- 返回类型必须是该枚举的 `CEValue`。
-- 方法名就是最终成员名。
+## 资源类型特殊规则
 
-### 覆盖与追加的区别
+扩展 `ResourceType` 时，金资源命名必须用 `Gold_普通资源名`（如 `Cross` + `Gold_Cross`），否则不会配对共享模板。
 
-- 如果方法名和现有成员同名，例如上面的 `Carol`，则会覆盖该成员的排序优先级。
-- 如果方法名不存在，则会追加一个新成员。
-
-## 资源类型的特殊规则
-
-如果你扩展的是 `ResourceType`，并且想引入一组"普通资源 / 金资源"配对资源，那么金资源命名必须使用：
-
-```text
-Gold_普通资源名
-```
-
-例如：
-
-- `Cross`
-- `Gold_Cross`
-
-否则资源系统不会把它们识别成一对共享模板的资源。
-
-## 来自示例项目的真实写法
-
-仓库中的 `Project/Blacksmith/ModExamples/HolyBookMod/EnumExtension.cs` 提供了一个实际例子：
+## 真实示例
 
 ```csharp
 [IsBlacksmithEnumModifier]
@@ -139,14 +64,11 @@ public static class ResourceExtension
 }
 ```
 
-这说明：
-
-- 外部 Mod 不需要修改主工程源码。
-- 只要把扩展类编译进外部 DLL，启动时即可自动加载。
+参考：`Project/Blacksmith/ModExamples/HolyBookMod/EnumExtension.cs`
 
 ## 注意事项
 
-1. 多个 Mod 修改同一个枚举成员时，最终结果取决于 DLL 扫描加载顺序。
-2. 如果两个 Mod 定义了同名的枚举类型，程序会抛出异常。
-3. `priority` 只决定排序，不保证跨 Mod 的兼容性。
-4. 启动阶段结束后，`BlacksmithEnum` 工厂会关闭，因此不要指望运行过程中继续动态创建新成员。
+1. 多个 Mod 修改同一成员 → 结果取决于 DLL 加载顺序
+2. 同名枚举类型 → 抛异常
+3. `priority` 只决定排序，不保证跨 Mod 兼容性
+4. 启动后 `CloseFactory()` 关闭枚举工厂（见[启动流程](../项目架构.md#3-启动流程)），运行动态创建无效

@@ -128,13 +128,13 @@ namespace BlacksmithCore.Infra.DSL
                                 DefenseType.Instance.ThornReduction(),
                                 DefenseType.Instance.CommonReduction(),
                                 DefenseType.Instance.RockArmor(),
-                                DefenseType.Instance.ReadlArmor(),
+                                DefenseType.Instance.RealArmor(),
                                 DefenseType.Instance.CommonArmor()
                             };
                             var armorList = new List<DefenseType.CEValue>()
                             {
                                 DefenseType.Instance.RockArmor(),
-                                DefenseType.Instance.ReadlArmor(),
+                                DefenseType.Instance.RealArmor(),
                                 DefenseType.Instance.CommonArmor()
                             };
                             foreach (var temp in defenses)

@@ -22,9 +22,19 @@ if not exist "%OUTPUT_DIR%\.blacksmith\mod.json" (
 )
 
 dotnet publish "./Project/Blacksmith/BlacksmithClient/BlacksmithClient.csproj" -c Release -o "%OUTPUT_DIR%"
+if %ERRORLEVEL% NEQ 0 (
+    echo Build failed!
+    pause
+    exit /b 1
+)
 
 set TEMP_DIR=%TEMP%\BlacksmithModExamples_%RANDOM%
 dotnet publish "./Project/Blacksmith/ModExamples/ModExamples.csproj" -c Release -o "%TEMP_DIR%"
+if %ERRORLEVEL% NEQ 0 (
+    echo Build failed!
+    pause
+    exit /b 1
+)
 
 move /Y "%TEMP_DIR%\ModExamples.dll" "%OUTPUT_DIR%\ModExamples\"
 rmdir /S /Q "%TEMP_DIR%"

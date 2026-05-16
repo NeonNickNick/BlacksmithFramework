@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Attributes.Profession;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
@@ -15,7 +16,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     {
         public Warlock()
         {
-            AvailableSkillNames.Remove("midastouch");
+            AvailableSkillNames.Remove(nameof(MidasTouch).ToLower());
         }
         private bool MagicCheck(ISkillContext sc)
         {
@@ -73,14 +74,15 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2.5f);
         }
+        [IsEquipmentSkill]
         private IDSLSourceFile Alchemy(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(2.5f, ResourceType.Instance.Iron())
                 .WriteFree(source =>
                 {
-                    source.Focus.Get<Skill>().AddSkill("Warlock", "midastouch");
-                    source.Focus.Get<Skill>().RemoveSkill("Warlock", "alchemy");
+                    source.Focus.Get<Skill>().AddSkill(nameof(Warlock), nameof(MidasTouch).ToLower());
+                    source.Focus.Get<Skill>().RemoveSkill(nameof(Warlock), nameof(Alchemy));
                 }, false);
             return DSL.Create(sc.Self, pen);
         }

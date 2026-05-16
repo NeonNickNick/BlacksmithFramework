@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes;
+using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using ClapInfra.ClapEnum;
 
 namespace BlacksmithCore.Infra.Enum
