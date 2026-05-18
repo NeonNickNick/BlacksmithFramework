@@ -88,7 +88,7 @@ namespace ModExamples.PhantomBookMod
         [IsHighCost]
         private IDSLSourceFile Awakening(ISkillContext sc)
         {
-            var sandBoxInstance = sc.SudoOperations.DeepCopy(preRounds: 2);
+            var sandBoxInstance = sc.SudoOperations.DeepCopy(preRounds: 3);
             Body copiedBody = sc.SudoOperations.IsPlayer(sc.Self) ? sandBoxInstance.Player.Focus : sandBoxInstance.Enemy.Focus;
             var resource = copiedBody.Get<Resource>();
             float m = MathF.Min(2f, resource.QueryAll(ResourceType.Instance.Dream()));
