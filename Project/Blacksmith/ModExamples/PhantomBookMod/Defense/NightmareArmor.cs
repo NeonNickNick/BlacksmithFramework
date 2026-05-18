@@ -24,8 +24,8 @@ namespace ModExamples.PhantomBookMod.Defense
             if (Power <= 0)
             {
                 IsDead = true;
+                _callback();
             }
-            _callback();
         }
 
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)

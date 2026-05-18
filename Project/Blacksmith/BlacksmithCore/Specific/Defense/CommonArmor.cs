@@ -1,10 +1,10 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-namespace BlacksmithCore.Specific.Defenses
+namespace BlacksmithCore.Specific.Defense
 {
-    public class CommonReduction : DefenseBase
+    public class CommonArmor : DefenseBase
     {
-        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.CommonReduction();
+        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.CommonArmor();
         public override int Power { get; set; } = 0;
         public override bool CanMerge { get; set; } = false;
         public override bool IsDead { get; set; } = false;
@@ -15,11 +15,16 @@ namespace BlacksmithCore.Specific.Defenses
         }
         public override void Update()
         {
-            IsDead = true;
+            if (Power <= 0)
+            {
+                IsDead = true;
+            }
         }
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
-            return ((int)MathF.Max(0, attack - Power), (int)MathF.Min(attack, Power));
+            var res = ((int)MathF.Max(0, attack - Power), (int)MathF.Min(attack, Power));
+            Power = (int)MathF.Max(0, Power - attack);
+            return res;
         }
     }
 }

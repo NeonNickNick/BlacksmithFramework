@@ -2,7 +2,7 @@ using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
-using BlacksmithCore.Specific.Defenses;
+using BlacksmithCore.Specific.Defense;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {

@@ -127,13 +127,13 @@ namespace BlacksmithCore.Infra.DSL
                             {
                                 DefenseType.Instance.ThornReduction(),
                                 DefenseType.Instance.CommonReduction(),
-                                DefenseType.Instance.RockArmor(),
+                                DefenseType.Instance.StoneShell(),
                                 DefenseType.Instance.RealArmor(),
                                 DefenseType.Instance.CommonArmor()
                             };
                             var armorList = new List<DefenseType.CEValue>()
                             {
-                                DefenseType.Instance.RockArmor(),
+                                DefenseType.Instance.StoneShell(),
                                 DefenseType.Instance.RealArmor(),
                                 DefenseType.Instance.CommonArmor()
                             };
@@ -242,7 +242,9 @@ namespace BlacksmithCore.Infra.DSL
                     resolution.Execute = (target) =>
                     {
                         Body main = target.Focus;
-                        AddEffectEntity(source, main, type, duration, resolution, effectAction);
+                        var entity = new EffectEntity(resolution.Type, duration, resolution.Power);
+                        entity.Execute = (body) => effectAction(source, body, entity);
+                        main.Get<Effect>().Add(entity);
                         resolution.RunStage(EffectStage.OnSuccessfullyAdded, source, main);
                     };
                     source.Focus.Get<TurnContext>().WriteResolution(resolution);
@@ -336,24 +338,7 @@ namespace BlacksmithCore.Infra.DSL
             {
             }
         }
-        /// <summary>
-        /// 专用于外部产生的孤立效果生成
-        /// </summary>
-        public static void AddEffectEntity(Body main, EffectType.CEValue type, int duration, IResolution resolution, Action<Body, EffectEntity> effectAction)
-        {
-            EffectEntity effect = new EffectEntity(type, duration, resolution);
-            effect.Execute = (body) => effectAction(body, effect);
-            main.Get<Effect>().Add(effect);
-        }
-        /// <summary>
-        /// 专用于被EffectResolution引导的效果生成
-        /// </summary>
-        public static void AddEffectEntity(Community source, Body main, EffectType.CEValue type, int duration, EffectResolution resolution, Action<Community, Body, EffectEntity> effectAction)
-        {
-            EffectEntity effect = new EffectEntity(type, duration, resolution);
-            effect.Execute = (body) => effectAction(source, body, effect);
-            main.Get<Effect>().Add(effect);
-        }
+
         public static SourceFile Create(Community source, Pen Pen)
         {
             var sourceFile = new SourceFile(source);

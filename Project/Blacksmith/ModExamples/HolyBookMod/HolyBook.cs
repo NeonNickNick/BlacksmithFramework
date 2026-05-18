@@ -3,9 +3,10 @@ using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
+using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
-using BlacksmithCore.Specific.Defenses;
+using BlacksmithCore.Specific.Defense;
 using ModExamples.HolyBookMod;
 using ModExamples.HolyBookMod.Defense;
 namespace ModExamples
@@ -71,15 +72,14 @@ namespace ModExamples
                 3);
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Cross())
-                .WriteFree(source =>
-                {
-                    var entity = new EffectEntity(fakeResolution.Type, 3, fakeResolution);
-                    entity.Execute = (body) =>
-                    {
-                        body.Get<Health>().GainHP(3);
-                    };
-                    source.Focus.Get<Effect>().Add(entity);
-                }, true)
+                .WriteEffect(EffectType.Instance.AfterResolutionWritten()
+                            ,EffectTargetType.Instance.Self()
+                            , 3f
+                            , 3
+                            , (Community source, Body target, EffectEntity effectEntity) =>
+                            {
+                                target.Get<Health>().GainHP((int)effectEntity.Power);
+                            })
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 0)
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 1)
                 .WriteDefense(1, new PercentageReduction(baseline: 4), delayRounds: 2);

@@ -7,7 +7,7 @@ using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Judgement;
 using BlacksmithCore.Infra.Models.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
-using BlacksmithCore.Specific.Defenses;
+using BlacksmithCore.Specific.Defense;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {

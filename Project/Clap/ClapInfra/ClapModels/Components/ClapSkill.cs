@@ -28,13 +28,17 @@ namespace ClapInfra.ClapModels.Components
         {
             _packages.Add(package);
         }
+        public virtual void RemovePackage(string name)
+        { 
+            _packages.RemoveAll(p => p.Name == name);
+        }
         public virtual void AddSkill(string packageName, string skillName)
         {
-            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Add(skillName);
+            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Add(skillName.ToLower());
         }
         public virtual void RemoveSkill(string packageName, string skillName)
         {
-            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Remove(skillName);
+            _packages.Find(p => p.Name == packageName)?.SkillPackage.AvailableSkillNames.Remove(skillName.ToLower());
         }
         public virtual SkillDeclareResult TryDeclare(string skillName, TISkillContext sc)
         {
@@ -66,10 +70,6 @@ namespace ClapInfra.ClapModels.Components
                 return package.SkillPackage.SkillSourceFileGenerator[skillName](sc);
             }
             throw new ArgumentException("Unreachable1!");
-        }
-        public virtual List<TIDSLSourceFile> GetPassiveSkill(TISkillContext sc)
-        {
-            return _packages.Select(p => p.SkillPackage.PassiveSkill(sc)).ToList();
         }
         public virtual List<string> GetAvailableSkillNames()
         {

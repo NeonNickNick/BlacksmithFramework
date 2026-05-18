@@ -1,9 +1,9 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 
-namespace ModExamples.PhantomBookMod.Defense
+namespace BlacksmithCore.Specific.Defense
 {
-    public class MagicalImmunity : DefenseBase
+    public class PhysicalImmunity : DefenseBase
     {
         public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.PhysicalImmunity();
         public override int Power { get; set; } = 0;
@@ -19,7 +19,7 @@ namespace ModExamples.PhantomBookMod.Defense
         }
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
-            if (type == AttackType.Instance.Magical())
+            if (type == AttackType.Instance.Physical())
             {
                 return (0, attack);
             }

@@ -1,10 +1,10 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-namespace BlacksmithCore.Specific.Defenses
+namespace BlacksmithCore.Specific.Defense
 {
-    public class RealReduction : DefenseBase
+    public class CommonReduction : DefenseBase
     {
-        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.RealReduction();
+        public override DefenseType.CEValue Type { get; set; } = DefenseType.Instance.CommonReduction();
         public override int Power { get; set; } = 0;
         public override bool CanMerge { get; set; } = false;
         public override bool IsDead { get; set; } = false;

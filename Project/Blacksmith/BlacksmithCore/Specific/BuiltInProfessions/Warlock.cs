@@ -6,7 +6,7 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
-using BlacksmithCore.Specific.Defenses;
+using BlacksmithCore.Specific.Defense;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
@@ -14,10 +14,6 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class Warlock : MainProfession
     {
-        public Warlock()
-        {
-            AvailableSkillNames.Remove(nameof(MidasTouch).ToLower());
-        }
         private bool MagicCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
@@ -81,22 +77,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .UseResource(2.5f, ResourceType.Instance.Iron())
                 .WriteFree(source =>
                 {
-                    source.Focus.Get<Skill>().AddSkill(nameof(Warlock), nameof(MidasTouch).ToLower());
-                    source.Focus.Get<Skill>().RemoveSkill(nameof(Warlock), nameof(Alchemy));
+                    source.Focus.Get<Skill>().RemoveSkill(nameof(Warlock), nameof(Alchemy).ToLower());
+                    source.Focus.Get<Skill>().AddPackage(new(new Alchemy()));
                 }, false);
-            return DSL.Create(sc.Self, pen);
-        }
-
-        private bool MidasTouchCheck(ISkillContext sc)
-        {
-            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1, true);
-        }
-
-        private IDSLSourceFile MidasTouch(ISkillContext sc)
-        {
-            Pen pen = sf => sf
-                .UseResource(1, ResourceType.Instance.Iron(), true)
-                .WriteResource(5, ResourceType.Instance.Gold_Iron());
             return DSL.Create(sc.Self, pen);
         }
     }

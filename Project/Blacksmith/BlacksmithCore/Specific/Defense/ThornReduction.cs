@@ -2,7 +2,7 @@ using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 
-namespace BlacksmithCore.Specific.Defenses
+namespace BlacksmithCore.Specific.Defense
 {
     using DSL = DSLforSkillLogic;
     public class ThornReduction : DefenseBase

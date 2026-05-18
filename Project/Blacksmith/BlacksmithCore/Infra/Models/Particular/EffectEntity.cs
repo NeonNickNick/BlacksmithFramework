@@ -9,13 +9,13 @@ namespace BlacksmithCore.Infra.Models.Particular
         public readonly EffectType.CEValue Type;
         public int DelayTimes { get; set; } = 0;
         public int RemainingTimes { get; set; }
-        public IResolution Resolution { get; set; }
+        public float Power { get; set; }
         public Action<Body> Execute { get; set; } = null!;
-        public EffectEntity(EffectType.CEValue type, int remainingTimes, IResolution resolution)
+        public EffectEntity(EffectType.CEValue type, int remainingTimes, float power)
         {
             Type = type;
             RemainingTimes = remainingTimes;
-            Resolution = resolution;
+            Power = power;
         }
     }
 }
