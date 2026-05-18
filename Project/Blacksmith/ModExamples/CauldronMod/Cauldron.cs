@@ -1,11 +1,15 @@
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
+using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
+using BlacksmithCore.Infra.Models.Judgement;
+using BlacksmithCore.Infra.Models.Judgement.Core;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
 using ModExamples.CauldronMod.Defense;
+using ModExamples.HolyBookMod.Defense;
 using ModExamples.PhantomBookMod;
 using ModExamples.PhantomBookMod.Defense;
 
@@ -61,24 +65,24 @@ namespace ModExamples.CauldronMod
         }
         private bool ExplosionCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), 1f);
+            return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), sc.Param);
         }
         private IDSLSourceFile Explosion(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .UseResource(1f, ResourceType.Instance.Fire())
-                .WriteAttack(4f, AttackType.Instance.Magical());
+                .UseResource(sc.Param, ResourceType.Instance.Fire())
+                .WriteAttack(4f * sc.Param, AttackType.Instance.Magical());
             return DSL.Create(sc.Self, pen);
         }
         private bool IceBladeCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Water(), 1f);
+            return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Water(), sc.Param);
         }
         private IDSLSourceFile IceBlade(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .UseResource(1f, ResourceType.Instance.Water())
-                .WriteAttack(5f, AttackType.Instance.Physical());
+                .UseResource(sc.Param, ResourceType.Instance.Water())
+                .WriteAttack(5f * sc.Param, AttackType.Instance.Physical());
             return DSL.Create(sc.Self, pen);
         }
         private bool RegenerationCheck(ISkillContext sc)
@@ -113,6 +117,67 @@ namespace ModExamples.CauldronMod
                 .WriteDefense(0f, new StoneShell());
             return DSL.Create(sc.Self, pen);
         }
+        private bool LifeBurnCheck(ISkillContext sc)
+        {
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Wood(), 1f)
+                && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), 1f);
+        }
+        private IDSLSourceFile LifeBurn(ISkillContext sc)
+        {
+            Pen pen = sf => sf
+                .UseResource(1f, ResourceType.Instance.Fire())
+                .UseResource(1f, ResourceType.Instance.Wood())
+                .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 0)
+                .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 1)
+                .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 2)
+                .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 3)
+                .LinkJudgeRuleDynamic(
+                    DynamicJudgeRuleName.Instance.LifeBurn(),
+                    new()
+                    {
+                        new((player, enemy) =>
+                        {
+                            foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
+                            {
+                                if(resolution.Type == AttackType.Instance.Real()
+                                && resolution.DelayRounds == 0)
+                                {
+                                    resolution.Power /= 2;
+                                }
+                            }
+                        }, 
+                        JudgeStage.Instance.OnApplyingOthers(),
+                        RuleType.Modifier,
+                        ModifierOrder.Before,
+                        4),
+                        new((player, enemy) =>
+                        {
+                            foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
+                            {
+                                if(resolution.DelayRounds == 0)
+                                {
+                                    resolution.Power *= 2;
+                                }
+                            }
+                        },
+                        JudgeStage.Instance.OnBegin(),
+                        RuleType.Modifier,
+                        ModifierOrder.After,
+                        3,
+                        1),
+                        new((player, enemy) =>
+                        {
+                            player.Focus.Get<Health>().LoseMHP(114514);
+                        },
+                        JudgeStage.Instance.OnEnd(),
+                        RuleType.Modifier,
+                        ModifierOrder.Before,
+                        1,
+                        3)
+                    });
+            return DSL.Create(sc.Self, pen);
+        }
+
         private bool FireRainCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Earth(), 1f)
@@ -140,10 +205,10 @@ namespace ModExamples.CauldronMod
                 .UseResource(1f, ResourceType.Instance.Earth())
                 .UseResource(1f, ResourceType.Instance.Water())
                 .WriteDefense(0f, new PhysicalImmunity())
-                .WriteDefense(8f, new Defense.ElementalArmor(() =>
+                .WriteDefense(8f, new Defense.ElementalArmor(owner =>
                 {
-                    sc.Self.Focus.Get<Skill>().RemovePackage(nameof(ElementalArmor));
-                    sc.Self.Focus.Get<Skill>().Enable(packageNames);
+                    owner.Focus.Get<Skill>().RemovePackage(nameof(ElementalArmor));
+                    owner.Focus.Get<Skill>().Enable(packageNames);
                 }))
                 .WriteFree(source =>
                 {

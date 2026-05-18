@@ -70,11 +70,10 @@ namespace BlacksmithCore.Infra.Models.Judgement
             }
             public void Execute(Community player, Community enemy)
             {
-                Update();
                 Action<Community, Community>? overrideRule = null;
                 for (int i = _overrideRules.Count - 1; i >= 0; i--)
                 {
-                    if (_overrideRules[i].RemainingRounds == 0)
+                    if (_overrideRules[i].DelayRounds == 0 && _overrideRules[i].RemainingRounds > 0)
                     {
                         overrideRule = _overrideRules[i].Rule;
                         break;
@@ -84,7 +83,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
                     // BEFORE modifiers
                     foreach (var rule in _modifiersBefore)
                     {
-                        if (rule.RemainingRounds == 0)
+                        if (rule.DelayRounds == 0 && rule.RemainingRounds > 0)
                         {
                             rule.Rule(player, enemy);
                         }
@@ -95,13 +94,14 @@ namespace BlacksmithCore.Infra.Models.Judgement
                     // AFTER modifiers
                     foreach (var rule in _modifiersAfter)
                     {
-                        if (rule.RemainingRounds == 0)
+                        if (rule.DelayRounds == 0 && rule.RemainingRounds > 0)
                         {
                             rule.Rule(player, enemy);
                         }
                     }
                 }
                 ;
+                Update();
             }
         }
         private readonly static SortedDictionary<JudgeStage.CEValue, StageRuleContainer> _defaultRuleContainers = new()
@@ -233,8 +233,8 @@ namespace BlacksmithCore.Infra.Models.Judgement
         private static void SwapEffects(List<EffectResolution> playerResolutions,
             List<EffectResolution> enemyResolutions)
         {
-            var playerTemp = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToHashSet();
-            var enemyTemp = enemyResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToHashSet();
+            var playerTemp = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() && e.DelayRounds == 0).ToHashSet();
+            var enemyTemp = enemyResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() && e.DelayRounds == 0).ToHashSet();
 
             playerResolutions.RemoveAll(playerTemp.Contains);
             enemyResolutions.RemoveAll(enemyTemp.Contains);

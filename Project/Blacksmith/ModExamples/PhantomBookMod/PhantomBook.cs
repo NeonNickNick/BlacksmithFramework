@@ -120,10 +120,10 @@ namespace ModExamples.PhantomBookMod
                 .UseResource(1f, ResourceType.Instance.Dream())
                 .LoseHP(5)
                 .WriteDefense(0f, new PhysicalImmunity())
-                .WriteDefense(6f, new NightmareArmor(() =>
+                .WriteDefense(6f, new NightmareArmor(owner =>
                 {
-                    sc.Self.Focus.Get<Skill>().AddSkill(nameof(PhantomBook), nameof(Nightmare));
-                    sc.Self.Focus.Get<Skill>().RemovePackage(nameof(Nightmare));
+                    owner.Focus.Get<Skill>().AddSkill(nameof(PhantomBook), nameof(Nightmare));
+                    owner.Focus.Get<Skill>().RemovePackage(nameof(Nightmare));
                 }))
                 .WriteFree(source =>
                 {

@@ -30,6 +30,13 @@ namespace ClapInfra.ClapModels.Components
                 _resolutionLists[type] = (IList)Activator.CreateInstance(listType)!;
             }
         }
+        public void Clear()
+        {
+            foreach(var list in _resolutionLists.Values)
+            {
+                list.Clear();
+            }
+        }
         public List<TResolution> Get<TResolution>()
             where TResolution : TIResolution
         {

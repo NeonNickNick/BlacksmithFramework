@@ -9,8 +9,8 @@ namespace ModExamples.CauldronMod.Defense
         public override int Power { get; set; } = 0;
         public override bool CanMerge { get; set; } = true;
         public override bool IsDead { get; set; } = false;
-        private Action _callback;
-        public ElementalArmor(Action callback)
+        private Action<Community> _callback;
+        public ElementalArmor(Action<Community> callback)
         {
             _callback = callback;
         }
@@ -24,7 +24,7 @@ namespace ModExamples.CauldronMod.Defense
             if(Power <= 0)
             {
                 IsDead = true;
-                _callback();
+                _callback(Owner!);
             }
         }
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)

@@ -3,6 +3,7 @@ namespace BlacksmithCore.Infra.Models.Core
 {
     public abstract class DefenseBase : IDefenseWork
     {
+        public Community? Owner { get; set; }
         public abstract DefenseType.CEValue Type { get; set; }
         public abstract int Power { get; set; }
         public abstract bool CanMerge { get; set; }

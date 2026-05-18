@@ -10,8 +10,8 @@ namespace ModExamples.PhantomBookMod.Defense
         public int Baseline { get; set; } = 1;
         public override bool CanMerge { get; set; } = false;
         public override bool IsDead { get; set; } = false;
-        private readonly Action _callback;
-        public NightmareArmor(Action callback)
+        private readonly Action<Community> _callback;
+        public NightmareArmor(Action<Community> callback)
         {
             _callback = callback;
         }
@@ -24,7 +24,7 @@ namespace ModExamples.PhantomBookMod.Defense
             if (Power <= 0)
             {
                 IsDead = true;
-                _callback();
+                _callback(Owner!);
             }
         }
 

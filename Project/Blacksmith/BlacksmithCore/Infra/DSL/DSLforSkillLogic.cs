@@ -200,6 +200,7 @@ namespace BlacksmithCore.Infra.DSL
                     resolution.Execute = (target) =>
                     {
                         defense.Power = (int)resolution.Power;
+                        defense.Owner = source;
                         target.Focus.Get<Defense>().Add(resolution.Defense);
                     };
                     source.Focus.Get<TurnContext>().WriteResolution(resolution);
