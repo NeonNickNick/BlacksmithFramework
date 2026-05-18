@@ -6,6 +6,7 @@ namespace BlacksmithCore.Infra.Models.Components.Resolutions
     public enum AttackStage
     {
         OnHitArmorFirstTime,
+        OnHitBody,
         OnEnd
     }
     public class AttackResolution : IResolution

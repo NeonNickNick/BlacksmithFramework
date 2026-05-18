@@ -166,6 +166,7 @@ namespace BlacksmithCore.Infra.DSL
                         {
                             resolution.RunStage(AttackStage.OnHitArmorFirstTime, main);
                         }
+                        resolution.RunStage(AttackStage.OnHitBody, main);
                         main.Get<Health>().LoseHP((int)resolution.Power);
                         resolution.TotalDamage += (int)resolution.Power;
                         resolution.RunStage(AttackStage.OnEnd, main);
