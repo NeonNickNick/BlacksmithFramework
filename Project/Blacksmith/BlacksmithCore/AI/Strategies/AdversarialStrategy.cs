@@ -532,8 +532,6 @@ namespace BlacksmithCore.AI.Strategies
 
             if (playerHaveProfession && !haveProfession)
             {
-                if (round >= 10)
-                    score -= 5e6;
                 if (enemyIron - playerIron < _params.IronDeficitThreshold)
                     score -= _params.IronDeficitPenaltyWhenEnemyHasProfession;
             }

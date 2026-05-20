@@ -445,11 +445,6 @@ namespace BlacksmithCore.AI.Strategies
 
             if (playerHaveProfession && !haveProfession)
             {
-                if (round >= 8)
-                {
-                    //如果已经过了8回合还没有职业，给严厉惩罚
-                    score -= 5e8;
-                }
                 if (enemyIron - playerIron < _params.IronDeficitThreshold)
                 {
                     score -= _params.IronDeficitPenaltyWhenEnemyHasProfession;
