@@ -220,7 +220,7 @@ namespace BlacksmithCore.AI.Strategies
             _main = gameInstance;
         }
 
-        public (string skillName, int param, string stringParam) ChooseSkill(Community self, Community opponent)
+        public (string skillName, int param, string stringParam) ChooseSkill()
         {
             var sw = Stopwatch.StartNew();
 
@@ -310,7 +310,7 @@ namespace BlacksmithCore.AI.Strategies
 
                 // Rollout：双方都用同一深度的启发式，让推演到「双方都理性」的局面
                 var simState = node.State.DeepCopy();
-                for (int d = 0; d < 30; d++)
+                for (int d = 0; d < 5; d++)
                 {
                     if (IsTerminal(simState))
                         break;
@@ -358,31 +358,15 @@ namespace BlacksmithCore.AI.Strategies
 
             foreach (var a in actions)
             {
-                GameInstance sim;
-                try
-                {
-                    sim = instance.DeepCopy();
-                }
-                catch
-                {
-                    // DeepCopy 失败兜底：直接退化为均匀随机，避免搜索整体崩溃
-                    return RandomAction(actor, instance);
-                }
+                GameInstance sim = instance.DeepCopy();
 
                 var opp = actorIsEnemy ? sim.Player : sim.Enemy;
                 var oppAction = HeuristicAction(opp, sim, depth - 1);
 
-                try
-                {
-                    if (actorIsEnemy)
-                        sim.Declare(oppAction.Item1, oppAction.Item2, a.Item1, a.Item2, oppAction.Item3, a.Item3);
-                    else
-                        sim.Declare(a.Item1, a.Item2, oppAction.Item1, oppAction.Item2, a.Item3, oppAction.Item3);
-                }
-                catch
-                {
-                    continue;
-                }
+                if (actorIsEnemy)
+                    sim.Declare(oppAction.Item1, oppAction.Item2, a.Item1, a.Item2, oppAction.Item3, a.Item3);
+                else
+                    sim.Declare(a.Item1, a.Item2, oppAction.Item1, oppAction.Item2, a.Item3, oppAction.Item3);
 
                 double score = Evaluate(sim);
                 if (!actorIsEnemy) score = -score;

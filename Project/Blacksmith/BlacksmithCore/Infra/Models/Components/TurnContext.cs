@@ -42,12 +42,13 @@ namespace BlacksmithCore.Infra.Models.Components
         }
         protected override void ExecuteImpl<TResolution>(Community community, List<TResolution> list, Func<TResolution, bool>? ifProcess)
         {
-            for (int i = list.Count - 1; i >= 0; i--)
+            for (int i = 0; i < list.Count; i++)
             {
                 if (list[i].DelayRounds == 0)
                 {
                     list[i].Execute(community);
                     list.RemoveAt(i);
+                    i--;
                 }
                 else
                 {

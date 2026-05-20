@@ -26,7 +26,7 @@ namespace BlacksmithCore.Specific.Defense
             int absorbed = (int)MathF.Min(attack, Power);
             if (type == AttackType.Instance.Physical())
             {
-                DSL.Create(owner.Get<Community>(), sf => sf.WriteAttack((int)MathF.Ceiling(absorbed / 2f), AttackType.Instance.Magical(), delayRounds: 1)).Compile().Execute(owner.Get<Community>());
+                DSL.Create(owner.Get<Community>(), sf => sf.WriteAttack(MathF.Ceiling(absorbed / 2f), AttackType.Instance.Magical(), delayRounds: 1)).Compile().Execute(owner.Get<Community>());
             }
             return (res, absorbed);
         }

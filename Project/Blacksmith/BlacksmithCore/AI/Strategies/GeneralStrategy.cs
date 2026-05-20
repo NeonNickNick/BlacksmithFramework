@@ -203,7 +203,7 @@ namespace BlacksmithCore.AI.Strategies
             _main = gameInstance;
         }
 
-        public (string skillName, int param, string stringParam) ChooseSkill(Community self, Community opponent)
+        public (string skillName, int param, string stringParam) ChooseSkill()
         {
             int threadCount = Math.Min(7, Environment.ProcessorCount);
             var tasks = new List<Task<List<MCTSNode>>>();
@@ -283,7 +283,7 @@ namespace BlacksmithCore.AI.Strategies
 
                 // Rollout
                 var simState = node.State.DeepCopy();
-                for (int d = 0; d < 20; d++)
+                for (int d = 0; d < 5; d++)
                 {
                     if (IsTerminal(simState))
                         break;

@@ -13,7 +13,6 @@ namespace BlacksmithClient
             GeneralStrategyParams? param = null;//暂时使用默认参数
             List<IAIStrategy> strategies = new()
             {
-                new BloodSigilStrategy(),
                 new GeneralStrategy(param),
                 new AdversarialStrategy()
             };

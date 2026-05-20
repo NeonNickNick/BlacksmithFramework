@@ -74,7 +74,7 @@ namespace BlacksmithClient.Frontend
 
             _cts = new CancellationTokenSource();
             var ct = _cts.Token;
-            _pendingAI = Task.Run(() => _activeAI.ChooseSkill(_game.Enemy, _game.Player), ct);
+            _pendingAI = Task.Run(() => _activeAI.ChooseSkill(), ct);
         }
 
         public async Task<DeclareResult> DeclareTurnAsync(string skillName, int param, string esn, int ep, string stringParam = "", string esp = "")
@@ -95,7 +95,7 @@ namespace BlacksmithClient.Frontend
                 var sw = Stopwatch.StartNew();
                 if (_pendingAI == null)
                 {
-                    (enemySkillName, enemyParam, enemyStringParam) = _activeAI.ChooseSkill(_game.Enemy, _game.Player);
+                    (enemySkillName, enemyParam, enemyStringParam) = _activeAI.ChooseSkill();
                 }
                 else
                 {
