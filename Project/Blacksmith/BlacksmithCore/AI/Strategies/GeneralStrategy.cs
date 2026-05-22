@@ -15,177 +15,49 @@ namespace BlacksmithCore.AI.Strategies
         {
 
         }
-        public GeneralStrategyParams(GeneralStrategyParams other)
-        {
-            TemperatureCoefficient = other.TemperatureCoefficient;
-            WinScore = other.WinScore;
-            LoseScore = other.LoseScore;
-            PlayerResourceEnemyHPRatio = other.PlayerResourceEnemyHPRatio;
-            EnemyResourcePlayerHPRatio = other.EnemyResourcePlayerHPRatio;
-            EarlyIronWeight = other.EarlyIronWeight;
-            EarlyExcessIronWeight = other.EarlyExcessIronWeight;
-            EarlySpaceWeight = other.EarlySpaceWeight;
-            EarlyTimeWeight = other.EarlyTimeWeight;
-            EarlyDefaultWeight = other.EarlyDefaultWeight;
-            EarlyIronOverstockPenalty = other.EarlyIronOverstockPenalty;
-            MidIronWeight = other.MidIronWeight;
-            MidSpaceWeight = other.MidSpaceWeight;
-            MidTimeWeight = other.MidTimeWeight;
-            MidDefaultWeight = other.MidDefaultWeight;
-            LateIronWeight = other.LateIronWeight;
-            LateSpaceWeight = other.LateSpaceWeight;
-            LateTimeWeight = other.LateTimeWeight;
-            LateDefaultWeight = other.LateDefaultWeight;
-            HaveProfessionBonus = other.HaveProfessionBonus;
-            IronDeficitPenaltyWhenEnemyHasProfession = other.IronDeficitPenaltyWhenEnemyHasProfession;
-            IronDeficitPenaltyWhenBothNoProfession = other.IronDeficitPenaltyWhenBothNoProfession;
-            IronDeficitThreshold = other.IronDeficitThreshold;
-            EarlyUnnecessaryAttackPenaltyMultiplier = other.EarlyUnnecessaryAttackPenaltyMultiplier;
-            MidAdvantageAttackBonusMultiplier = other.MidAdvantageAttackBonusMultiplier;
-            MidUnnecessaryAttackPenaltyMultiplier = other.MidUnnecessaryAttackPenaltyMultiplier;
-            WithProfessionDamageBonusMultiplier = other.WithProfessionDamageBonusMultiplier;
-            WithProfessionHpDiffBonusMultiplier = other.WithProfessionHpDiffBonusMultiplier;
-            HpAdvantageThreshold = other.HpAdvantageThreshold;
-            EarlyRoundBonusPerRound = other.EarlyRoundBonusPerRound;
-            LateRoundPenaltyPerRound = other.LateRoundPenaltyPerRound;
-        }
-
-        public GeneralStrategyParams GetMutation(Random rand, double MutationScale)
-        {
-            double Mut(double v)
-            {
-                double noise = (rand.NextDouble() * 2 - 1);
-                return v * (1 + noise * MutationScale);
-            }
-            GeneralStrategyParams res = new(this);
-            // 补充变异逻辑
-            res.TemperatureCoefficient = Mut(TemperatureCoefficient);
-            res.WinScore = Mut(WinScore);
-            res.LoseScore = Mut(LoseScore);
-            res.PlayerResourceEnemyHPRatio = Mut(PlayerResourceEnemyHPRatio);
-            res.EnemyResourcePlayerHPRatio = Mut(EnemyResourcePlayerHPRatio);
-            res.EarlyIronWeight = Mut(EarlyIronWeight);
-            res.EarlyExcessIronWeight = Mut(EarlyExcessIronWeight);
-            res.EarlySpaceWeight = Mut(EarlySpaceWeight);
-            res.EarlyTimeWeight = Mut(EarlyTimeWeight);
-            res.EarlyDefaultWeight = Mut(EarlyDefaultWeight);
-            res.EarlyIronOverstockPenalty = Mut(EarlyIronOverstockPenalty);
-            res.MidIronWeight = Mut(MidIronWeight);
-            res.MidSpaceWeight = Mut(MidSpaceWeight);
-            res.MidTimeWeight = Mut(MidTimeWeight);
-            res.MidDefaultWeight = Mut(MidDefaultWeight);
-            res.LateIronWeight = Mut(LateIronWeight);
-            res.LateSpaceWeight = Mut(LateSpaceWeight);
-            res.LateTimeWeight = Mut(LateTimeWeight);
-            res.LateDefaultWeight = Mut(LateDefaultWeight);
-            res.HaveProfessionBonus = Mut(HaveProfessionBonus);
-            res.IronDeficitPenaltyWhenEnemyHasProfession = Mut(IronDeficitPenaltyWhenEnemyHasProfession);
-            res.IronDeficitPenaltyWhenBothNoProfession = Mut(IronDeficitPenaltyWhenBothNoProfession);
-            res.IronDeficitThreshold = Mut(IronDeficitThreshold);
-            res.EarlyUnnecessaryAttackPenaltyMultiplier = Mut(EarlyUnnecessaryAttackPenaltyMultiplier);
-            res.MidAdvantageAttackBonusMultiplier = Mut(MidAdvantageAttackBonusMultiplier);
-            res.MidUnnecessaryAttackPenaltyMultiplier = Mut(MidUnnecessaryAttackPenaltyMultiplier);
-            res.WithProfessionDamageBonusMultiplier = Mut(WithProfessionDamageBonusMultiplier);
-            res.WithProfessionHpDiffBonusMultiplier = Mut(WithProfessionHpDiffBonusMultiplier);
-            res.HpAdvantageThreshold = Mut(HpAdvantageThreshold);
-            res.EarlyRoundBonusPerRound = Mut(EarlyRoundBonusPerRound);
-            res.LateRoundPenaltyPerRound = Mut(LateRoundPenaltyPerRound);
-            return res;
-        }
-
-        public GeneralStrategyParams GetCrossWith(Random rand, GeneralStrategyParams other)
-        {
-            double Pick(double a, double b)
-            {
-                return rand.NextDouble() < 0.5 ? a : b;
-            }
-            GeneralStrategyParams res = new();
-            // 补充交叉逻辑
-            res.TemperatureCoefficient = Pick(TemperatureCoefficient, other.TemperatureCoefficient);
-            res.WinScore = Pick(WinScore, other.WinScore);
-            res.LoseScore = Pick(LoseScore, other.LoseScore);
-            res.PlayerResourceEnemyHPRatio = Pick(PlayerResourceEnemyHPRatio, other.PlayerResourceEnemyHPRatio);
-            res.EnemyResourcePlayerHPRatio = Pick(EnemyResourcePlayerHPRatio, other.EnemyResourcePlayerHPRatio);
-            res.EarlyIronWeight = Pick(EarlyIronWeight, other.EarlyIronWeight);
-            res.EarlyExcessIronWeight = Pick(EarlyExcessIronWeight, other.EarlyExcessIronWeight);
-            res.EarlySpaceWeight = Pick(EarlySpaceWeight, other.EarlySpaceWeight);
-            res.EarlyTimeWeight = Pick(EarlyTimeWeight, other.EarlyTimeWeight);
-            res.EarlyDefaultWeight = Pick(EarlyDefaultWeight, other.EarlyDefaultWeight);
-            res.EarlyIronOverstockPenalty = Pick(EarlyIronOverstockPenalty, other.EarlyIronOverstockPenalty);
-            res.MidIronWeight = Pick(MidIronWeight, other.MidIronWeight);
-            res.MidSpaceWeight = Pick(MidSpaceWeight, other.MidSpaceWeight);
-            res.MidTimeWeight = Pick(MidTimeWeight, other.MidTimeWeight);
-            res.MidDefaultWeight = Pick(MidDefaultWeight, other.MidDefaultWeight);
-            res.LateIronWeight = Pick(LateIronWeight, other.LateIronWeight);
-            res.LateSpaceWeight = Pick(LateSpaceWeight, other.LateSpaceWeight);
-            res.LateTimeWeight = Pick(LateTimeWeight, other.LateTimeWeight);
-            res.LateDefaultWeight = Pick(LateDefaultWeight, other.LateDefaultWeight);
-            res.HaveProfessionBonus = Pick(HaveProfessionBonus, other.HaveProfessionBonus);
-            res.IronDeficitPenaltyWhenEnemyHasProfession = Pick(IronDeficitPenaltyWhenEnemyHasProfession, other.IronDeficitPenaltyWhenEnemyHasProfession);
-            res.IronDeficitPenaltyWhenBothNoProfession = Pick(IronDeficitPenaltyWhenBothNoProfession, other.IronDeficitPenaltyWhenBothNoProfession);
-            res.IronDeficitThreshold = Pick(IronDeficitThreshold, other.IronDeficitThreshold);
-            res.EarlyUnnecessaryAttackPenaltyMultiplier = Pick(EarlyUnnecessaryAttackPenaltyMultiplier, other.EarlyUnnecessaryAttackPenaltyMultiplier);
-            res.MidAdvantageAttackBonusMultiplier = Pick(MidAdvantageAttackBonusMultiplier, other.MidAdvantageAttackBonusMultiplier);
-            res.MidUnnecessaryAttackPenaltyMultiplier = Pick(MidUnnecessaryAttackPenaltyMultiplier, other.MidUnnecessaryAttackPenaltyMultiplier);
-            res.WithProfessionDamageBonusMultiplier = Pick(WithProfessionDamageBonusMultiplier, other.WithProfessionDamageBonusMultiplier);
-            res.WithProfessionHpDiffBonusMultiplier = Pick(WithProfessionHpDiffBonusMultiplier, other.WithProfessionHpDiffBonusMultiplier);
-            res.HpAdvantageThreshold = Pick(HpAdvantageThreshold, other.HpAdvantageThreshold);
-            res.EarlyRoundBonusPerRound = Pick(EarlyRoundBonusPerRound, other.EarlyRoundBonusPerRound);
-            res.LateRoundPenaltyPerRound = Pick(LateRoundPenaltyPerRound, other.LateRoundPenaltyPerRound);
-            return res;
-        }
         public double TemperatureCoefficient = 0.03; // 原 0.03 * round
-
-        // 终局奖励/惩罚
-        public double WinScore = 1e9;
-        public double LoseScore = -1e9;
-
-        //交叉权重
-        public double PlayerResourceEnemyHPRatio = 100;
-        public double EnemyResourcePlayerHPRatio = 100;
-
         // ========== 早期资源权重 ==========
-        public double EarlyIronWeight = 1200;
-        public double EarlyExcessIronWeight = 1200;     // 超过4铁时的额外奖励
-        public double EarlySpaceWeight = 4000;
-        public double EarlyTimeWeight = 3500;
-        public double EarlyDefaultWeight = 2000;
-        public double EarlyIronOverstockPenalty = 80;   // 超过7铁的惩罚
+        public double EarlyIronWeight = 12;
+        public double EarlyExcessIronWeight = 12;     // 超过4铁时的额外奖励
+        public double EarlySpaceWeight = 4;
+        public double EarlyTimeWeight = 3.5;
+        public double EarlyDefaultWeight = 3;
 
         // ========== 中期资源权重 ==========
-        public double MidIronWeight = 300;
-        public double MidSpaceWeight = 1000;
-        public double MidTimeWeight = 900;
-        public double MidDefaultWeight = 600;
+        public double MidIronWeight = 3;
+        public double MidSpaceWeight = 10;
+        public double MidTimeWeight = 9;
+        public double MidDefaultWeight = 6;
 
         // ========== 后期资源权重 ==========
-        public double LateIronWeight = 100;
-        public double LateSpaceWeight = 250;
-        public double LateTimeWeight = 250;
-        public double LateDefaultWeight = 150;
+        public double LateIronWeight = 1;
+        public double LateSpaceWeight = 2.5;
+        public double LateTimeWeight = 2.5;
+        public double LateDefaultWeight = 1.5;
 
-        // ========== 职业相关 ==========
-        public double HaveProfessionBonus = 500;
-        public double IronDeficitPenaltyWhenEnemyHasProfession = 300;
-        public double IronDeficitPenaltyWhenBothNoProfession = 1000;
-        public double IronDeficitThreshold = 3;         // 铁差阈值
 
         // ========== 攻击策略权重 ==========
-        public double EarlyUnnecessaryAttackPenaltyMultiplier = 30;    // (100 - HP) * 30
+        public double EarlyUnnecessaryAttackPenaltyMultiplier = 30;    // (10 - HP) * 30
         public double MidAdvantageAttackBonusMultiplier = 2;           // hpDiff * 2
-        public double MidUnnecessaryAttackPenaltyMultiplier = 10;      // (100 - HP) * 10
-        public double WithProfessionDamageBonusMultiplier = 20;        // (100 - HP) * 20
-        public double WithProfessionHpDiffBonusMultiplier = 5;         // hpDiff * 5
-        public double HpAdvantageThreshold = 20;                       // hpDiff > 20 才算优势
+        public double MidUnnecessaryAttackPenaltyMultiplier = 10;      // (10 - HP) * 10
+        public double WithProfessionDamageBonusMultiplier = 20;        // (10 - HP) * 20
+        public double WithProfessionHpDiffBonusMultiplier = 20;         // hpDiff * 5
+        public double HpAdvantageThreshold = 2;                       // hpDiff > 2 才算优势
 
         // ========== 回合节奏 ==========
-        public double EarlyRoundBonusPerRound = 1;
         public double LateRoundPenaltyPerRound = 40;
+
+        // ========== 终局分数 ==========
+        public double WinScore = 100;
     }
     public class GeneralStrategy : IAIStrategy
     {
         private readonly GeneralStrategyParams _params;
         private GameInstance _main = null!;
+        private static readonly HashSet<string> _uselessActions = new()
+        {
+            //"stick", "drill", "recovery", "shield", "thornshield", "mute"
+        };
         private static ThreadLocal<Random> _random = new(() =>
         {
             return new Random(Random.Shared.Next());
@@ -213,7 +85,7 @@ namespace BlacksmithCore.AI.Strategies
                 tasks.Add(Task.Run(() =>
                 {
                     var localGame = _main.DeepCopy();
-                    return RunMCTS(localGame, 4000 / threadCount);
+                    return RunMCTS(localGame, 7000 / threadCount);
                 }));
             }
 
@@ -261,56 +133,102 @@ namespace BlacksmithCore.AI.Strategies
                     node = Select(node);
                 }
 
-                // Expansion
                 if (node.UntriedActions.Count > 0)
                 {
+                    EnsureState(node);
+
                     var action = node.UntriedActions[0];
                     node.UntriedActions.RemoveAt(0);
 
-                    var nextState = node.State.DeepCopy();
-                    var playerAction = RandomAction(nextState.Player, nextState);
-                    nextState.Declare(
+                    // 一次 DeepCopy 同时用于 expansion 与 rollout
+                    var simState = node.State!.DeepCopy();
+                    var playerAction = RandomAction(simState.Player, simState);
+                    simState.Declare(
                         playerAction.Item1, playerAction.Item2,
                         action.Item1, action.Item2,
                         playerAction.Item3, action.Item3
                     );
 
-                    var nextActions = GetAllAvailable(nextState.Enemy, nextState);
-                    var child = new MCTSNode(nextState, node, nextActions) { Action = action };
+                    // 在 rollout 覆盖之前捕获子节点的合法动作
+                    var nextActions = GetAllAvailable(simState.Enemy, simState);
+
+                    // 创建延迟子节点
+                    var child = new MCTSNode(null, node, nextActions)
+                    {
+                        Action = action,
+                        PlayerAction = playerAction
+                    };
                     node.Children.Add(child);
                     node = child;
+
+
+                    double result = Evaluate(simState);
+                    // Rollout 从已应用 expansion 的同一状态开始
+                    for (int d = 1; d < 5; d++)
+                    {
+                        if (IsTerminal(simState))
+                            break;
+
+                        var p = RandomAction(simState.Player, simState);
+                        var e = RandomAction(simState.Enemy, simState);
+                        simState.Declare(p.Item1, p.Item2, e.Item1, e.Item2, p.Item3, e.Item3);
+
+                        result = (result * d + MathF.Exp(-0.3f*d) * Evaluate(simState)) / (d + 1);
+                    }
+
+
+                    // Backprop
+                    while (node != null)
+                    {
+                        node.Visits++;
+                        node.Wins += result;
+                        node = node.Parent!;
+                    }
                 }
-
-                // Rollout
-                var simState = node.State.DeepCopy();
-                for (int d = 0; d < 5; d++)
+                else
                 {
-                    if (IsTerminal(simState))
-                        break;
-
-                    var p = RandomAction(simState.Player, simState);
-                    var e = RandomAction(simState.Enemy, simState);
-                    simState.Declare(p.Item1, p.Item2, e.Item1, e.Item2, p.Item3, e.Item3);
-                }
-
-                double result = Evaluate(simState);
-
-                // Backprop
-                while (node != null)
-                {
-                    node.Visits++;
-                    node.Wins += result;
-                    node = node.Parent!;
+                    // 终端节点
+                    EnsureState(node);
+                    double result = Evaluate(node.State!);
+                    while (node != null)
+                    {
+                        node.Visits++;
+                        node.Wins += result;
+                        node = node.Parent!;
+                    }
                 }
             }
 
             return root.Children;
         }
 
+        private void EnsureState(MCTSNode node)
+        {
+            if (node.State != null)
+                return;
+            var parent = node.Parent!;
+            EnsureState(parent);
+            node.State = parent.State!.DeepCopy();
+            var pa = node.PlayerAction!.Value;
+            var ea = node.Action!.Value;
+            node.State.Declare(pa.Item1, pa.Item2, ea.Item1, ea.Item2, pa.Item3, ea.Item3);
+        }
+
         private (string, int, string) SampleFromTopK(List<MCTSNode> children, int round)
         {
             int k = Math.Min(2, children.Count);
-            double temperature = Math.Max(0, _params.TemperatureCoefficient * round);
+            double temperature = Math.Max(0.003, _params.TemperatureCoefficient * round);
+
+
+            children.ForEach(c =>
+            {
+                if (c.Action.HasValue)
+                {
+                    var action = c.Action.Value;
+                    Console.WriteLine($"{action.skill}:{c.Wins / (c.Visits + 1e-6)}");
+                }
+            });
+            Console.WriteLine($"");
 
             var topK = children
                 .OrderByDescending(c => c.Wins / (c.Visits + 1e-6))
@@ -342,19 +260,22 @@ namespace BlacksmithCore.AI.Strategies
 
         private class MCTSNode
         {
-            public GameInstance State;
+            public GameInstance? State;
             public MCTSNode? Parent;
             public List<MCTSNode> Children = new();
             public (string skill, int param, string stringParam)? Action;
+            public (string skill, int param, string stringParam)? PlayerAction;
             public int Visits = 0;
             public double Wins = 0;
             public List<(string, int, string)> UntriedActions;
 
-            public MCTSNode(GameInstance state, MCTSNode? parent, List<(string, int, string)> actions)
+            public MCTSNode(GameInstance? state, MCTSNode? parent, List<(string, int, string)> actions)
             {
                 State = state;
                 Parent = parent;
-                UntriedActions = new List<(string, int, string)>(actions);
+                UntriedActions = new List<(string, int, string)>(actions.Count > 0 ? actions.Count : 16);
+                if (actions.Count > 0)
+                    UntriedActions.AddRange(actions);
             }
         }
 
@@ -380,11 +301,11 @@ namespace BlacksmithCore.AI.Strategies
             double enemyIron = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Iron());
             double enemySpace = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Space());
             double enemyTime = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Time());
-            double enemySpecific = enemy.Focus.Get<Resource>().QuerySpecific(ResourceType.Instance.Magic());
+            double enemySpecific = enemy.Focus.Get<Resource>().QuerySpecific();
 
             double playerIron = player.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Iron());
             double playerSpace = player.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Space());
-            double playerSpecific = player.Focus.Get<Resource>().QuerySpecific(ResourceType.Instance.Magic());
+            double playerSpecific = player.Focus.Get<Resource>().QuerySpecific();
 
             bool haveProfession = enemy.Focus.Get<Skill>().HaveProfession;
             bool playerHaveProfession = player.Focus.Get<Skill>().HaveProfession;
@@ -392,25 +313,15 @@ namespace BlacksmithCore.AI.Strategies
             int round = state.History.SkillHistory.Count;//已经过的回合数
 
             // 终局
-            if (enemyHP <= 0) return _params.LoseScore;
+            if (enemyHP <= 0) return -_params.WinScore;
             if (playerHP <= 0) return _params.WinScore;
 
             double score = 0;
 
             // 阶段划分
-            bool early = round < 10;
-            bool mid = round >= 10 && round < 15;
+            bool early = round < 8;
+            bool mid = round >= 8 && round < 15;
             bool late = round >= 15;
-
-            //0 交叉关注
-            //引入双方铁和生命值之间的关系
-            score -= 10 *
-                ((playerIron + 3 * playerSpace + 2 * playerSpecific) / (enemyHP + 1e-6)) *
-                    _params.PlayerResourceEnemyHPRatio;
-
-            score += 10 *
-                ((enemyIron + 3 * enemySpace + 2 * enemySpecific) / (playerHP + 1e-6)) *
-                    _params.EnemyResourcePlayerHPRatio;
 
             // 1️⃣ 资源系统
             double resourceScore = 0;
@@ -421,7 +332,6 @@ namespace BlacksmithCore.AI.Strategies
                 resourceScore += enemySpace * _params.EarlySpaceWeight;
                 resourceScore += enemyTime * _params.EarlyTimeWeight;
                 resourceScore += enemySpecific * _params.EarlyDefaultWeight;
-                resourceScore -= Math.Max(0, enemyIron - 7) * _params.EarlyIronOverstockPenalty;
             }
             else if (mid)
             {
@@ -439,51 +349,39 @@ namespace BlacksmithCore.AI.Strategies
             }
             score += resourceScore;
 
-            // 2️⃣ 职业系统
-            if (haveProfession)//有职业就奖励
-                score += _params.HaveProfessionBonus;
-
-            if (playerHaveProfession && !haveProfession)
-            {
-                if (enemyIron - playerIron < _params.IronDeficitThreshold)
-                {
-                    score -= _params.IronDeficitPenaltyWhenEnemyHasProfession;
-                }//如果玩家已经选了职业但是铁差小于3（可变）
-            }
-
-            if (!playerHaveProfession && !haveProfession)
-            {
-                if (enemyIron - playerIron < 0)
-                    score -= _params.IronDeficitPenaltyWhenBothNoProfession;
-            }
-
             // 3️⃣ 攻击策略
-            double hpDiff = enemyHP - playerHP;
-            if (!haveProfession)
+            if (!early)
             {
-                if (early)
-                    score -= (100 - playerHP) * _params.EarlyUnnecessaryAttackPenaltyMultiplier;
-                else if (mid)
+                double hpDiff = enemyHP - playerHP;
+                if (!haveProfession)
                 {
-                    if (hpDiff > _params.HpAdvantageThreshold)
-                        score += hpDiff * _params.MidAdvantageAttackBonusMultiplier;
-                    else
-                        score -= (100 - playerHP) * _params.MidUnnecessaryAttackPenaltyMultiplier;
+                    if (early)
+                        score -= (10 - playerHP) * _params.EarlyUnnecessaryAttackPenaltyMultiplier;
+                    else if (mid)
+                    {
+                        if (hpDiff > _params.HpAdvantageThreshold)
+                            score += hpDiff * _params.MidAdvantageAttackBonusMultiplier;
+                        else
+                            score -= (10 - playerHP) * _params.MidUnnecessaryAttackPenaltyMultiplier;
+                    }
                 }
-            }
-            else
-            {
-                score += (100 - playerHP) * _params.WithProfessionDamageBonusMultiplier;
-                score += hpDiff * _params.WithProfessionHpDiffBonusMultiplier;
+                else
+                {
+                    score += (10 - playerHP) * _params.WithProfessionDamageBonusMultiplier;
+                    score += hpDiff * _params.WithProfessionHpDiffBonusMultiplier;
+                }
             }
 
             // 4️⃣ 回合节奏
-            if (early)
-                score += round * _params.EarlyRoundBonusPerRound;
-            else if (late)
+            if (late)
                 score -= round * _params.LateRoundPenaltyPerRound;
 
-            return score;
+            const double scale = 30.0;
+
+            double normalized =
+                _params.WinScore * Math.Tanh(score / scale);
+
+            return normalized;
         }
 
         private bool IsTerminal(GameInstance state)
@@ -502,13 +400,12 @@ namespace BlacksmithCore.AI.Strategies
 
         private List<(string, int, string)> GetAllAvailable(Community actor, GameInstance instance)
         {
-            List<(string, int, string)> res = new();
+            List<(string, int, string)> res = new(16);
             var names = actor.Focus.Get<Skill>().GetAvailableSkillNames();
 
             foreach (var name in names)
             {
-                var useless = new List<string>() { "stick", "drill", "recovery", "shield", "thornshield", "mute" };
-                if (useless.Contains(name))
+                if (_uselessActions.Contains(name))
                     continue;
 
                 for (int i = 0; i <= 5; i++)

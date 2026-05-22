@@ -1,6 +1,7 @@
+using System.Collections.Concurrent;
+using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Models.Judgement;
 using BlacksmithCore.Infra.Profession;
 using ClapInfra.ClapModels.Components;
 
@@ -50,6 +51,7 @@ namespace BlacksmithCore.Driver
         public GameInstance DeepCopy(int preRounds = 0)
         {
             GameInstance res = new();
+
             int n = History.SkillHistory.Count - preRounds;
             if (n < 0)
             {

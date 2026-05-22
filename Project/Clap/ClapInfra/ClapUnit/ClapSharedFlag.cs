@@ -1,4 +1,4 @@
-namespace ClapInfra.ClapUtils
+namespace ClapInfra.ClapUnit
 {
     public class ClapSharedFlag
     {

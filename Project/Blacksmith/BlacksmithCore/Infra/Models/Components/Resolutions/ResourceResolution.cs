@@ -1,11 +1,12 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
+using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Infra.Models.Components.Resolutions
 {
     public class ResourceResolution : IResolution
     {
-        public int DelayRounds { get; set; } = 0;
+        public required ClapRoundClock Clock { get; set; }
         public ResourceType.CEValue Type { get; set; }
         public float Power { get; set; }
         public Action<Community> Execute { get; set; } = null!;

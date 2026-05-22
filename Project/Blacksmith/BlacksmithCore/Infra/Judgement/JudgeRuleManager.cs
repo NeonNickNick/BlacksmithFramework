@@ -2,36 +2,24 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Models.Judgement.Core;
+using BlacksmithCore.Infra.Judgement.Core;
 using ClapInfra.ClapJudgement;
+using ClapInfra.ClapUnit;
 
-namespace BlacksmithCore.Infra.Models.Judgement
+namespace BlacksmithCore.Infra.Judgement
 {
     public class JudgeRuleManager : ClapJudgeRuleManager<Community>
     {
-        DynamicJudgeRulePool _dynamicPool = new();
         public class StageRuleContainer
         {
             public class RuleUnit
             {
-                public int RemainingRounds;
-                public int DelayRounds;
+                public ClapRoundClock Clock;
                 public Action<Community, Community> Rule;
-                public void TimePass()
+                
+                public RuleUnit(ClapRoundClock clock, Action<Community, Community> rule)
                 {
-                    if (DelayRounds > 0)
-                    {
-                        DelayRounds--;
-                    }
-                    else
-                    {
-                        RemainingRounds--;
-                    }
-                }
-                public RuleUnit(int remainingRounds, int delayRounds, Action<Community, Community> rule)
-                {
-                    RemainingRounds = remainingRounds;
-                    DelayRounds = delayRounds;
+                    Clock = clock;
                     Rule = rule;
                 }
             }
@@ -60,20 +48,20 @@ namespace BlacksmithCore.Infra.Models.Judgement
             }
             public void Update()
             {
-                _overrideRules.RemoveAll(o => o.RemainingRounds <= 0);
-                _modifiersBefore.RemoveAll(o => o.RemainingRounds <= 0);
-                _modifiersAfter.RemoveAll(o => o.RemainingRounds <= 0);
+                _overrideRules.RemoveAll(o => o.Clock.IsDead);
+                _modifiersBefore.RemoveAll(o => o.Clock.IsDead);
+                _modifiersAfter.RemoveAll(o => o.Clock.IsDead);
 
-                _overrideRules.ForEach(o => o.TimePass());
-                _modifiersBefore.ForEach(o => o.TimePass());
-                _modifiersAfter.ForEach(o => o.TimePass());
+                _overrideRules.ForEach(o => o.Clock.RoundPass());
+                _modifiersBefore.ForEach(o => o.Clock.RoundPass());
+                _modifiersAfter.ForEach(o => o.Clock.RoundPass());
             }
             public void Execute(Community player, Community enemy)
             {
                 Action<Community, Community>? overrideRule = null;
                 for (int i = _overrideRules.Count - 1; i >= 0; i--)
                 {
-                    if (_overrideRules[i].DelayRounds == 0 && _overrideRules[i].RemainingRounds > 0)
+                    if (_overrideRules[i].Clock.IsRinging)
                     {
                         overrideRule = _overrideRules[i].Rule;
                         break;
@@ -83,7 +71,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
                     // BEFORE modifiers
                     foreach (var rule in _modifiersBefore)
                     {
-                        if (rule.DelayRounds == 0 && rule.RemainingRounds > 0)
+                        if (rule.Clock.IsRinging)
                         {
                             rule.Rule(player, enemy);
                         }
@@ -94,7 +82,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
                     // AFTER modifiers
                     foreach (var rule in _modifiersAfter)
                     {
-                        if (rule.DelayRounds == 0 && rule.RemainingRounds > 0)
+                        if (rule.Clock.IsRinging)
                         {
                             rule.Rule(player, enemy);
                         }
@@ -233,8 +221,8 @@ namespace BlacksmithCore.Infra.Models.Judgement
         private static void SwapEffects(List<EffectResolution> playerResolutions,
             List<EffectResolution> enemyResolutions)
         {
-            var playerTemp = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() && e.DelayRounds == 0).ToHashSet();
-            var enemyTemp = enemyResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() && e.DelayRounds == 0).ToHashSet();
+            var playerTemp = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() && e.Clock.IsRinging).ToHashSet();
+            var enemyTemp = enemyResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() && e.Clock.IsRinging).ToHashSet();
 
             playerResolutions.RemoveAll(playerTemp.Contains);
             enemyResolutions.RemoveAll(enemyTemp.Contains);
@@ -262,13 +250,13 @@ namespace BlacksmithCore.Infra.Models.Judgement
                 var playerAttack = playerResolutions[playerIndex];
                 var enemyAttack = enemyResolutions[enemyIndex];
 
-                if (playerAttack.Type == AttackType.Instance.Real() || playerAttack.DelayRounds != 0)
+                if (playerAttack.Type == AttackType.Instance.Real() || !playerAttack.Clock.IsRinging)
                 {
                     playerIndex++;
                     continue;
                 }
 
-                if (enemyAttack.Type == AttackType.Instance.Real() || enemyAttack.DelayRounds != 0)
+                if (enemyAttack.Type == AttackType.Instance.Real() || !enemyAttack.Clock.IsRinging)
                 {
                     enemyIndex++;
                     continue;
@@ -297,8 +285,8 @@ namespace BlacksmithCore.Infra.Models.Judgement
         private static void SwapAttacks(List<AttackResolution> playerResolutions,
             List<AttackResolution> enemyResolutions)
         {
-            var playerTemp = playerResolutions.Where(e => e.DelayRounds == 0).ToList();
-            var enemyTemp = enemyResolutions.Where(e => e.DelayRounds == 0).ToList();
+            var playerTemp = playerResolutions.Where(e => e.Clock.IsRinging).ToList();
+            var enemyTemp = enemyResolutions.Where(e => e.Clock.IsRinging).ToList();
 
             playerResolutions.RemoveAll(e => playerTemp.Contains(e));
             enemyResolutions.RemoveAll(e => enemyTemp.Contains(e));
@@ -352,16 +340,28 @@ namespace BlacksmithCore.Infra.Models.Judgement
             }
             ;
         }
-        public void RegistJudgeRuleDynamic(DynamicJudgeRuleName.CEValue name, List<Mutation> mutations)
+
+        public void AddJudgeRule(Community source, List<Mutation> mutations)
         {
-            _dynamicPool.RegistDynamic(name, mutations);
-        }
-        public void AddJudgeRule(Community source, DynamicJudgeRuleName.CEValue name)
-        {
-            List<Mutation> mutations = _dynamicPool.Query(source, name);
+            mutations.ForEach(m =>
+            {
+                var originalRule = m.JudgeRule;
+
+                m.JudgeRule = (player, enemy) =>
+                {
+                    if (source == player)
+                    {
+                        originalRule(player, enemy); 
+                    }
+                    else
+                    {
+                        originalRule(enemy, player); 
+                    }
+                };
+            });
             foreach (var mutation in mutations)
             {
-                StageRuleContainer.RuleUnit unit = new(mutation.RemainingRounds, mutation.DelayRounds, mutation.JudgeRule);
+                StageRuleContainer.RuleUnit unit = new(mutation.Clock, mutation.JudgeRule);
                 if (mutation.RuleType == RuleType.Override)
                 {
                     _ruleContainers[mutation.Stage].AddOverride(unit);
@@ -370,7 +370,7 @@ namespace BlacksmithCore.Infra.Models.Judgement
                 {
                     _ruleContainers[mutation.Stage].AddModifier(unit, mutation.ModifierOrder);
                 }
-                _notDefaultRounds = Math.Max(_notDefaultRounds, (mutation.RemainingRounds + mutation.DelayRounds));
+                _notDefaultRounds = Math.Max(_notDefaultRounds, mutation.Clock.RemainingRounds + mutation.Clock.DelayRounds);
             }
         }
     }

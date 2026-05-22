@@ -2,7 +2,8 @@ using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.BuiltInProfessions;
 using ClapInfra.ClapModels.Components;
-using ClapInfra.ClapUtils;
+using ClapInfra.ClapUnit;
+
 namespace BlacksmithCore.Infra.Models.Components
 {
     public class PackageContainer : ClapPackageContainer<ISkillPackage>

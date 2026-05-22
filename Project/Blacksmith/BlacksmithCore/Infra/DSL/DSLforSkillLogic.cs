@@ -1,9 +1,9 @@
+using BlacksmithCore.Infra.Judgement;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Models.Judgement;
-using BlacksmithCore.Infra.Models.Judgement.Core;
 using BlacksmithCore.Infra.Models.Particular;
 namespace BlacksmithCore.Infra.DSL
 {
@@ -46,7 +46,7 @@ namespace BlacksmithCore.Infra.DSL
             protected Community _owner;
             protected List<Sentence> _sentences = new();
             protected Stack<Sentence> _rhetoricCache = new();
-            protected Dictionary<DynamicJudgeRuleName.CEValue, List<Mutation>> _mutationsOnCompile = new();
+            protected List<List<Mutation>> _mutationsOnCompile = new();
             protected SourceFile(SourceFile origin)
             {
                 _owner = origin._owner;
@@ -79,10 +79,9 @@ namespace BlacksmithCore.Infra.DSL
                 Action<Community> result = (a) => { };
                 if (judger != null)
                 {
-                    foreach (var pair in _mutationsOnCompile)
+                    foreach (var temp in _mutationsOnCompile)
                     {
-                        judger.JudgeRuleManager.RegistJudgeRuleDynamic(pair.Key, pair.Value);
-                        judger.JudgeRuleManager.AddJudgeRule(_owner, pair.Key);
+                        judger.JudgeRuleManager.AddJudgeRule(_owner, temp);
                     }
                 }
                 foreach (var sentence in sentences)
@@ -108,7 +107,7 @@ namespace BlacksmithCore.Infra.DSL
                     var resolution = new AttackResolution
                     {
                         Source = source,
-                        DelayRounds = delayRounds,
+                        Clock = new(delayRounds : delayRounds),
                         Type = attackType,
                         Power = power
                     };
@@ -194,7 +193,7 @@ namespace BlacksmithCore.Infra.DSL
                 {
                     var resolution = new DefenseResolution()
                     {
-                        DelayRounds = delayRounds,
+                        Clock = new(delayRounds: delayRounds),
                         Defense = defense,
                         Power = power
                     };
@@ -218,7 +217,7 @@ namespace BlacksmithCore.Infra.DSL
                 {
                     var resolution = new ResourceResolution()
                     {
-                        DelayRounds = delayRounds,
+                        Clock = new(delayRounds: delayRounds),
                         Power = power,
                         Type = type
                     };
@@ -235,12 +234,13 @@ namespace BlacksmithCore.Infra.DSL
                 EffectTargetType.CEValue targetType,
                 float power,
                 int duration,
-                Action<Community, Body, EffectEntity> effectAction
+                Action<Community, Body, EffectEntity> effectAction,
+                int delayRounds = 0
                 )
             {
                 _sentences.Add(new((source) =>
                 {
-                    var resolution = new EffectResolution(type, targetType, power);
+                    var resolution = new EffectResolution(new(delayRounds: delayRounds), type, targetType, power);
                     resolution.Execute = (target) =>
                     {
                         Body main = target.Focus;
@@ -266,10 +266,9 @@ namespace BlacksmithCore.Infra.DSL
                 return WriteFree(source => source.Focus.Get<Health>().LoseMHP(loss), false);
             }
             public SourceFile LinkJudgeRuleDynamic(
-                DynamicJudgeRuleName.CEValue ruleKey,
                 List<Mutation> mutations)
             {
-                _mutationsOnCompile[ruleKey] = mutations;
+                _mutationsOnCompile.Add(mutations);
                 return this;
             }
 

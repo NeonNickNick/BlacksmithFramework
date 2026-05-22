@@ -1,9 +1,9 @@
 using BlacksmithCore.Infra.DSL;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Models.Judgement.Core;
 using ClapInfra.ClapJudgement;
 
-namespace BlacksmithCore.Infra.Models.Judgement
+namespace BlacksmithCore.Infra.Judgement
 {
     public class Judger : ClapJudger<Community, Judger, JudgeRuleManager, Intent, IDSLSourceFile>
     {

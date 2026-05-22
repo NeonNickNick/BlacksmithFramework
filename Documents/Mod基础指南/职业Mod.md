@@ -90,7 +90,7 @@ private IDSLSourceFile SomeSkill(ISkillContext sc)
 | `WriteDefense(power, defense, delay)` | 防御 |
 | `WriteResource(power, type, delay)` | 资源 |
 | `WriteRecovery(power)` | 回复 HP |
-| `WriteEffect(...)` | 效果 |
+| `WriteEffect(type, target, power, duration, action, delayRounds)` | 效果，`delayRounds` 可选（默认 0） |
 | `WriteFree(action, canMove: true)` | 可转移的自由逻辑 |
 | `UseResource(need, type)` | 消耗资源（不可转移） |
 | `LoseHP(loss)` / `LoseMHP(loss)` | 扣血（不可转移） |

@@ -135,7 +135,7 @@ namespace BlacksmithCore.Infra.Models.Components
         {
             return _resources[type].Gold + _resources[type].Common;
         }
-        public float QuerySpecific(ResourceType.CEValue type)
+        public float QuerySpecific()
         {
             float res = 0;
             foreach (var name in _resources.Keys)
@@ -143,11 +143,11 @@ namespace BlacksmithCore.Infra.Models.Components
                 if (name == ResourceType.Instance.Iron() ||
                     name == ResourceType.Instance.Gold_Iron() ||
                     name == ResourceType.Instance.Space() ||
-                    name == ResourceType.Instance.Space())
+                    name == ResourceType.Instance.Time())
                 {
                     continue;
                 }
-                res += _resources[type].Gold + _resources[type].Common;
+                res += _resources[name].Gold + _resources[name].Common;
             }
             return res;
         }

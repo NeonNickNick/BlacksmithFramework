@@ -66,10 +66,6 @@ namespace ModExamples
         }
         private IDSLSourceFile Rebirth(ISkillContext sc)
         {
-            EffectResolution fakeResolution = new(
-                EffectType.Instance.AfterResolutionWritten(),
-                EffectTargetType.Instance.Self(),
-                3);
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Cross())
                 .WriteEffect(EffectType.Instance.AfterResolutionWritten()

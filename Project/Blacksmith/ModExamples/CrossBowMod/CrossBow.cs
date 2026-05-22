@@ -1,13 +1,13 @@
 
 using BlacksmithCore.Infra.DSL;
+using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
-using BlacksmithCore.Infra.Models.Judgement;
-using BlacksmithCore.Infra.Models.Judgement.Core;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
-using ClapInfra.ClapUtils;
+using ClapInfra.ClapUnit;
 
 namespace ModExamples.CrossBowMod
 {
@@ -81,14 +81,13 @@ namespace ModExamples.CrossBowMod
                 .UseResource(1f, ResourceType.Instance.Iron())
                 .WriteAttack(1f, AttackType.Instance.Physical())
                 .LinkJudgeRuleDynamic(
-                    DynamicJudgeRuleName.Instance.MarkingBolt(),
                     new()
                     {
                         new((player, enemy) =>
                         {
                             foreach(var resolution in enemy.Focus.Get<TurnContext>().Get<AttackResolution>())
                             {
-                                if(resolution.DelayRounds == 0)
+                                if(resolution.Clock.IsRinging)
                                 {
                                     resolution.AddStage(AttackStage.OnHitBody, (community, body, aresolution) =>
                                     {

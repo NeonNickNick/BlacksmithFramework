@@ -457,11 +457,11 @@ namespace BlacksmithCore.AI.Strategies
             double enemyIron = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Iron());
             double enemySpace = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Space());
             double enemyTime = enemy.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Time());
-            double enemySpecific = enemy.Focus.Get<Resource>().QuerySpecific(ResourceType.Instance.Magic());
+            double enemySpecific = enemy.Focus.Get<Resource>().QuerySpecific();
 
             double playerIron = player.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Iron());
             double playerSpace = player.Focus.Get<Resource>().QueryAll(ResourceType.Instance.Space());
-            double playerSpecific = player.Focus.Get<Resource>().QuerySpecific(ResourceType.Instance.Magic());
+            double playerSpecific = player.Focus.Get<Resource>().QuerySpecific();
 
             bool haveProfession = enemy.Focus.Get<Skill>().HaveProfession;
             bool playerHaveProfession = player.Focus.Get<Skill>().HaveProfession;

@@ -1,5 +1,6 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
+using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Infra.Models.Components.Resolutions
 {
@@ -12,14 +13,13 @@ namespace BlacksmithCore.Infra.Models.Components.Resolutions
     public class AttackResolution : IResolution
     {
         public Community? Source { get; set; }
-        public int DelayRounds { get; set; } = 0;
+        public required ClapRoundClock Clock { get; set; }
         public AttackType.CEValue Type { get; set; }
         public float Power { get; set; }
         public Action<Community> Execute { get; set; } = (a) => { };
         public int TotalDamage { get; set; } = 0;
 
         private readonly Dictionary<AttackStage, List<Action<Community?, Body, AttackResolution>>> _stages = new();
-        public AttackResolution() { }
 
         public void AddStage(AttackStage stage, Action<Community?, Body, AttackResolution> action)
         {

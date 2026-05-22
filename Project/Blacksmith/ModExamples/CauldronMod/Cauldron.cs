@@ -1,10 +1,10 @@
 using BlacksmithCore.Infra.DSL;
+using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Models.Judgement;
-using BlacksmithCore.Infra.Models.Judgement.Core;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
@@ -132,7 +132,6 @@ namespace ModExamples.CauldronMod
                 .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 2)
                 .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 3)
                 .LinkJudgeRuleDynamic(
-                    DynamicJudgeRuleName.Instance.LifeBurn(),
                     new()
                     {
                         new((player, enemy) =>
@@ -140,7 +139,7 @@ namespace ModExamples.CauldronMod
                             foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
                             {
                                 if(resolution.Type == AttackType.Instance.Real()
-                                && resolution.DelayRounds == 0)
+                                && resolution.Clock.IsRinging)
                                 {
                                     resolution.Power /= 2;
                                 }
@@ -154,7 +153,7 @@ namespace ModExamples.CauldronMod
                         {
                             foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
                             {
-                                if(resolution.DelayRounds == 0)
+                                if(resolution.Clock.IsRinging)
                                 {
                                     resolution.Power *= 2;
                                 }

@@ -1,5 +1,6 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
+using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Infra.Models.Components.Resolutions
 {
@@ -9,13 +10,14 @@ namespace BlacksmithCore.Infra.Models.Components.Resolutions
     }
     public class EffectResolution : IResolution
     {
-        public int DelayRounds { get; set; } = 0;
+        public ClapRoundClock Clock { get; set; }
         public readonly EffectType.CEValue Type;
         public EffectTargetType.CEValue TargetType { get; set; }
         public float Power { get; set; }
         public Action<Community> Execute { get; set; } = null!;
-        public EffectResolution(EffectType.CEValue type, EffectTargetType.CEValue targetType, float power)
+        public EffectResolution(ClapRoundClock clock, EffectType.CEValue type, EffectTargetType.CEValue targetType, float power)
         {
+            Clock = clock;
             Type = type;
             TargetType = targetType;
             Power = power;

@@ -7,17 +7,16 @@
 
 ```csharp
 // SourceFile 内部
-_mutationsOnCompile[ruleKey] = mutations;
+_mutationsOnCompile.Add(mutations);
 ```
 
 `Compile(judger)` 时才真正注册：
 
 ```csharp
-judger.JudgeRuleManager.RegistJudgeRuleDynamic(ruleKey, mutations);
-judger.JudgeRuleManager.AddJudgeRule(_owner, ruleKey);
+judger.JudgeRuleManager.AddJudgeRule(_owner, mutations);
 ```
 
-即：书写阶段记下来 → 编译阶段模板入池 → 按施法者专门化 → 加入本回合判定链。
+即：书写阶段记下来 → 编译阶段按施法者专门化 → 加入本回合判定链。
 
 ## 典型调用
 
@@ -25,7 +24,6 @@ judger.JudgeRuleManager.AddJudgeRule(_owner, ruleKey);
 Pen pen = sf => sf
     .UseResource(1, ResourceType.Instance.Iron())
     .LinkJudgeRuleDynamic(
-        DynamicJudgeRuleName.Instance.Charge(),
         new List<Mutation>
         {
             new Mutation(
@@ -63,7 +61,7 @@ new Mutation(
     (player, enemy) =>
     {
         if (enemy.Focus.Get<TurnContext>().Get<AttackResolution>()
-            .Find(a => a.DelayRounds == 0) == null) return;
+            .Find(a => a.Clock.IsRinging) == null) return;
 
         DSL.Create(player, sf => sf
             .WriteAttack(10, AttackType.Instance.Magical()))

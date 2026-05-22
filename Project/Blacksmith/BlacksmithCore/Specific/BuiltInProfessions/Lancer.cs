@@ -1,13 +1,13 @@
 using BlacksmithCore.Infra.DSL;
+using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Models.Judgement;
-using BlacksmithCore.Infra.Models.Judgement.Core;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
-using ClapInfra.ClapUtils;
+using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
@@ -171,7 +171,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .UseResource(_chargeCost.Value, ResourceType.Instance.Iron())
                 .WriteFree(a => _chargeCount.Increment(), true)
                 .WriteFree(a => _chargeCost.Set(0), true)
-                .LinkJudgeRuleDynamic(DynamicJudgeRuleName.Instance.Charge(), new()
+                .LinkJudgeRuleDynamic(new()
                 {
                     new(AttackCanceling_Modifier_Before,
                     JudgeStage.Instance.OnAttackCanceling(),
@@ -195,7 +195,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
         private void AttackCanceling_Modifier_Before(Community player, Community enemy)
         {
-            if (enemy.Focus.Get<TurnContext>().Get<AttackResolution>().Find(a => a.DelayRounds == 0) == null)
+            if (enemy.Focus.Get<TurnContext>().Get<AttackResolution>().Find(a => a.Clock.IsRinging) == null)
             {
                 return;
             }

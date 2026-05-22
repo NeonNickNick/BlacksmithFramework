@@ -3,7 +3,7 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
-using ClapInfra.ClapUtils;
+using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {

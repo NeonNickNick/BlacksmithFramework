@@ -5,7 +5,7 @@
 
 ## 适用范围
 
-项目核心类型使用继承自 `BlacksmithEnum<T>` 的可扩展枚举：`ResourceType`、`AttackType`、`DefenseType`、`EffectType`、`EffectTargetType`、`DynamicJudgeRuleName`、`JudgeStage`。机制原理见[项目架构](../项目架构.md#可扩展枚举-clapenumt-tmemberattribute)。
+项目核心类型使用继承自 `BlacksmithEnum<T>` 的可扩展枚举：`ResourceType`、`AttackType`、`DefenseType`、`EffectType`、`EffectTargetType`、`JudgeStage`。机制原理见[项目架构](../项目架构.md#可扩展枚举-clapenumt-tmemberattribute)。
 
 ## 总体流程
 

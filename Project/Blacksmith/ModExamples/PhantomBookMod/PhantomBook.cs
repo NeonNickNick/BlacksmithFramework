@@ -75,8 +75,8 @@ namespace ModExamples.PhantomBookMod
                (Community source, Body main, EffectEntity effectEntity) =>
                {
                    var tc = main.Get<TurnContext>();
-                   tc.Get<AttackResolution>().ForEach(a => a.DelayRounds++);
-                   tc.AddPreprocess<AttackResolution>(a => a.DelayRounds++);
+                   tc.Get<AttackResolution>().ForEach(a => a.Clock.DelayRounds++);
+                   tc.AddPreprocess<AttackResolution>(a => a.Clock.DelayRounds++, isInfinite: true);
                });
             return DSL.Create(sc.Self, pen);
         }

@@ -1,11 +1,11 @@
 using BlacksmithCore.Infra.Attributes.Profession;
 using BlacksmithCore.Infra.DSL;
+using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Models.Judgement;
-using BlacksmithCore.Infra.Models.Judgement.Core;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
 
@@ -140,7 +140,6 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Instance.Space())
                 .LinkJudgeRuleDynamic(
-                    DynamicJudgeRuleName.Instance.Reflect(),
                     new()
                     {
                         new(
@@ -265,11 +264,11 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             var playerResolutions = player.Focus.Get<TurnContext>().Get<EffectResolution>();
 
-            var reflect = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.DelayRounds == 0).ToList();
+            var reflect = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.Clock.IsRinging).ToList();
 
             playerResolutions.RemoveAll(e => reflect.Contains(e));
 
-            reflect.ForEach(e => e.DelayRounds = 1);
+            reflect.ForEach(e => e.Clock.DelayRounds = 1);
 
             playerResolutions.AddRange(reflect);
         }
@@ -278,13 +277,13 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             var tc = player.Focus.Get<TurnContext>();
             var playerResolutions = tc.Get<AttackResolution>();
 
-            var reflect = playerResolutions.Where(a => a.DelayRounds == 0).ToList();
+            var reflect = playerResolutions.Where(a => a.Clock.IsRinging).ToList();
 
             playerResolutions.RemoveAll(a => reflect.Contains(a));
 
             reflect.ForEach(a =>
             {
-                a.DelayRounds = 1;
+                a.Clock.DelayRounds = 1;
                 a.Source = player;
             });
             foreach (var res in reflect)
