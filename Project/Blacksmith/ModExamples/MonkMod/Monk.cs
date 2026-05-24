@@ -19,6 +19,7 @@ namespace ModExamples.MonkMod
         private ClapStateVar<int> _cloneNum = new(0);
         private ClapStateVar<int> _gbcTimes = new(0);
         private ClapStateVar<float> _transmitPercent = new(0.5f);
+        private ClapStateVar<bool> _mist = new(true);
         private bool JadeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1f);
@@ -40,6 +41,7 @@ namespace ModExamples.MonkMod
             Body clone = null!;
             Pen pen = sf => sf
                 .UseResource(1f, ResourceType.Instance.Jade())
+                .LoseHP(1)
                 .WriteFree(source =>
                 {
                     _cloneNum.Increment();
@@ -138,15 +140,18 @@ namespace ModExamples.MonkMod
         }
         private bool MistCheck(ISkillContext sc)
         {
-            return _cloneNum.Value > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Jade(), 1f);
+            return _mist.Value
+                && _cloneNum.Value > 0
+                && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1f);
         }
         private IDSLSourceFile Mist(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .UseResource(1f, ResourceType.Instance.Jade())
+                .UseResource(1f, ResourceType.Instance.Iron())
                 .WriteFree(source =>
                 {
                     _transmitPercent.Set(0.9f);
+                    _mist.Set(false);
                     _clones.RemoveAll(c => c.Get<Health>().IsKilled);
                     var hpMin = _clones.MinBy(c => c.Get<Health>().HP);
                     var entity = new EffectEntity(
@@ -164,6 +169,7 @@ namespace ModExamples.MonkMod
                     new((player, enemy) =>
                     {
                         _transmitPercent.Reset();
+                        _mist.Reset();
                     },
                     JudgeStage.Instance.OnEnd(),
                     RuleType.Modifier,
