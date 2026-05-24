@@ -37,10 +37,26 @@ function renderActor(prefix, actor) {
     const hp = document.getElementById(prefix === 'player' ? 'pHP' : 'eHP');
     const name = document.getElementById(prefix === 'player' ? 'playerName' : 'enemyName');
     const profession = document.getElementById(prefix === 'player' ? 'playerProfession' : 'enemyProfession');
+    const bodyNameEl = document.getElementById(prefix === 'player' ? 'playerBodyName' : 'enemyBodyName');
+    const summonNav = document.getElementById(prefix === 'player' ? 'playerSummonNav' : 'enemySummonNav');
+    const summonLabel = document.getElementById(prefix === 'player' ? 'playerSummonLabel' : 'enemySummonLabel');
 
-    if (!actor) {
+    const summonIndex = prefix === 'player' ? State.playerSummonIndex : State.enemySummonIndex;
+    const summons = Array.isArray(actor?.summons) ? actor.summons : [];
+
+    var effectiveActor = actor;
+    if (actor && summonIndex >= 0 && summonIndex < summons.length) {
+        effectiveActor = summons[summonIndex];
+    }
+
+    if (summonNav) {
+        summonNav.classList.toggle('is-hidden', !actor || summons.length === 0);
+    }
+
+    if (!effectiveActor) {
         if (name) name.textContent = prefix === 'player' ? 'You' : 'Opponent';
         if (profession) profession.textContent = 'None';
+        if (bodyNameEl) bodyNameEl.textContent = '--';
         if (hp) hp.textContent = 'HP --/--';
         setHealthBar(prefix === 'player' ? 'playerHealthFill' : 'enemyHealthFill', 0, 1);
         renderTokenGrid(`${prefix}Resources`, [], () => '', 'No data yet.');
@@ -52,44 +68,80 @@ function renderActor(prefix, actor) {
     }
 
     if (name) name.textContent = prefix === 'player' ? 'You' : 'Opponent';
+    if (bodyNameEl) bodyNameEl.textContent = effectiveActor.bodyName || '--';
     if (profession) {
-        const profs = Array.isArray(actor.professions) ? actor.professions : [];
+        const profs = Array.isArray(effectiveActor.professions) ? effectiveActor.professions : [];
         profession.textContent = profs.length > 0 ? profs.join(', ') : 'None';
     }
-    if (hp) hp.textContent = `HP ${actor.hp}/${actor.maxHP}`;
-    setHealthBar(prefix === 'player' ? 'playerHealthFill' : 'enemyHealthFill', actor.hp, actor.maxHP);
+    if (hp) hp.textContent = `HP ${effectiveActor.hp}/${effectiveActor.maxHP}`;
+    setHealthBar(prefix === 'player' ? 'playerHealthFill' : 'enemyHealthFill', effectiveActor.hp, effectiveActor.maxHP);
+
+    if (summonLabel && summons.length > 0) {
+        if (summonIndex < 0) {
+            summonLabel.textContent = 'Main Body';
+        } else {
+            summonLabel.textContent = effectiveActor.bodyName || 'Summon ' + (summonIndex + 1);
+        }
+    }
+
+    var prevBtn = document.getElementById(prefix === 'player' ? 'playerSummonPrev' : 'enemySummonPrev');
+    var nextBtn = document.getElementById(prefix === 'player' ? 'playerSummonNext' : 'enemySummonNext');
+    if (prevBtn) {
+        prevBtn.disabled = summonIndex < 0;
+        prevBtn.onclick = function () {
+            if (prefix === 'player') {
+                State.playerSummonIndex = Math.max(-1, State.playerSummonIndex - 1);
+            } else {
+                State.enemySummonIndex = Math.max(-1, State.enemySummonIndex - 1);
+            }
+            renderSnapshot(State.snapshot);
+        };
+    }
+    if (nextBtn) {
+        nextBtn.disabled = summons.length === 0 || summonIndex >= summons.length - 1;
+        nextBtn.onclick = function () {
+            if (prefix === 'player') {
+                State.playerSummonIndex = Math.min(summons.length - 1, State.playerSummonIndex + 1);
+            } else {
+                State.enemySummonIndex = Math.min(summons.length - 1, State.enemySummonIndex + 1);
+            }
+            renderSnapshot(State.snapshot);
+        };
+    }
+
+    const resources = (effectiveActor.resources || []).filter(function (item) { return item.quantity !== 0; });
 
     renderTokenGrid(
         `${prefix}Resources`,
-        actor.resources || [],
+        resources,
         item => `<div class="token"><strong>${item.name}</strong><div>${item.quantity}</div></div>`,
         'No data yet.'
     );
 
     renderTokenGrid(
         `${prefix}Defenses`,
-        actor.defenses || [],
+        effectiveActor.defenses || [],
         item => `<div class="token"><strong>${item.name}</strong><div>Power ${item.power}</div></div>`,
         'No active defenses.'
     );
 
     renderTokenGrid(
         `${prefix}Skills`,
-        actor.availableSkills || [],
+        effectiveActor.availableSkills || [],
         item => `<div class="token"><strong>${item}</strong></div>`,
         'No data yet.'
     );
 
     renderTokenGrid(
         `${prefix}FutureAttacks`,
-        actor.futureAttacks || [],
+        effectiveActor.futureAttacks || [],
         item => `<div class="token"><strong>${item.name}</strong><div>In ${item.delayRounds} turn(s)</div><div>Power ${item.power}</div></div>`,
         'No pending attacks.'
     );
 
     renderTokenGrid(
         `${prefix}FutureDefenses`,
-        actor.futureDefenses || [],
+        effectiveActor.futureDefenses || [],
         item => `<div class="token"><strong>${item.name}</strong><div>In ${item.delayRounds} turn(s)</div><div>Power ${item.power}</div></div>`,
         'No pending defenses.'
     );
@@ -229,6 +281,12 @@ function renderAiStats() {
 
 function renderSnapshot(snapshot, options = {}) {
     const autoFocusLatest = Boolean(options.autoFocusLatest);
+
+    if (snapshot !== State.snapshot) {
+        State.playerSummonIndex = -1;
+        State.enemySummonIndex = -1;
+    }
+
     State.snapshot = snapshot;
     State.turns = snapshot?.turns || [];
     State.gameStarted = Boolean(snapshot?.started);

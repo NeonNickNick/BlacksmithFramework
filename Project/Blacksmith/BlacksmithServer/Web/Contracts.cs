@@ -53,6 +53,7 @@ namespace BlacksmithServer.Web
 
     public sealed class ActorSnapshot
     {
+        public string BodyName { get; set; } = string.Empty;
         public List<string> Professions { get; set; } = new();
         public int Hp { get; set; }
         public int MaxHp { get; set; }
@@ -61,6 +62,7 @@ namespace BlacksmithServer.Web
         public List<FutureValueSnapshot> FutureAttacks { get; set; } = new();
         public List<FutureValueSnapshot> FutureDefenses { get; set; } = new();
         public List<string> AvailableSkills { get; set; } = new();
+        public List<ActorSnapshot> Summons { get; set; } = new();
     }
 
     public sealed class NamedValueSnapshot

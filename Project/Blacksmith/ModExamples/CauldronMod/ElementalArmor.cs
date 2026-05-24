@@ -13,7 +13,7 @@ namespace ModExamples.CauldronMod
         private IDSLSourceFile Hammer(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .WriteAttack(1, AttackType.Instance.Physical());
+                .WriteAttack(6f, AttackType.Instance.Physical());
             return DSL.Create(sc.Self, pen);
         }
         private bool GuardCheck(ISkillContext sc) => true;

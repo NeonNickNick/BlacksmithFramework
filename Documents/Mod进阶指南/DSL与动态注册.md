@@ -1,7 +1,7 @@
-# DSL与规则链接
+# DSL与动态注册
 [返回](./引言.md)
 
-专门解释 `LinkJudgeRuleDynamic` 方法——技能如何把动态规则挂到判定系统中。机制原理见[判定实现](./判定实现.md)。
+专门解释 `LinkJudgeRuleDynamic` 方法——技能如何向判定管线动态注册规则和回合事件。它不仅是"链接规则"，更是向特定 `JudgeStage` 注册 `Mutation`（含 `Action<Community, Community>` 回调 + `ClapRoundClock` 生命周期）的通用入口。机制原理见[判定实现](./判定实现.md)。
 
 ## 方法做了什么
 
@@ -34,8 +34,7 @@ Pen pen = sf => sf
                 stage: JudgeStage.Instance.OnAttackCanceling(),
                 ruleType: RuleType.Modifier,
                 modifierOrder: ModifierOrder.Before,
-                remainingRounds: 1,
-                delayRounds: 0)
+                clock: new ClapRoundClock(delayRounds: 0, remainingRounds: 1))
         });
 
 return DSL.Create(sc.Self, pen);
@@ -49,10 +48,9 @@ return DSL.Create(sc.Self, pen);
 | `stage` | 挂到哪个 `JudgeStage` |
 | `ruleType` | `Override` 覆盖或 `Modifier` 修饰 |
 | `modifierOrder` | `Before` 或 `After`（核心规则的前/后） |
-| `remainingRounds` | 规则持续几回合 |
-| `delayRounds` | 延迟几回合开始生效 |
+| `clock` | `ClapRoundClock`，统一管理 `delayRounds`、`remainingRounds`、`isInfinite`、`forceKill` |
 
-## 规则内可做的事
+## Mutation 内可做的事
 
 操作 Resolution 列表、组件，甚至临时编译 DSL：
 
@@ -68,7 +66,8 @@ new Mutation(
             .Compile().Execute(player);
     },
     JudgeStage.Instance.OnAttackCanceling(),
-    RuleType.Modifier, ModifierOrder.Before)
+    RuleType.Modifier, ModifierOrder.Before,
+    new ClapRoundClock(remainingRounds: 1))
 ```
 
 ## 常见模式：下回合检查 + 本回合触发
@@ -78,12 +77,13 @@ new List<Mutation>
 {
     new Mutation(/* 触发规则：本阶段立刻生效 */,
         JudgeStage.Instance.OnAttackCanceling(),
-        RuleType.Modifier, ModifierOrder.Before),
+        RuleType.Modifier, ModifierOrder.Before,
+        new ClapRoundClock(remainingRounds: 1)),
 
     new Mutation(/* 清理/重置：下回合开始执行 */,
         JudgeStage.Instance.OnBegin(),
         RuleType.Modifier, ModifierOrder.Before,
-        delayRounds: 1)
+        new ClapRoundClock(delayRounds: 1, remainingRounds: 1))
 }
 ```
 
@@ -96,6 +96,6 @@ new List<Mutation>
 1. `judgeRule` 只写阶段相关逻辑，不要重写整套技能
 2. 在规则内制造即时攻击时，调用简短 DSL 即可
 3. 规则依赖技能类字段时，控制好重置时机
-4. 先写最小可运行版本，再补持续/延迟回合
+4. 先写最小可运行版本，再通过 `ClapRoundClock` 补持续/延迟回合和 `forceKill` 条件
 
-参考：`Project/Blacksmith/BlacksmithCore/Specific/BuiltInProfessions/Lancer.cs`。完整拆解见[高级技能模式 - 动态规则](../高级技能模式.md#6-动态规则-linkjudgeruledynamic)。
+参考：`Project/Blacksmith/BlacksmithCore/Specific/BuiltInProfessions/Lancer.cs`。完整拆解见[高级技能模式 - 动态注册](../高级技能模式.md#6-动态注册-linkjudgeruledynamic)。

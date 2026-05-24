@@ -21,7 +21,7 @@ namespace BlacksmithCore.Infra.Models.Entites
         private Dictionary<Body, Action> _callbacks = new();
         public Community()
         {
-            Focus = new(this);
+            Focus = new(this, "Main");
         }
         public void AddTransform(
             Action action,

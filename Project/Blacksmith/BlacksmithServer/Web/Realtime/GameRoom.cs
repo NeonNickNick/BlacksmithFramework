@@ -315,8 +315,10 @@ namespace BlacksmithServer.Web.Realtime
         private BattleSnapshot BuildSnapshotNoLock(RoomParticipant participant)
         {
             var viewerIsPlayerOne = participant == RoomParticipant.PlayerOne;
-            var selfView = viewerIsPlayerOne ? _game.Player.Focus.GetView() : _game.Enemy.Focus.GetView();
-            var enemyView = viewerIsPlayerOne ? _game.Enemy.Focus.GetView() : _game.Player.Focus.GetView();
+            var selfCommunity = viewerIsPlayerOne ? _game.Player : _game.Enemy;
+            var enemyCommunity = viewerIsPlayerOne ? _game.Enemy : _game.Player;
+            var selfView = selfCommunity.Focus.GetView();
+            var enemyView = enemyCommunity.Focus.GetView();
             var viewerName = viewerIsPlayerOne ? PlayerOneUsername : PlayerTwoUsername;
             var opponentName = viewerIsPlayerOne ? PlayerTwoUsername : PlayerOneUsername;
             var playerTimeouts = viewerIsPlayerOne ? _playerOneTimeouts : _playerTwoTimeouts;
@@ -343,8 +345,8 @@ namespace BlacksmithServer.Web.Realtime
                 PlayerTimeouts = playerTimeouts,
                 EnemyTimeouts = enemyTimeouts,
                 StatusMessage = BuildStatusMessageNoLock(participant),
-                Player = BuildActor(selfView, viewerIsPlayerOne ? _game.Player.Focus.Get<Skill>().GetAvailableSkillNames() : _game.Enemy.Focus.Get<Skill>().GetAvailableSkillNames()),
-                Enemy = BuildActor(enemyView, viewerIsPlayerOne ? _game.Enemy.Focus.Get<Skill>().GetAvailableSkillNames() : _game.Player.Focus.Get<Skill>().GetAvailableSkillNames()),
+                Player = BuildActor(selfView, selfCommunity.Focus.Get<Skill>().GetAvailableSkillNames(), selfCommunity),
+                Enemy = BuildActor(enemyView, enemyCommunity.Focus.Get<Skill>().GetAvailableSkillNames(), enemyCommunity),
                 Turns = BuildTurnsNoLock(participant)
             };
         }
@@ -517,10 +519,11 @@ namespace BlacksmithServer.Web.Realtime
             await _persistAndSendAsync(PlayerTwoUsername, snapshots[PlayerTwoUsername], message);
         }
 
-        private static ActorSnapshot BuildActor(BodyView view, List<string> availableSkills)
+        private static ActorSnapshot BuildActor(BodyView view, List<string> availableSkills, Community? community = null)
         {
             return new ActorSnapshot
             {
+                BodyName = view.BodyName,
                 Professions = view.ProfessionNames,
                 Hp = view.HP,
                 MaxHp = view.MHP,
@@ -546,7 +549,10 @@ namespace BlacksmithServer.Web.Realtime
                     DelayRounds = f.delayRounds,
                     Power = f.power
                 }).ToList(),
-                AvailableSkills = availableSkills
+                AvailableSkills = availableSkills,
+                Summons = community?.SummonList.Select(s =>
+                    BuildActor(s.GetView(), s.Get<Skill>().GetAvailableSkillNames(), null)
+                ).ToList() ?? new List<ActorSnapshot>()
             };
         }
 

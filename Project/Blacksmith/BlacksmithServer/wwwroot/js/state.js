@@ -20,5 +20,7 @@ const State = {
     turns: [],
     currentTurn: -1,
     heroCollapsed: false,
-    lastBanner: 'Register or log in to connect to the arena.'
+    lastBanner: 'Register or log in to connect to the arena.',
+    playerSummonIndex: -1,
+    enemySummonIndex: -1
 };

@@ -7,5 +7,7 @@ const State = {
     lastResult: 'Awaiting game',
     busy: false,
     snapshot: null,
-    heroCollapsed: false
+    heroCollapsed: false,
+    playerSummonIndex: -1,
+    enemySummonIndex: -1
 };

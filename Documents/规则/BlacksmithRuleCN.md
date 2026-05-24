@@ -1,6 +1,6 @@
-# 《打铁》核心规则手册 v1.1
+# 《打铁》核心规则手册 v1.3
 
-> 核对最新实现、技能数值或职业细节，请以 `Project/Blacksmith/BlacksmithCore` 下实际代码为准。
+> 核对最新实现、技能数值或职业细节，请以 `Project/Blacksmith/BlacksmithCore` 下实际代码为准。Mod 示例职业以 `Project/Blacksmith/ModExamples/` 下实际代码为准。
 
 ---
 
@@ -22,15 +22,18 @@
 ## 2. 资源与数值
 
 - **基础资源：** Iron（最小单位 0.5）、Time、Space
-- **专属资源：** Magic（术士）、gIron（金铁）、Marks（战矛纹章状态）、HP（鲜血印记/术士可作为成本）
+- **内置专属资源：** Magic（术士）、gIron（金铁/炼金术）、Marks（战矛纹章状态）
+- **Mod 专属资源：** Cross（圣书）、Dream（幻书）、Spirit（梦魇）、Fire/Water/Wood/Earth（炼药锅）、Bolt（弩）、Jade（武僧）
+- **HP 作为成本：** 鲜血印记、术士、幻书、武僧均可消耗 HP
 
 ### 伤害与防御优先级
 
 - **伤害：** Real(0) > Magical(128) > Physical(256)
-- **伤减（单回合）：** CommonReduction(16) < ThornReduction(8) < RealReduction(0)
-- **装甲（永久）：** CommonArmor(128) < ReadlArmor(64) < RockArmor(32)
+- **伤减（单回合）：** PercentageReduction(24) < CommonReduction(16) < ThornReduction(8) < RealReduction(0)
+- **装甲（永久）：** CommonArmor(128) < RealArmor(64) < StoneShell(32)
+- **特殊防御：** PhysicalImmunity(-16) / MagicalImmunity(-16) 完全免疫对应类型；GreyHP（亵渎）提供可成长的真实伤减；PermanentRealReduction（免罪）提供永续真实伤减
 
-ThornReduction 吸收物理攻击时反弹 50%（向上取整）为 Magical 伤害。
+ThornReduction 吸收物理攻击时反弹 50%（向上取整）为 Magical 伤害。PercentageReduction 以百分比减免伤害（baseline 为分母基准，如 baseline:100 时每点防御 = 1% 减伤）。
 
 ---
 
@@ -50,6 +53,7 @@ ThornReduction 吸收物理攻击时反弹 50%（向上取整）为 Magical 伤�
 | 时间 | 3 Iron | 1 Time |
 | 空间 | 3 Iron | 1 Space |
 | 撕裂 | 1 Space | 8 ATK |
+| 反射 | 2 Space | 本回合所有即时攻击和指向敌方的效果推迟一回合生效 |
 
 ### 3.2 职业购买
 
@@ -62,6 +66,11 @@ ThornReduction 吸收物理攻击时反弹 50%（向上取整）为 Magical 伤�
 | 术士(法杖) | 1 Iron | 获得术士特性 |
 | 鲜血印记 | 7 Iron | +4 HP, +4 Max HP，获得鲜血印记特性。禁止使用刺/钻/切 |
 | 战矛 | 3 Iron | 获得战矛特性 |
+| 圣书 | 2 Iron | 获得圣书特性（Mod） |
+| 幻书 | 2.5 Iron | 获得幻书特性（Mod） |
+| 炼药锅 | 3 Iron | 获得炼药锅特性（Mod） |
+| 弩 | 2 Iron | 获得弩特性（Mod） |
+| 武僧 | 3 Iron | 获得武僧特性（Mod） |
 
 ### 3.3 职业专属技能
 
@@ -70,7 +79,7 @@ ThornReduction 吸收物理攻击时反弹 50%（向上取整）为 Magical 伤�
 | 技能 | 成本 | 效果 |
 |:---|:---|:---|
 | 炮击 | 1 Iron | 4 ATK |
-| 二连击 | 2 Iron | 7 ATK |
+| 二连击 | 2 Iron | 8 ATK |
 | 三连击 | 3 Iron | 11 ATK |
 | 炮管 | 0 | 1 ATK + 2 DEF |
 | 穿甲弹 | 1 Iron | 2 ATK。造成伤害则打断对手本回合"打铁"或"积魔"。对非真实防御时伤害临时 ×3 穿透，离开后 ÷3（向上取整）还原 |
@@ -134,3 +143,96 @@ ThornReduction 吸收物理攻击时反弹 50%（向上取整）为 Magical 伤�
 | Disillusionment | 2 Jade | 6ATK + 4MATK|
 | 被动 | 0 | 每主动或被动失去一个分身，下回合追加一次伤害减半的Disillusionment |
 | 分身 | 0 | 每回合给Monk施加一次GoldenBellCover，Monk和每个分身独立计数<br>注：GhostStep创建分身当回合伤害转移即生效，但分身下回合才开始释放此技能|
+
+#### 圣书
+
+> 源码：`Project/Blacksmith/ModExamples/HolyBookMod/HolyBook.cs`
+
+专属资源：**Cross**（圣痕）。
+
+| 技能 | 成本 | 效果 |
+|:---|:---|:---|
+| 圣痕 | 0.5 Iron | 1 Cross |
+| 祈祷 | 0 | 3 DEF |
+| 约柜 | 2 Cross | 8 ATK + 1 50%伤减 |
+| 亵渎 | 1 Cross | 2 RATK + (2+n/3) GreyHP。n 为已使用亵渎次数（向上取整） |
+| 重生 | 1 Cross | 3 HP恢复 × 3回合 + 25%伤减 × 3回合（每回合独立部署） |
+| 免罪 | 1 Cross | 1 永续真实伤减（PermanentRealReduction，跨回合不消失） |
+
+**防御机制：**
+- **GreyHP**：可变值的真实伤减，亵渎使用次数越多越厚
+- **PermanentRealReduction**：与其他伤减不同，不会在回合结束时清除
+
+#### 幻书
+
+> 源码：`Project/Blacksmith/ModExamples/PhantomBookMod/PhantomBook.cs`
+
+专属资源：**Dream**（梦境）。
+
+| 技能 | 成本 | 效果 |
+|:---|:---|:---|
+| 幻想曲 | 0.5 Iron | 1 Dream |
+| 联想 | 2 Dream | 复制对手一个可用技能并施放（消耗由自己支付）。不可复制转职/装备技能/联想自身 |
+| 致幻 | 2 Dream | 对手本回合及之后所有攻击延迟 +1 回合（无限持续预处理钩子） |
+| 梦醒时分 | 最高 2 Dream | 将自身状态回滚到 3 回合前的沙盒快照（含 HP、资源、防御） |
+| 幻觉 | 1 Dream | 回复 5 HP |
+| 梦魇（装备） | 1 Dream + 5 HP | 物免 + 6 梦魇装甲。装甲破裂时恢复梦魇入口技能并移除子职业包 |
+
+**二级装备/子职业 - 梦魇：**
+
+> 源码：`Project/Blacksmith/ModExamples/PhantomBookMod/Nightmare.cs`
+
+专属资源：**Spirit**（魂）。
+
+| 技能 | 成本 | 效果 |
+|:---|:---|:---|
+| 梦潜 | 1 Dream | 2 RATK + 5 DEF + 回复 1 HP + 1 Spirit + 魔法免疫 |
+| 具现 | 1 Dream + 2 Spirit | 4 ATK + 4 RATK + 4 DEF |
+| 缠身 | 1 Spirit | 2 MATK（本回合）+ 2 MATK（下回合）+ 1 MATK（第三回合） |
+| 通灵 | 1 Spirit | 回复 3 HP + 2 DEF + 魔法免疫 |
+
+#### 炼药锅
+
+> 源码：`Project/Blacksmith/ModExamples/CauldronMod/Cauldron.cs`
+
+专属资源：**Fire**（火）、**Water**（水）、**Wood**（木）、**Earth**（土）。
+
+| 技能 | 成本 | 效果 |
+|:---|:---|:---|
+| 火 | 1 Iron | 1 Fire |
+| 水 | 1 Iron | 1 Water |
+| 木 | 1 Iron | 1 Wood |
+| 土 | 1 Iron | 1 Earth |
+| 爆炸(n) | n Fire | 4n MATK |
+| 冰刃(n) | n Water | 5n ATK |
+| 再生 | 1 Wood | 1→2→3 递增 HP 恢复 × 3回合 |
+| 岩壳 | 1 Earth | 一次性完全吸收物理攻击 |
+| 燃命 | 1 Fire + 1 Wood | 25%伤减 × 4回合；真实伤害减半 × 4回合；1回合后全部攻击翻倍 × 3回合；3回合后自毁（扣 114514 MHP） |
+| 火雨 | 1 Fire + 1 Earth | 8 ATK + 2 RATK + 1 RATK（同回合三段） |
+| 元素之甲（装备） | 1 Earth + 1 Water | 物免 + 8 元素装甲。禁用所有其他技能包，切换为元素之甲模式 |
+
+**二级装备/子职业 - 元素之甲：**
+
+> 源码：`Project/Blacksmith/ModExamples/CauldronMod/ElementalArmor.cs`
+
+进入元素之甲模式后所有原有技能被禁用，仅可使用以下技能。装甲破裂后恢复原有技能包。
+
+| 技能 | 成本 | 效果 |
+|:---|:---|:---|
+| 锤 | 0 | 6 ATK |
+| 守护 | 0 | 8 DEF |
+
+#### 弩
+
+> 源码：`Project/Blacksmith/ModExamples/CrossBowMod/CrossBow.cs`
+
+专属资源：**Bolt**（弩箭）。
+
+| 技能 | 成本 | 效果 |
+|:---|:---|:---|
+| 制箭 | 1 Iron | 3 Bolt |
+| 箭雨(n) | n Bolt | n ATK |
+| 瞄准 | 0 | 下次暴击强化：物理伤害归零，真实伤害从 1 提升至 2 |
+| 暴击 | 1 Bolt | 未瞄准：1 ATK + 1 RATK。瞄准后：0 ATK + 2 RATK。瞄准状态消费后复位 |
+| 格挡(n) | 0.5n Bolt | (4.5n - 0.5n²) DEF（n=1~4，盾牌公式抛物线）。Iron 不足不可用 |
+| 标记弹 | 1 Bolt + 1 Iron | 1 ATK。下回合对手所有即时攻击在命中身体时伤害翻倍 |

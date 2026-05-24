@@ -151,8 +151,8 @@ namespace BlacksmithClient.Frontend
 
             return new
             {
-                player = BuildActor(pv, _game.Player.Focus.Get<Skill>().GetAvailableSkillNames()),
-                enemy = BuildActor(ev, _game.Enemy.Focus.Get<Skill>().GetAvailableSkillNames()),
+                player = BuildActor(pv, _game.Player.Focus.Get<Skill>().GetAvailableSkillNames(), _game.Player),
+                enemy = BuildActor(ev, _game.Enemy.Focus.Get<Skill>().GetAvailableSkillNames(), _game.Enemy),
                 turns = _game.History.SkillHistory.Select((pair, i) => new
                 {
                     index = i + 1,
@@ -172,10 +172,21 @@ namespace BlacksmithClient.Frontend
             };
         }
 
-        private static object BuildActor(BodyView view, List<string> availableSkills)
+        private static object BuildActor(BodyView view, List<string> availableSkills, Community? community = null)
         {
+            var summons = new List<object>();
+            if (community != null)
+            {
+                summons = community.SummonList.Select(s =>
+                {
+                    var sv = s.GetView();
+                    return BuildActor(sv, s.Get<Skill>().GetAvailableSkillNames(), null);
+                }).ToList();
+            }
+
             return new
             {
+                bodyName = view.BodyName,
                 professions = view.ProfessionNames,
                 hp = view.HP,
                 maxHP = view.MHP,
@@ -193,7 +204,8 @@ namespace BlacksmithClient.Frontend
                     delayRounds = f.delayRounds,
                     power = f.power
                 }).ToList(),
-                availableSkills = availableSkills
+                availableSkills = availableSkills,
+                summons = summons
             };
         }
 

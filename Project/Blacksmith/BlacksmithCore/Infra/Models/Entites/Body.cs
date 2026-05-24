@@ -5,8 +5,8 @@ namespace BlacksmithCore.Infra.Models.Entites
 {
     public class Body : ClapBody
     {
-        
-        public Body(Community community) : base(new()
+        private string _name;
+        public Body(Community community, string name) : base(new()
         {
             community,
             new Skill(),
@@ -17,11 +17,13 @@ namespace BlacksmithCore.Infra.Models.Entites
             new TurnContext()
         })
         {
+            _name = name;
         }
         public BodyView GetView()
         {
             return new()
             {
+                BodyName = _name,
                 ProfessionNames = Get<Skill>().GetView(),
                 HP = Get<Health>().HP,
                 MHP = Get<Health>().MHP,
@@ -34,6 +36,7 @@ namespace BlacksmithCore.Infra.Models.Entites
     }
     public class BodyView
     {
+        public required string BodyName { get; set; }
         public required List<string> ProfessionNames { get; set; }
         public required int HP { get; set; }
         public required int MHP { get; set; }

@@ -45,7 +45,7 @@ namespace ModExamples.MonkMod
                 .WriteFree(source =>
                 {
                     _cloneNum.Increment();
-                    clone = new Body(source);
+                    clone = new Body(source, $"Clone{_cloneNum.Value}");
                     clone.Get<Health>().MHP = source.Focus.Get<Health>().MHP;
                     clone.Get<Health>().HP = source.Focus.Get<Health>().HP;
                     clone.Get<Skill>().AddPackage(new(new Clone()));
