@@ -22,7 +22,7 @@ namespace BlacksmithCore.Specific.Defense
         }
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
-            int res = (int)MathF.Max(0, attack - Power);
+            int res = Math.Max(0, attack - Power);
             int absorbed = (int)MathF.Min(attack, Power);
             if (type == AttackType.Instance.Physical())
             {

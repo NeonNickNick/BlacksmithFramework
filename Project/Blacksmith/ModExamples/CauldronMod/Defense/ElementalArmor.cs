@@ -21,7 +21,7 @@ namespace ModExamples.CauldronMod.Defense
         public override void Update()
         {
             Power -= 2;
-            if(Power <= 0)
+            if (Power <= 0)
             {
                 IsDead = true;
                 _callback(Owner!);
@@ -30,15 +30,15 @@ namespace ModExamples.CauldronMod.Defense
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
             (int, int) res;
-            if(type == AttackType.Instance.Magical())
+            if (type == AttackType.Instance.Magical())
             {
-                res = ((int)MathF.Max(0, attack - Power), (int)MathF.Min(attack, Power));
+                res = (Math.Max(0, attack - Power), Math.Min(attack, Power));
             }
             else
             {
                 res = (0, attack);
-            } 
-            Power = (int)MathF.Max(0, Power - attack);
+            }
+            Power = Math.Max(0, Power - attack);
             return res;
         }
     }

@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Entites;
@@ -92,10 +91,12 @@ namespace BlacksmithCore.Driver
 
             var ps = Player.Focus.Get<Skill>();
             var psfs = ps.GetPassiveSkill(playerContext);
+            Player.SummonList.ForEach(s => psfs.AddRange(s.Get<Skill>().GetPassiveSkill(playerContext)));
             psfs.Add(ps.Declare(skillName, playerContext));
 
             var es = Enemy.Focus.Get<Skill>();
             var esfs = es.GetPassiveSkill(enemyContext);
+            Enemy.SummonList.ForEach(s => esfs.AddRange(s.Get<Skill>().GetPassiveSkill(enemyContext)));
             esfs.Add(es.Declare(esn, enemyContext));
 
             Judger.Judge(psfs, esfs);

@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;

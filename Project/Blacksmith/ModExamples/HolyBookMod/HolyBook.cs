@@ -1,7 +1,6 @@
 using BlacksmithCore.Infra.Attributes.MarkOnly;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
-using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Models.Particular;
@@ -69,7 +68,7 @@ namespace ModExamples
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Cross())
                 .WriteEffect(EffectType.Instance.AfterResolutionWritten()
-                            ,EffectTargetType.Instance.Self()
+                            , EffectTargetType.Instance.Self()
                             , 3f
                             , 3
                             , (Community source, Body target, EffectEntity effectEntity) =>

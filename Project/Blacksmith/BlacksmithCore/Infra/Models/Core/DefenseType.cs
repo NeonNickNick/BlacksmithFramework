@@ -6,9 +6,11 @@ namespace BlacksmithCore.Infra.Models.Core
     public class DefenseType : BlacksmithEnum<DefenseType>
     {
         [IsBlacksmithEnumMember(-16)]
-        public DefenseType.CEValue PhysicalImmunity() => DefenseType.GetCEValue();
+        public DefenseType.CEValue PhysicalImmunity() => GetCEValue();
         [IsBlacksmithEnumMember(-16)]
-        public DefenseType.CEValue MagicalImmunity() => DefenseType.GetCEValue();
+        public DefenseType.CEValue MagicalImmunity() => GetCEValue();
+        [IsBlacksmithEnumMember(-8)]
+        public DefenseType.CEValue PercentageReduction() => GetCEValue();
         [IsBlacksmithEnumMember(0)]
         public CEValue RealReduction() => GetCEValue();
         [IsBlacksmithEnumMember(8)]

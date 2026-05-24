@@ -30,8 +30,8 @@ namespace ModExamples.PhantomBookMod.Defense
 
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
-            var res = ((int)MathF.Max(0, attack - Power), (int)MathF.Min(attack, Power));
-            Power = (int)MathF.Max(0, Power - attack);
+            var res = (Math.Max(0, attack - Power), (int)MathF.Min(attack, Power));
+            Power = Math.Max(0, Power - attack);
             return res;
         }
     }

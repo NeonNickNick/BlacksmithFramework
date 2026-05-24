@@ -25,5 +25,9 @@ namespace ClapInfra.ClapUnit
         {
             clapStateVar.Set(clapStateVar.Value + 1);
         }
+        public static void Decrement(this ClapStateVar<int> clapStateVar)
+        {
+            clapStateVar.Set(clapStateVar.Value - 1);
+        }
     }
 }

@@ -5,7 +5,6 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
 
@@ -146,12 +145,14 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                             ReflectRule.EffectSwaping_Modifier_After,
                             JudgeStage.Instance.OnEffectSwaping(),
                             RuleType.Modifier,
-                            ModifierOrder.After),
+                            ModifierOrder.After,
+                            new()),
                         new(
                             ReflectRule.AttackSwaping_Modifier_After,
                             JudgeStage.Instance.OnAttackSwaping(),
                             RuleType.Modifier,
-                            ModifierOrder.After)
+                            ModifierOrder.After,
+                            new())
                     });
             return DSL.Create(sc.Self, pen);
         }

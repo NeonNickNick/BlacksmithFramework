@@ -12,8 +12,7 @@ namespace ModExamples.HolyBookMod
     [IsBlacksmithEnumModifier]
     public static class DefenseExtension
     {
-        [IsBlacksmithEnumMember(-8)]
-        public static DefenseType.CEValue PercentageReduction(this DefenseType defenseType) => DefenseType.GetCEValue();
+
         [IsBlacksmithEnumMember(32768)]
         public static DefenseType.CEValue GreyHP(this DefenseType defenseType) => DefenseType.GetCEValue();
     }

@@ -17,32 +17,32 @@ namespace BlacksmithCore.AI.Strategies
         }
         public double TemperatureCoefficient = 0.03; // 原 0.03 * round
         // ========== 早期资源权重 ==========
-        public double EarlyIronWeight = 12;
-        public double EarlyExcessIronWeight = 12;     // 超过4铁时的额外奖励
+        public double EarlyIronWeight = 120;
+        public double EarlyExcessIronWeight = 102;     // 超过4铁时的额外奖励
         public double EarlySpaceWeight = 4;
         public double EarlyTimeWeight = 3.5;
         public double EarlyDefaultWeight = 3;
 
         // ========== 中期资源权重 ==========
-        public double MidIronWeight = 3;
+        public double MidIronWeight = 12;
         public double MidSpaceWeight = 10;
         public double MidTimeWeight = 9;
         public double MidDefaultWeight = 6;
 
         // ========== 后期资源权重 ==========
-        public double LateIronWeight = 1;
+        public double LateIronWeight = 2;
         public double LateSpaceWeight = 2.5;
         public double LateTimeWeight = 2.5;
         public double LateDefaultWeight = 1.5;
 
 
         // ========== 攻击策略权重 ==========
-        public double EarlyUnnecessaryAttackPenaltyMultiplier = 30;    // (10 - HP) * 30
-        public double MidAdvantageAttackBonusMultiplier = 2;           // hpDiff * 2
-        public double MidUnnecessaryAttackPenaltyMultiplier = 10;      // (10 - HP) * 10
-        public double WithProfessionDamageBonusMultiplier = 20;        // (10 - HP) * 20
-        public double WithProfessionHpDiffBonusMultiplier = 20;         // hpDiff * 5
-        public double HpAdvantageThreshold = 2;                       // hpDiff > 2 才算优势
+        public double EarlyUnnecessaryAttackPenaltyMultiplier = 40;    // (10 - HP) * 30
+        public double MidAdvantageAttackBonusMultiplier = -10;           // hpDiff * 2
+        public double MidUnnecessaryAttackPenaltyMultiplier = 0;      // (10 - HP) * 10
+        public double WithProfessionDamageBonusMultiplier = 0;        // (10 - HP) * 20
+        public double WithProfessionHpDiffBonusMultiplier = 0;         // hpDiff * 5
+        public double HpAdvantageThreshold = 0;                       // hpDiff > 2 才算优势
 
         // ========== 回合节奏 ==========
         public double LateRoundPenaltyPerRound = 40;
@@ -164,7 +164,7 @@ namespace BlacksmithCore.AI.Strategies
 
                     double result = Evaluate(simState);
                     // Rollout 从已应用 expansion 的同一状态开始
-                    for (int d = 1; d < 5; d++)
+                    for (int d = 1; d < 2; d++)
                     {
                         if (IsTerminal(simState))
                             break;
@@ -173,7 +173,8 @@ namespace BlacksmithCore.AI.Strategies
                         var e = RandomAction(simState.Enemy, simState);
                         simState.Declare(p.Item1, p.Item2, e.Item1, e.Item2, p.Item3, e.Item3);
 
-                        result = (result * d + MathF.Exp(-0.3f*d) * Evaluate(simState)) / (d + 1);
+                        result = (result * d + MathF.Exp(-0.3f * d) * Evaluate(simState));
+                        result /= d;
                     }
 
 

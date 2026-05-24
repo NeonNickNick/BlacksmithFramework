@@ -4,19 +4,20 @@ namespace BlacksmithCore.Infra.Models.Components
     {
         private int _hp;
         private bool _killed = false;
+        public bool IsKilled => _killed;
         public int HP
         {
             get => _hp;
             set
             {
-                if(value <= 0)
+                if (value <= 0)
                 {
                     _killed = true;
                 }
                 _hp = value;
             }
         }
-        public int MHP { get; private set; }
+        public int MHP { get; set; }
         public Health(int hp, int mhp)
         {
             HP = hp;
@@ -44,8 +45,8 @@ namespace BlacksmithCore.Infra.Models.Components
         }
         public void LoseMHP(int loss)
         {
-            MHP = (int)MathF.Max(0, MHP - loss);
-            HP = (int)MathF.Min(MHP, HP);
+            MHP = Math.Max(0, MHP - loss);
+            HP = Math.Min(MHP, HP);
         }
     }
 }

@@ -68,7 +68,7 @@ namespace BlacksmithCore.Infra.Models.Components
             foreach (var package in _packages)
             {
                 package.Flag.Disable();
-                res.Add(package.Name); 
+                res.Add(package.Name);
             }
             return res;
         }

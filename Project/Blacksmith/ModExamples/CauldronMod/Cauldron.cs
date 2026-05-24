@@ -4,14 +4,10 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Particular;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
 using ModExamples.CauldronMod.Defense;
-using ModExamples.HolyBookMod.Defense;
-using ModExamples.PhantomBookMod;
-using ModExamples.PhantomBookMod.Defense;
 
 namespace ModExamples.CauldronMod
 {
@@ -144,11 +140,11 @@ namespace ModExamples.CauldronMod
                                     resolution.Power /= 2;
                                 }
                             }
-                        }, 
+                        },
                         JudgeStage.Instance.OnApplyingOthers(),
                         RuleType.Modifier,
                         ModifierOrder.Before,
-                        4),
+                        new(remainingRounds: 4)),
                         new((player, enemy) =>
                         {
                             foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
@@ -162,8 +158,7 @@ namespace ModExamples.CauldronMod
                         JudgeStage.Instance.OnBegin(),
                         RuleType.Modifier,
                         ModifierOrder.After,
-                        3,
-                        1),
+                        new(remainingRounds: 3, delayRounds: 1)),
                         new((player, enemy) =>
                         {
                             player.Focus.Get<Health>().LoseMHP(114514);
@@ -171,8 +166,7 @@ namespace ModExamples.CauldronMod
                         JudgeStage.Instance.OnEnd(),
                         RuleType.Modifier,
                         ModifierOrder.Before,
-                        1,
-                        3)
+                        new(remainingRounds: 1, delayRounds: 3)),
                     });
             return DSL.Create(sc.Self, pen);
         }

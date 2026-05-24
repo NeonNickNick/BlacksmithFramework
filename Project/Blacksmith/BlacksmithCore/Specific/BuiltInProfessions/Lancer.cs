@@ -4,7 +4,6 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
 using ClapInfra.ClapUnit;
@@ -176,7 +175,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                     new(AttackCanceling_Modifier_Before,
                     JudgeStage.Instance.OnAttackCanceling(),
                     RuleType.Modifier,
-                    ModifierOrder.Before),
+                    ModifierOrder.Before,
+                    new()),
                     new((player, enemy) =>
                     {
                         if(_chargeCount.Value == chargeCountThis && !_wasPassive.Value)
@@ -189,7 +189,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                     JudgeStage.Instance.OnBegin(),
                     RuleType.Modifier,
                     ModifierOrder.Before,
-                    delayRounds: 1)
+                    new(delayRounds: 1))
                 });
             return DSL.Create(sc.Self, pen);
         }

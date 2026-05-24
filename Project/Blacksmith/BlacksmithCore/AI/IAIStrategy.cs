@@ -1,5 +1,4 @@
 using BlacksmithCore.Driver;
-using BlacksmithCore.Infra.Models.Entites;
 
 namespace BlacksmithCore.AI
 {

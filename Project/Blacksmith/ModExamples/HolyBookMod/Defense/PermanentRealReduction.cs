@@ -24,7 +24,7 @@ namespace ModExamples.HolyBookMod.Defense
 
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
-            return ((int)MathF.Max(0, attack - Power), (int)MathF.Min(attack, Power));
+            return (Math.Max(0, attack - Power), Math.Max(attack, Power));
         }
     }
 }

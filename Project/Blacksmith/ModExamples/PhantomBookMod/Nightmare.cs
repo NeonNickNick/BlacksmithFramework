@@ -4,7 +4,6 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
-using ModExamples.PhantomBookMod.Defense;
 
 namespace ModExamples.PhantomBookMod
 {

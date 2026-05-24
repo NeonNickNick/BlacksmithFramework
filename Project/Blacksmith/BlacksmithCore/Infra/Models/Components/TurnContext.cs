@@ -60,7 +60,7 @@ namespace BlacksmithCore.Infra.Models.Components
                     if (list[i].Clock.IsDead)
                     {
                         list.RemoveAt(i);
-                        return;
+                        continue;
                     }
                     list[i].Clock.RoundPass();
                 }
@@ -69,14 +69,14 @@ namespace BlacksmithCore.Infra.Models.Components
         public override void WriteResolution(IResolution resolution)
         {
             var pp = _preprocesses[resolution.GetType()];
-            pp.ForEach(p => 
-            { 
-                if (p.Clock.IsRinging) 
+            pp.ForEach(p =>
+            {
+                if (p.Clock.IsRinging)
                 {
                     p.Action(resolution);
                 }
             });
-            base.WriteResolution(resolution); 
+            base.WriteResolution(resolution);
         }
         protected override void ExecuteImpl<TResolution>(Community community, List<TResolution> list, Func<TResolution, bool>? ifProcess)
         {

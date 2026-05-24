@@ -10,7 +10,7 @@ namespace ClapInfra.ClapUnit
         }
         public void Enable()
         {
-            if( _times <= 0 )
+            if (_times <= 0)
             {
                 return;
             }

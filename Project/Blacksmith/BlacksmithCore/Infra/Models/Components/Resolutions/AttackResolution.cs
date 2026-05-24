@@ -12,16 +12,16 @@ namespace BlacksmithCore.Infra.Models.Components.Resolutions
     }
     public class AttackResolution : IResolution
     {
-        public Community? Source { get; set; }
+        public required Community Source { get; set; }
         public required ClapRoundClock Clock { get; set; }
         public AttackType.CEValue Type { get; set; }
         public float Power { get; set; }
         public Action<Community> Execute { get; set; } = (a) => { };
         public int TotalDamage { get; set; } = 0;
 
-        private readonly Dictionary<AttackStage, List<Action<Community?, Body, AttackResolution>>> _stages = new();
+        private readonly Dictionary<AttackStage, List<Action<Community, Body, AttackResolution>>> _stages = new();
 
-        public void AddStage(AttackStage stage, Action<Community?, Body, AttackResolution> action)
+        public void AddStage(AttackStage stage, Action<Community, Body, AttackResolution> action)
         {
             if (!_stages.TryGetValue(stage, out var list))
             {

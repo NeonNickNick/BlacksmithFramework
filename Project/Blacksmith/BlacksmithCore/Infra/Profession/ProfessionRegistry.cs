@@ -52,7 +52,7 @@ namespace BlacksmithCore.Infra.Profession
             }
         }
 
-        
+
 
         public static void RegistProfessionModifier(string targetName, SkillPackageBase modifier)
         {

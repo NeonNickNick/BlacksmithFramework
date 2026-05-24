@@ -93,7 +93,10 @@ namespace ModExamples.PhantomBookMod
             var resource = copiedBody.Get<Resource>();
             float m = MathF.Min(2f, resource.QueryAll(ResourceType.Instance.Dream()));
             resource.Use(ResourceType.Instance.Dream(), m);
-            sc.Self.ReplaceDelayed(copiedBody);
+            sc.Self.AddTransform(() =>
+            {
+                sc.Self.Focus = copiedBody;
+            });
             return DSL.Create(sc.Self, _ => _);
         }
         private bool IllusionCheck(ISkillContext sc)

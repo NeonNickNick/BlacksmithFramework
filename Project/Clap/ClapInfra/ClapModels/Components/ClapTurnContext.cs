@@ -32,7 +32,7 @@ namespace ClapInfra.ClapModels.Components
         }
         public void Clear()
         {
-            foreach(var list in _resolutionLists.Values)
+            foreach (var list in _resolutionLists.Values)
             {
                 list.Clear();
             }

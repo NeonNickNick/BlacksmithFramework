@@ -26,8 +26,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .LoseHP(4)
-                .WriteAttack(IncreaseAttack(6), AttackType.Instance.Physical())
-                    .WithBloodSuck(0.66f);
+                .WriteAttack(IncreaseAttack(4), AttackType.Instance.Physical())
+                    .WithBloodSuck(0.5f);
             return DSL.Create(sc.Self, pen);
         }
         private bool BloodLustCheck(ISkillContext sc)
@@ -70,7 +70,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         private IDSLSourceFile BloodRage(ISkillContext sc)
         {
             Pen pen = sf => sf
-                .LoseHP(1)
+                .LoseHP(2)
                 .WriteAttack(IncreaseAttack(5), AttackType.Instance.Physical())
                     .WithBloodSuck(1.5f);
             return DSL.Create(sc.Self, pen);

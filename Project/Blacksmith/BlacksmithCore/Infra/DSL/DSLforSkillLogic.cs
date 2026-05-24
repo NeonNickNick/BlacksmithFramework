@@ -107,7 +107,7 @@ namespace BlacksmithCore.Infra.DSL
                     var resolution = new AttackResolution
                     {
                         Source = source,
-                        Clock = new(delayRounds : delayRounds),
+                        Clock = new(delayRounds: delayRounds),
                         Type = attackType,
                         Power = power
                     };
@@ -136,6 +136,7 @@ namespace BlacksmithCore.Infra.DSL
                                 DefenseType.Instance.RealArmor(),
                                 DefenseType.Instance.CommonArmor()
                             };
+
                             foreach (var temp in defenses)
                             {
                                 if (!ifHitArmor && armorList.Contains(temp.Type))
@@ -244,7 +245,7 @@ namespace BlacksmithCore.Infra.DSL
                     resolution.Execute = (target) =>
                     {
                         Body main = target.Focus;
-                        var entity = new EffectEntity(resolution.Type, duration, resolution.Power);
+                        var entity = new EffectEntity(resolution.Type, resolution.Power, new(remainingRounds: duration));
                         entity.Execute = (body) => effectAction(source, body, entity);
                         main.Get<Effect>().Add(entity);
                         resolution.RunStage(EffectStage.OnSuccessfullyAdded, source, main);
@@ -287,7 +288,7 @@ namespace BlacksmithCore.Infra.DSL
         }
         public class AttackFile : SourceFile
         {
-            public AttackFile WithFree(AttackStage stage, Action<Community?, Body, AttackResolution> action)
+            public AttackFile WithFree(AttackStage stage, Action<Community, Body, AttackResolution> action)
             {
                 _rhetoricCache.Push(new((source) =>
                 {

@@ -2,7 +2,6 @@ using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
-using BlacksmithCore.Infra.Judgement.Core;
 using ClapInfra.ClapJudgement;
 using ClapInfra.ClapUnit;
 
@@ -16,7 +15,7 @@ namespace BlacksmithCore.Infra.Judgement
             {
                 public ClapRoundClock Clock;
                 public Action<Community, Community> Rule;
-                
+
                 public RuleUnit(ClapRoundClock clock, Action<Community, Community> rule)
                 {
                     Clock = clock;
@@ -92,65 +91,6 @@ namespace BlacksmithCore.Infra.Judgement
                 Update();
             }
         }
-        private readonly static SortedDictionary<JudgeStage.CEValue, StageRuleContainer> _defaultRuleContainers = new()
-        {
-            {
-                JudgeStage.Instance.OnBegin(),
-                new((player, enemy) => { })
-            },
-            {
-                JudgeStage.Instance.OnEffectTaking_AfterResolutionWritten(),
-                new((player, enemy) => TakeEffects(EffectType.Instance.AfterResolutionWritten(), player, enemy))
-            },
-            {
-                JudgeStage.Instance.OnEffectSwaping(),
-                new(SwapEffects)
-            },
-            {
-                JudgeStage.Instance.OnAttackCanceling(),
-                new(CancelAttacks)
-            },
-            {
-                JudgeStage.Instance.OnAttackSwaping(),
-                new(SwapAttacks)
-            },
-            {
-                JudgeStage.Instance.OnApplyingEffect(),
-                new(ApplyEffect)
-            },
-            {
-                JudgeStage.Instance.OnEffectTaking_AfterTransport(),
-                new((player, enemy) => TakeEffects(EffectType.Instance.AfterTransport(), player, enemy))
-            },
-            {
-                JudgeStage.Instance.OnApplyingOthers(),
-                new(ApplyOthers)
-            },
-            {
-                JudgeStage.Instance.OnUpdating(),
-                new(Update)
-            },
-            {
-                JudgeStage.Instance.OnEffectTaking_AfterResult(),
-                new((player, enemy) => TakeEffects(EffectType.Instance.AfterResult(), player, enemy))
-            },
-            {
-                JudgeStage.Instance.OnEnd(),
-                new(UpdateCommunity)
-            }
-        };
-        private static Action<Community, Community> _defaultRule;
-        private int _notDefaultRounds = 0;
-        static JudgeRuleManager()
-        {
-            _defaultRule = (a, b) =>
-            {
-                foreach (var stage in _defaultRuleContainers)
-                {
-                    stage.Value.Execute(a, b);
-                }
-            };
-        }
         private readonly SortedDictionary<JudgeStage.CEValue, StageRuleContainer> _ruleContainers = new()
         {
             {
@@ -195,18 +135,20 @@ namespace BlacksmithCore.Infra.Judgement
             },
             {
                 JudgeStage.Instance.OnEnd(),
-                new(UpdateCommunity)
+                new((player, enemy) => { })
             }
         };
         #region Default Rules（原有逻辑）
         private static void TakeEffects(EffectType.CEValue type, Community player, Community enemy)
         {
-            foreach (var temp in player.BodyList)
+            player.Focus.Get<Effect>().Execute(type, player.Focus);
+            foreach (var temp in player.SummonList)
             {
                 temp.Get<Effect>().Execute(type, temp);
             }
 
-            foreach (var temp in enemy.BodyList)
+            enemy.Focus.Get<Effect>().Execute(type, enemy.Focus);
+            foreach (var temp in enemy.SummonList)
             {
                 temp.Get<Effect>().Execute(type, temp);
             }
@@ -313,32 +255,16 @@ namespace BlacksmithCore.Infra.Judgement
 
         private static void Update(Community player, Community enemy)
         {
-            foreach (var temp in player.BodyList)
-                temp.Update();
-
-            foreach (var temp in enemy.BodyList)
-                temp.Update();
-        }
-        private static void UpdateCommunity(Community player, Community enemy)
-        {
             player.Update();
             enemy.Update();
         }
         #endregion
         public override void Judge(Community player, Community enemy)
         {
-            if (_notDefaultRounds == 0)
+            foreach (var stage in _ruleContainers)
             {
-                _defaultRule(player, enemy);
+                stage.Value.Execute(player, enemy);
             }
-            _notDefaultRounds--;
-            {
-                foreach (var stage in _ruleContainers)
-                {
-                    stage.Value.Execute(player, enemy);
-                }
-            }
-            ;
         }
 
         public void AddJudgeRule(Community source, List<Mutation> mutations)
@@ -351,11 +277,11 @@ namespace BlacksmithCore.Infra.Judgement
                 {
                     if (source == player)
                     {
-                        originalRule(player, enemy); 
+                        originalRule(player, enemy);
                     }
                     else
                     {
-                        originalRule(enemy, player); 
+                        originalRule(enemy, player);
                     }
                 };
             });
@@ -370,7 +296,6 @@ namespace BlacksmithCore.Infra.Judgement
                 {
                     _ruleContainers[mutation.Stage].AddModifier(unit, mutation.ModifierOrder);
                 }
-                _notDefaultRounds = Math.Max(_notDefaultRounds, mutation.Clock.RemainingRounds + mutation.Clock.DelayRounds);
             }
         }
     }

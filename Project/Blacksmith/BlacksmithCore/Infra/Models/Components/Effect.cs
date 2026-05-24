@@ -17,24 +17,19 @@ namespace BlacksmithCore.Infra.Models.Components
         }
         public void Execute(EffectType.CEValue type, Body body)
         {
-            List<EffectEntity> tempList = _effects.Where(e => e.Type == type).ToList();
+            IEnumerable<EffectEntity> tempList = _effects.Where(e => e.Type == type);
             foreach (var temp in tempList)
             {
-                if (temp.DelayTimes > 0)
-                {
-                    temp.DelayTimes--;
-                    continue;
-                }
-                if (temp.RemainingTimes > 0)
+                if (temp.Clock.IsRinging)
                 {
                     temp.Execute(body);
-                    temp.RemainingTimes--;
                 }
             }
         }
         public void Update()
         {
-            _effects.RemoveAll(e => e.RemainingTimes <= 0);
+            _effects.ForEach(e => e.Clock.RoundPass());
+            _effects.RemoveAll(e => e.Clock.IsDead);
         }
         public List<EffectEntity> Get()
         {

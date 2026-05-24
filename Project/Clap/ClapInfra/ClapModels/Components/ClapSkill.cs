@@ -29,7 +29,7 @@ namespace ClapInfra.ClapModels.Components
             _packages.Add(package);
         }
         public virtual void RemovePackage(string name)
-        { 
+        {
             _packages.RemoveAll(p => p.Name == name);
         }
         public virtual void AddSkill(string packageName, string skillName)

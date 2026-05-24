@@ -1,7 +1,7 @@
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 
-namespace ModExamples.HolyBookMod.Defense
+namespace BlacksmithCore.Specific.Defense
 {
     public class PercentageReduction : DefenseBase
     {
@@ -32,7 +32,7 @@ namespace ModExamples.HolyBookMod.Defense
         public override (int, int) Work(Body source, Body owner, int attack, AttackType.CEValue type)
         {
             float percent = 1.0f * Power / Baseline;
-            return ((int)(attack * percent), attack - (int)(attack * percent));
+            return (attack - (int)MathF.Ceiling(attack * percent), Math.Max((int)MathF.Ceiling(attack * percent), 0));
         }
     }
 }

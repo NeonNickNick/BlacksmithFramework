@@ -4,7 +4,6 @@ using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
-using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
 using ClapInfra.ClapUnit;
@@ -13,7 +12,7 @@ namespace ModExamples.CrossBowMod
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
-    public partial class CrossBow : MainProfession 
+    public partial class CrossBow : MainProfession
     {
         private ClapStateVar<bool> _aimed = new(false);
         private bool CraftBoltCheck(ISkillContext sc)
@@ -99,8 +98,7 @@ namespace ModExamples.CrossBowMod
                         JudgeStage.Instance.OnApplyingOthers(),
                         RuleType.Modifier,
                         ModifierOrder.Before,
-                        1, 
-                        1),
+                        new(remainingRounds: 1, delayRounds: 1)),
                     });
             return DSL.Create(sc.Self, pen);
         }

@@ -53,10 +53,9 @@ namespace BlacksmithCore.Infra.Judgement
             JudgeStage.CEValue stage,
             RuleType ruleType,
             ModifierOrder modifierOrder,
-            int remainingRounds = 1,
-            int delayRounds = 0)
+            ClapRoundClock clock)
         {
-            Clock = new(remainingRounds: remainingRounds, delayRounds: delayRounds);
+            Clock = clock;
             Stage = stage;
             RuleType = ruleType;
             ModifierOrder = modifierOrder;
