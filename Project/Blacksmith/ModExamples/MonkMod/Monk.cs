@@ -33,7 +33,6 @@ namespace ModExamples.MonkMod
         private bool GhostStepCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Jade(), 1f)
-                && sc.Self.Focus.Get<Health>().HP > 2
                 && _cloneNum.Value < 2;
         }
         private IDSLSourceFile GhostStep(ISkillContext sc)
@@ -41,7 +40,6 @@ namespace ModExamples.MonkMod
             Body clone = null!;
             Pen pen = sf => sf
                 .UseResource(1f, ResourceType.Instance.Jade())
-                .LoseHP(2)
                 .WriteFree(source =>
                 {
                     _cloneNum.Increment();
@@ -140,7 +138,7 @@ namespace ModExamples.MonkMod
         }
         private bool MistCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Jade(), 1f);
+            return _cloneNum.Value > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Jade(), 1f);
         }
         private IDSLSourceFile Mist(ISkillContext sc)
         {

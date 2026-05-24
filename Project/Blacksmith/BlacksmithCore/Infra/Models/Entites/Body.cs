@@ -5,6 +5,7 @@ namespace BlacksmithCore.Infra.Models.Entites
 {
     public class Body : ClapBody
     {
+        
         public Body(Community community) : base(new()
         {
             community,

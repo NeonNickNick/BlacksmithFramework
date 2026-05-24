@@ -44,7 +44,8 @@ declareBtn?.addEventListener('click', () => {
         sendSocketMessage({
             type: 'submitTurn',
             skillName: skill.name,
-            param: skill.param
+            param: skill.param,
+            stringParam: skill.stringParam
         });
     } catch (error) {
         State.lastBanner = error instanceof Error ? error.message : 'Unable to submit turn.';
