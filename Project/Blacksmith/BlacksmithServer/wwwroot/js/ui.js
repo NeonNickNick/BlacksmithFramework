@@ -16,8 +16,8 @@ function parseSkill(text) {
             const parsed = Number.parseInt(tokens[i + 1], 10);
             if (Number.isFinite(parsed) && parsed >= 0) {
                 param = parsed;
+                i++;
             }
-            i++;
         } else if (tokens[i] === '-s' && i + 1 < tokens.length) {
             stringParam = tokens[i + 1];
             i++;
@@ -49,24 +49,22 @@ function stateLabel(snapshot) {
     }
 }
 
-function withBusy(task) {
-    if (State.busy) return Promise.resolve();
+async function withBusy(task) {
+    if (State.busy) return;
 
     State.busy = true;
     updateBusyState();
 
-    return Promise.resolve()
-        .then(task)
-        .catch(error => {
-            const message = error instanceof Error ? error.message : 'Unexpected error';
-            State.lastBanner = message;
-            renderHeroCopy();
-            throw error;
-        })
-        .finally(() => {
-            State.busy = false;
-            updateBusyState();
-        });
+    try {
+        await task();
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unexpected error';
+        State.lastBanner = message;
+        renderHeroCopy();
+    } finally {
+        State.busy = false;
+        updateBusyState();
+    }
 }
 
 function renderTokenGrid(elementId, items, renderer, emptyText) {

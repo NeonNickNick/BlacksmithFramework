@@ -117,6 +117,9 @@ function connectSocket() {
 
         if (data.type === 'snapshot' && data.snapshot) {
             renderSnapshot(data.snapshot, { message: data.message, autoFocusLatest: true });
+            if (data.message && (data.message.includes('Illegal.') || data.message.includes('Rejected.'))) {
+                alert(data.message);
+            }
             return;
         }
 

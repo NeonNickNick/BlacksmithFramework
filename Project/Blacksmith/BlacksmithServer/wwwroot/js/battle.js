@@ -38,8 +38,8 @@ logoutBtn?.addEventListener('click', () => {
     });
 });
 
-declareBtn?.addEventListener('click', () => {
-    try {
+function submitTurn() {
+    withBusy(async () => {
         const skill = parseSkill(skillInput?.value || '');
         sendSocketMessage({
             type: 'submitTurn',
@@ -47,9 +47,15 @@ declareBtn?.addEventListener('click', () => {
             param: skill.param,
             stringParam: skill.stringParam
         });
-    } catch (error) {
-        State.lastBanner = error instanceof Error ? error.message : 'Unable to submit turn.';
-        renderHeroCopy();
+    });
+}
+
+declareBtn?.addEventListener('click', () => submitTurn());
+
+skillInput?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        submitTurn();
     }
 });
 

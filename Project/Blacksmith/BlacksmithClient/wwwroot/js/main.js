@@ -12,8 +12,8 @@ function parseSkill(text) {
             const parsed = Number.parseInt(tokens[i + 1], 10);
             if (Number.isFinite(parsed) && parsed >= 0) {
                 param = parsed;
+                i++;
             }
-            i++;
         } else if (tokens[i] === '-s' && i + 1 < tokens.length) {
             stringParam = tokens[i + 1];
             i++;
