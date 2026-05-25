@@ -195,6 +195,7 @@ namespace BlacksmithServer
                         var skillName = ReadString(root, "skillName") ?? "iron";
                         var param = ReadInt(root, "param");
                         var stringParam = ReadString(root, "stringParam") ?? "";
+                        Console.WriteLine($"[Turn] {username}: skill='{skillName}' param={param} stringParam='{stringParam}' raw='{root.GetRawText()}'");
                         await coordinator.SubmitTurnAsync(username, skillName, param, stringParam);
                         break;
                     case "requestSnapshot":
@@ -208,6 +209,11 @@ namespace BlacksmithServer
             catch (JsonException)
             {
                 await coordinator.SendCurrentStateAsync(username, "Invalid message payload.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Error] HandleClientMessage for {username}: {ex}");
+                await coordinator.SendCurrentStateAsync(username, "An internal error occurred.");
             }
         }
 

@@ -14,7 +14,7 @@ namespace ClapInfra.ClapUtils
             foreach (var dir in dirs)
             {
                 if (!Directory.Exists(dir))
-                    return;
+                    continue;
 
                 foreach (var dll in Directory.GetFiles(dir, "*.dll"))
                 {

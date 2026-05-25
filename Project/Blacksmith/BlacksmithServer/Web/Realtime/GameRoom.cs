@@ -1,3 +1,4 @@
+using System.Linq;
 using BlacksmithCore.Driver;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Entites;
@@ -106,8 +107,14 @@ namespace BlacksmithServer.Web.Realtime
                         ? _game.TryDeclare(normalizedSkill, param, stringParam)
                         : _game.ETryDeclare(normalizedSkill, param, stringParam);
 
+                    Console.WriteLine($"[GameRoom] {username}: TryDeclare('{normalizedSkill}', param={param}, stringParam='{stringParam}') => {validation}");
+
                     if (validation != SkillDeclareResult.Success)
                     {
+                        var community = participant == RoomParticipant.PlayerOne ? _game.Player : _game.Enemy;
+                        var resources = community.Focus.Get<Resource>().GetView();
+                        var resSummary = string.Join(", ", resources.Select(r => $"{r.name}={r.quantity}"));
+                        Console.WriteLine($"[GameRoom] {username}: validation failed. Available resources: [{resSummary}]");
                         snapshots = BuildSnapshotsNoLock();
                         message = $"Skill '{normalizedSkill}' {validation}.";
                     }
@@ -197,17 +204,18 @@ namespace BlacksmithServer.Web.Realtime
             await _gate.WaitAsync();
             try
             {
-                if (_completed)
+                if (_completed || _roundDeadlineUtc == null)
                 {
                     return;
                 }
+
+                _roundDeadlineUtc = null;
 
                 var playerOneTurn = _playerOnePending ?? new PendingTurn("iron", 0, "", true);
                 var playerTwoTurn = _playerTwoPending ?? new PendingTurn("iron", 0, "", true);
 
                 _playerOnePending = null;
                 _playerTwoPending = null;
-                _roundDeadlineUtc = null;
 
                 _game.Declare(playerOneTurn.SkillName, playerOneTurn.Param, playerTwoTurn.SkillName, playerTwoTurn.Param, playerOneTurn.StringParam, playerTwoTurn.StringParam);
 
@@ -466,7 +474,14 @@ namespace BlacksmithServer.Web.Realtime
                 return;
             }
 
-            await ResolveRoundAsync("Round timer expired. Missing inputs defaulted to iron 0.");
+            try
+            {
+                await ResolveRoundAsync("Round timer expired. Missing inputs defaulted to iron 0.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GameRoom] Round timer resolution failed: {ex}");
+            }
         }
 
         private void CancelRoundTimerNoLock()
