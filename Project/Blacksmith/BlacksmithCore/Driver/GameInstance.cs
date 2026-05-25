@@ -45,6 +45,7 @@ namespace BlacksmithCore.Driver
         {
             return community == Player;
         }
+        public List<(ISkillContext, ISkillContext)> SkillHistory => History.SkillHistory;
         public IReadOnlySet<string> ProfessionSkillNames => ProfessionRegistry.ProfessionSkillNames;
         public IReadOnlySet<string> EquipmentSkillNames => ProfessionRegistry.EquipmentSkillNames;
         public GameInstance DeepCopy(int preRounds = 0)

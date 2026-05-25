@@ -144,6 +144,20 @@ ThornReduction 吸收物理攻击时反弹 50%（向上取整）为 Magical 伤�
 | 被动 | 0 | 每主动或被动失去一个分身，下回合追加一次伤害减半的Disillusionment |
 | 分身 | 0 | 每回合给Monk施加一次GoldenBellCover，Monk和每个分身独立计数<br>注：GhostStep创建分身当回合伤害转移即生效，但分身下回合才开始释放此技能|
 
+#### 预言者
+| 技能 | 成本 | 效果 |
+|:---|:---|:---|
+| Crystal | 1.5 Iron | 1 Crystal |
+| CrystalBall | 2 Crystal | 1 CrystalBall, 最多持有1个 |
+| Foretold | 1 iron | 闪避所有直接伤害 |
+| GreatestCaution | 1 Crystal | 下次闪避时，如果闪避成功，下回合反伤4RATK |
+| Revelation | 1 Iron | 下次闪避时，如果闪避成功，额外获得一个Crystal |
+| Assertion | 0 | 闪避所有直接伤害，但如果对方这回合没有攻击，失去2HP |
+| CrystalWall | 1 CrystalBall | 7RDEF * 2回合，100%物理反伤（反为魔法伤害），且如果该RDEF受到攻击则返还1Crystal |
+| Refraction | 要求持有CrystalBall | 50%伤减 |
+| Ultimatum | 1 CrystalBall + 2 Crystal | 宣告一个正整数n，要求n > 5，n回合后追加12RATK |
+| 被动 | 0 | 每次闪避成功后立即获得一个Crystal |
+
 #### 圣书
 
 > 源码：`Project/Blacksmith/ModExamples/HolyBookMod/HolyBook.cs`
