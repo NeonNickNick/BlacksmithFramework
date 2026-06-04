@@ -2,6 +2,7 @@ using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
+using BlacksmithCore.Specific.Combat;
 using BlacksmithCore.Specific.Defense;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
@@ -10,6 +11,10 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class Cannon : MainProfession
     {
+        private readonly NextAttackAdditiveBonus _nextAttackBonus = new();
+
+        private int AttackPower(int basePower) => _nextAttackBonus.ApplyToAttackPower(basePower);
+
         private bool StrikeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
@@ -18,7 +23,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Iron())
-                .WriteAttack(4, AttackType.Instance.Physical());
+                .WriteAttack(AttackPower(4), AttackType.Instance.Physical());
             return DSL.Create(sc.Self, pen);
         }
 
@@ -30,7 +35,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Instance.Iron())
-                .WriteAttack(8, AttackType.Instance.Physical());
+                .WriteAttack(AttackPower(8), AttackType.Instance.Physical());
             return DSL.Create(sc.Self, pen);
         }
 
@@ -42,7 +47,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .UseResource(3, ResourceType.Instance.Iron())
-                .WriteAttack(11, AttackType.Instance.Physical());
+                .WriteAttack(AttackPower(11), AttackType.Instance.Physical())
+                .WriteResource(0.5f, ResourceType.Instance.Iron())
+                .WriteFree(_ => _nextAttackBonus.Grant(1), canMove: true);
             return DSL.Create(sc.Self, pen);
         }
 
@@ -54,7 +61,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Iron())
-                .WriteAttack(2, AttackType.Instance.Physical(), 3)
+                .WriteAttack(AttackPower(2), AttackType.Instance.Physical(), 3)
                     .WithInterupt();
             return DSL.Create(sc.Self, pen);
         }
@@ -64,7 +71,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .WriteDefense(2, new CommonReduction())
-                .WriteAttack(1, AttackType.Instance.Physical());
+                .WriteAttack(AttackPower(1), AttackType.Instance.Physical());
             return DSL.Create(sc.Self, pen);
         }
     }

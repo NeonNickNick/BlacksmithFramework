@@ -2,6 +2,7 @@ using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
+using BlacksmithCore.Specific.Combat;
 using BlacksmithCore.Specific.Defense;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
@@ -10,6 +11,10 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class Driver : MainProfession
     {
+        private readonly NextAttackAdditiveBonus _nextAttackBonus = new();
+
+        private int AttackPower(int basePower) => _nextAttackBonus.ApplyToAttackPower(basePower);
+
         public override IDSLSourceFile PassiveSkill(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -25,7 +30,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param, ResourceType.Instance.Space())
-                .WriteAttack(12 * sc.Param, AttackType.Instance.Physical());
+                .WriteAttack(AttackPower(12 * sc.Param), AttackType.Instance.Physical());
             return DSL.Create(sc.Self, pen);
         }
 
@@ -38,7 +43,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Space())
                 .WriteResource(1, ResourceType.Instance.Time())
-                .WriteDefense(3, new RealReduction());
+                .WriteDefense(3, new RealReduction())
+                .WriteFree(_ => _nextAttackBonus.Grant(1), canMove: true);
             return DSL.Create(sc.Self, pen);
         }
 
@@ -51,7 +57,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             Pen pen = sf => sf
                 .UseResource(1, ResourceType.Instance.Time())
                 .WriteResource(1, ResourceType.Instance.Space())
-                .WriteDefense(3, new RealReduction());
+                .WriteDefense(3, new RealReduction())
+                .WriteFree(_ => _nextAttackBonus.Grant(1), canMove: true);
             return DSL.Create(sc.Self, pen);
         }
 
