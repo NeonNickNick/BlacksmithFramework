@@ -1,4 +1,3 @@
-using System.Linq;
 using BlacksmithCore.Driver;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Entites;

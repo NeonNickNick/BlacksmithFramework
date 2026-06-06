@@ -304,9 +304,9 @@ namespace BlacksmithCore.Infra.DSL
             }
             public AttackFile WithBloodSuck(float percent)
             {
-                var suck = (Community? source, Body target, AttackResolution resolution) =>
+                var suck = (Community source, Body target, AttackResolution resolution) =>
                 {
-                    source?.Focus.Get<Health>().GainHP((int)MathF.Ceiling(resolution.Power * percent));
+                    source.Focus.Get<Health>().GainHP((int)MathF.Ceiling(resolution.Power * percent));
                 };
                 return WithFree(AttackStage.OnEnd, suck);
             }
@@ -318,7 +318,7 @@ namespace BlacksmithCore.Infra.DSL
                     ResourceType.Instance.Gold_Iron(),
                     ResourceType.Instance.Magic()
                 };
-                var interupt = (Community? source, Body target, AttackResolution resolution) =>
+                var interupt = (Community source, Body target, AttackResolution resolution) =>
                 {
                     target.Get<TurnContext>().Get<ResourceResolution>().RemoveAll(r => interuptList.Contains(r.Type));
                 };

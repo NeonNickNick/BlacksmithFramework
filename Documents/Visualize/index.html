@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blacksmith Framework — 可视化文档</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #f0883e; --accent2: #e3b341;
+    --blue: #58a6ff; --green: #3fb950; --purple: #bc8cff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0d1117 70%);
+  }
+  .container { text-align: center; padding: 40px; }
+  h1 { font-size: 2.5rem; color: var(--accent); letter-spacing: 3px; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 48px; }
+  .cards { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 40px 36px; width: 360px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.25s; text-align: left;
+  }
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(240,136,62,0.12);
+  }
+  .card .icon { font-size: 2.5rem; margin-bottom: 16px; }
+  .card h2 { font-size: 1.3rem; color: var(--accent2); margin-bottom: 10px; }
+  .card p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+  .card .tags { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .card .tag {
+    padding: 2px 10px; border-radius: 10px; font-size: 0.72rem;
+    border: 1px solid;
+  }
+  .back-link {
+    margin-top: 48px; color: var(--muted); font-size: 0.82rem;
+    text-decoration: none; transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>⚒ Blacksmith Framework</h1>
+  <p class="subtitle">交互式可视化文档 — 图示优先，而非文字堆砌</p>
+
+  <div class="cards">
+    <a href="architecture.html" class="card">
+      <div class="icon">🏗</div>
+      <h2>项目架构全景</h2>
+      <p>
+        方案结构 · 核心抽象层 · 运行时对象关系 · 技能管线 · DSL 编译流程 · 扩展路径
+      </p>
+      <div class="tags">
+        <span class="tag" style="color:#3fb950;border-color:#3fb950">ClapInfra</span>
+        <span class="tag" style="color:#f0883e;border-color:#f0883e">Blacksmith</span>
+        <span class="tag" style="color:#58a6ff;border-color:#58a6ff">技能系统</span>
+        <span class="tag" style="color:#bc8cff;border-color:#bc8cff">DSL</span>
+      </div>
+    </a>
+
+    <a href="judgment-pipeline.html" class="card">
+      <div class="icon">⚖</div>
+      <h2>判定流程可视化</h2>
+      <p>
+        11 阶段链全景 · Resolution 流转 · 动态注册机制 · Clock 时钟 · 代码映射 · 技能编写指南
+      </p>
+      <div class="tags">
+        <span class="tag" style="color:#f85149;border-color:#f85149">JudgeRuleManager</span>
+        <span class="tag" style="color:#3fb950;border-color:#3fb950">Resolution</span>
+        <span class="tag" style="color:#f0883e;border-color:#f0883e">Mutation</span>
+        <span class="tag" style="color:#e3b341;border-color:#e3b341">ClapRoundClock</span>
+      </div>
+    </a>
+  </div>
+
+  <a href="../项目架构.md" class="back-link">← 返回文本文档</a>
+</div>
+</body>
+</html>

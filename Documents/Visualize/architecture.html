@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目架构 — Blacksmith Framework</title>
+<style>
+  :root {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#c9d1d9; --muted:#8b949e; --accent:#f0883e;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; }
+  header {
+    background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+    border-bottom:2px solid var(--accent); padding:24px 32px; text-align:center;
+  }
+  header h1 { font-size:1.6rem; color:var(--accent); letter-spacing:2px; }
+  header p { color:var(--muted); margin-top:4px; font-size:.85rem; }
+  html, body { height:100%; }
+  .wrap { max-width:98vw; margin:0 auto; padding:12px; }
+  .diagram {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:20px;
+    overflow:auto; max-height:82vh;
+  }
+  .diagram h2 { font-size:1.05rem; color:#e3b341; margin-bottom:14px; }
+  svg { display:block; min-width:1340px; }
+  .legend {
+    display:flex; flex-wrap:wrap; gap:18px; margin-top:16px;
+    padding-top:12px; border-top:1px solid var(--border);
+  }
+  .legend-item { display:flex; align-items:center; gap:7px; font-size:.78rem; color:var(--muted); }
+  .legend-swatch { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+  footer { text-align:center; padding:20px; color:var(--muted); font-size:.75rem; border-top:1px solid var(--border); margin-top:28px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚒ Blacksmith Framework · 项目架构全景图</h1>
+  <p>从方案结构到技能管线到扩展路径 — 一张图纵览全局</p>
+</header>
+
+<div class="wrap">
+<div class="diagram">
+  <h2>完整架构图</h2>
+
+  <svg viewBox="0 0 1360 2120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.1"/></filter>
+      <marker id="arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#f0883e"/></marker>
+      <marker id="arr-g" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#3fb950"/></marker>
+      <marker id="arr-b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#58a6ff"/></marker>
+      <marker id="arr-p" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#bc8cff"/></marker>
+      <linearGradient id="g-clap" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3fb950" stop-opacity="0.15"/><stop offset="100%" stop-color="#3fb950" stop-opacity="0.03"/></linearGradient>
+      <linearGradient id="g-bs" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f0883e" stop-opacity="0.15"/><stop offset="100%" stop-color="#f0883e" stop-opacity="0.03"/></linearGradient>
+      <linearGradient id="g-xio" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#bc8cff" stop-opacity="0.12"/><stop offset="100%" stop-color="#bc8cff" stop-opacity="0.02"/></linearGradient>
+    </defs>
+
+    <!-- ====== SECTION 1: SOLUTION STRUCTURE ====== -->
+    <rect x="20" y="20" width="1320" height="145" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+    <text x="680" y="48" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">方案结构与项目依赖</text>
+
+    <!-- Solutions -->
+    <rect x="45" y="60" width="150" height="28" rx="6" fill="#1c2128" stroke="#30363d" stroke-width="1"/>
+    <text x="120" y="79" text-anchor="middle" fill="#8b949e" font-size="10">Project.sln</text>
+    <rect x="210" y="60" width="160" height="28" rx="6" fill="#1c2128" stroke="#30363d" stroke-width="1"/>
+    <text x="290" y="79" text-anchor="middle" fill="#8b949e" font-size="10">BlacksmithOnly.sln</text>
+    <rect x="385" y="60" width="130" height="28" rx="6" fill="#1c2128" stroke="#30363d" stroke-width="1"/>
+    <text x="450" y="79" text-anchor="middle" fill="#8b949e" font-size="10">XioOnly.sln</text>
+
+    <!-- Clap Layer -->
+    <rect x="40" y="100" width="450" height="55" rx="8" fill="url(#g-clap)" stroke="#3fb950" stroke-width="1.2" filter="url(#sh)"/>
+    <text x="265" y="120" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="bold">Clap/ 共享基础层 (无游戏依赖)</text>
+    <rect x="55" y="128" width="195" height="20" rx="4" fill="#0d1117"/>
+    <text x="152" y="142" text-anchor="middle" fill="#c9d1d9" font-size="9">ClapInfra · 泛型骨架</text>
+    <rect x="260" y="128" width="215" height="20" rx="4" fill="#0d1117"/>
+    <text x="367" y="142" text-anchor="middle" fill="#c9d1d9" font-size="9">ClapSourceGenerators · Roslyn SG</text>
+
+    <!-- Arrows -->
+    <line x1="265" y1="155" x2="200" y2="185" stroke="#f0883e" stroke-width="1.5" marker-end="url(#arr)"/>
+    <line x1="265" y1="155" x2="680" y2="185" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+    <!-- Blacksmith Layer -->
+    <rect x="30" y="188" width="600" height="95" rx="8" fill="url(#g-bs)" stroke="#f0883e" stroke-width="1.5" filter="url(#sh)"/>
+    <text x="330" y="210" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="bold">Blacksmith/ 游戏层</text>
+    <rect x="45" y="220" width="260" height="50" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="0.8"/>
+    <text x="175" y="240" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="bold">BlacksmithCore</text>
+    <text x="175" y="258" text-anchor="middle" fill="#8b949e" font-size="8">Infra — Models · DSL · Judgement · Profession</text>
+    <rect x="315" y="220" width="145" height="50" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="0.8"/>
+    <text x="387" y="240" text-anchor="middle" fill="#c9d1d9" font-size="10" font-weight="bold">BlacksmithClient</text>
+    <text x="387" y="258" text-anchor="middle" fill="#8b949e" font-size="8">ASP.NET · Web 入口</text>
+    <rect x="470" y="220" width="145" height="50" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="0.8" stroke-dasharray="4,3"/>
+    <text x="542" y="240" text-anchor="middle" fill="#c9d1d9" font-size="10">ModExamples</text>
+    <text x="542" y="258" text-anchor="middle" fill="#8b949e" font-size="8">示例 Mod (不在 .sln)</text>
+
+    <!-- Xio Layer -->
+    <rect x="660" y="188" width="340" height="95" rx="8" fill="url(#g-xio)" stroke="#bc8cff" stroke-width="1.5" filter="url(#sh)"/>
+    <text x="830" y="210" text-anchor="middle" fill="#bc8cff" font-size="12" font-weight="bold">Xio/ 独立游戏层</text>
+    <rect x="675" y="220" width="150" height="50" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="0.8"/>
+    <text x="750" y="240" text-anchor="middle" fill="#c9d1d9" font-size="10">XioCore</text>
+    <text x="750" y="258" text-anchor="middle" fill="#8b949e" font-size="8">Xio 游戏引擎</text>
+    <rect x="835" y="220" width="150" height="50" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="0.8"/>
+    <text x="910" y="240" text-anchor="middle" fill="#c9d1d9" font-size="10">XioClient</text>
+    <text x="910" y="258" text-anchor="middle" fill="#8b949e" font-size="8">Xio Web 宿主</text>
+
+    <!-- Separator -->
+    <rect x="20" y="300" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
+
+    <!-- ====== SECTION 2: CLAPINFRA ABSTRACTIONS ====== -->
+    <text x="680" y="330" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">ClapInfra 核心抽象 — 各游戏通过继承具体化</text>
+
+    <!-- Row 1: Type System + Skill System -->
+    <rect x="40" y="345" width="300" height="140" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="1.2"/>
+    <rect x="40" y="345" width="300" height="24" rx="8" fill="rgba(63,185,80,0.15)"/>
+    <text x="190" y="361" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="bold">ClapEnum&lt;T, TMember&gt;</text>
+    <text x="55" y="390" fill="#8b949e" font-size="9">可扩展枚举 · 运行时创建成员</text>
+    <text x="55" y="408" fill="#8b949e" font-size="9">[IsXxxMember] 自动注册 · 全局递增 ID</text>
+    <text x="55" y="426" fill="#8b949e" font-size="9">Create(name, priority) 覆盖</text>
+    <text x="55" y="444" fill="#8b949e" font-size="9">CloseFactory() 关闭工厂</text>
+    <text x="55" y="468" fill="#39d2c0" font-size="8">→ BlacksmithEnum / XioEnum</text>
+
+    <rect x="360" y="345" width="320" height="140" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="1.2"/>
+    <rect x="360" y="345" width="320" height="24" rx="8" fill="rgba(88,166,255,0.15)"/>
+    <text x="520" y="361" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="bold">技能包系统</text>
+    <text x="375" y="388" fill="#c9d1d9" font-size="9">ClapSkillPackage → 源生成器配对</text>
+    <text x="375" y="405" fill="#8b949e" font-size="9">XxxCheck(ISkillContext) → bool</text>
+    <text x="375" y="422" fill="#8b949e" font-size="9">Xxx(ISkillContext) → IDSLSourceFile</text>
+    <text x="375" y="443" fill="#c9d1d9" font-size="9">ClapSkill → 多包管理</text>
+    <text x="375" y="460" fill="#8b949e" font-size="9">AddPackage · TryDeclare · Declare · GetPassiveSkill</text>
+    <text x="375" y="478" fill="#39d2c0" font-size="8">→ SkillPackageBase · MainProfession · ProfessionModifier</text>
+
+    <rect x="700" y="345" width="300" height="140" rx="8" fill="#0d1117" stroke="#f0883e" stroke-width="1.2"/>
+    <rect x="700" y="345" width="300" height="24" rx="8" fill="rgba(240,136,62,0.15)"/>
+    <text x="850" y="361" text-anchor="middle" fill="#f0883e" font-size="11" font-weight="bold">判定管线骨架</text>
+    <text x="715" y="388" fill="#c9d1d9" font-size="9">IClapDSLSourceFile → Compile(TJudger)</text>
+    <text x="715" y="405" fill="#c9d1d9" font-size="9">ClapJudger → 编排 Compile→Execute→GetRule</text>
+    <text x="715" y="422" fill="#c9d1d9" font-size="9">ClapJudgeRuleManager → Judge(player, enemy)</text>
+    <text x="715" y="439" fill="#c9d1d9" font-size="9">ClapIntent → Execute 委托</text>
+    <text x="715" y="460" fill="#8b949e" font-size="9">ClapRoundClock → 统一多回合生命周期</text>
+    <text x="715" y="478" fill="#39d2c0" font-size="8">→ Judger · JudgeRuleManager · Intent</text>
+
+    <!-- Row 2: Entity + Context + Utilities -->
+    <rect x="40" y="500" width="300" height="110" rx="8" fill="#0d1117" stroke="#bc8cff" stroke-width="1.2"/>
+    <rect x="40" y="500" width="300" height="24" rx="8" fill="rgba(188,140,255,0.15)"/>
+    <text x="190" y="516" text-anchor="middle" fill="#bc8cff" font-size="11" font-weight="bold">ClapBody · ClapTurnContext</text>
+    <text x="55" y="545" fill="#8b949e" font-size="9">ClapBody: 按类型键存储组件 · Get&lt;T&gt;()</text>
+    <text x="55" y="563" fill="#8b949e" font-size="9">ClapTurnContext: 泛型回合上下文</text>
+    <text x="55" y="581" fill="#8b949e" font-size="9">WriteResolution · Get&lt;T&gt; · Execute&lt;T&gt;</text>
+    <text x="55" y="600" fill="#39d2c0" font-size="8">→ Body (7组件) · TurnContext (4种Resolution)</text>
+
+    <rect x="360" y="500" width="300" height="110" rx="8" fill="#0d1117" stroke="#e3b341" stroke-width="1.2"/>
+    <rect x="360" y="500" width="300" height="24" rx="8" fill="rgba(227,179,65,0.12)"/>
+    <text x="510" y="516" text-anchor="middle" fill="#e3b341" font-size="11" font-weight="bold">工具类</text>
+    <text x="375" y="545" fill="#8b949e" font-size="9">ClapRoundClock: DelayRounds · RemainingRounds</text>
+    <text x="375" y="563" fill="#8b949e" font-size="9">IsRinging · IsDead · isInfinite · forceKill</text>
+    <text x="375" y="581" fill="#8b949e" font-size="9">ClapSharedFlag: 引用计数式开关</text>
+    <text x="375" y="599" fill="#8b949e" font-size="9">ClapStateVar&lt;T&gt;: 跨回合状态包装器</text>
+
+    <rect x="700" y="500" width="300" height="110" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+    <text x="850" y="525" text-anchor="middle" fill="#8b949e" font-size="11" font-weight="bold">DllLoader · EnumRegistry</text>
+    <text x="715" y="555" fill="#8b949e" font-size="9">DllLoader: 扫描 *.dll · LoadByType&lt;T&gt;</text>
+    <text x="715" y="575" fill="#8b949e" font-size="9">LoadStaticByAttribute</text>
+    <text x="715" y="595" fill="#8b949e" font-size="9">EnumRegistry: 泛型枚举注册表</text>
+
+    <!-- Separator -->
+    <rect x="20" y="628" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
+
+    <!-- ====== SECTION 3: STARTUP FLOW ====== -->
+    <text x="680" y="658" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">启动流程</text>
+
+    <rect x="45" y="672" width="140" height="48" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="1.2"/>
+    <text x="115" y="692" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">Program.cs</text>
+    <text x="115" y="710" text-anchor="middle" fill="#8b949e" font-size="8">入口点</text>
+    <line x1="185" y1="696" x2="215" y2="696" stroke="#f0883e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+    <rect x="220" y="672" width="160" height="48" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="1.2"/>
+    <text x="300" y="692" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="bold">ModLoader.Initialize</text>
+    <text x="300" y="710" text-anchor="middle" fill="#8b949e" font-size="8">读取 mod.json · 加载 DLL</text>
+    <line x1="380" y1="696" x2="410" y2="696" stroke="#f0883e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+    <rect x="415" y="665" width="190" height="62" rx="8" fill="#0d1117" stroke="#e3b341" stroke-width="1.2"/>
+    <text x="510" y="684" text-anchor="middle" fill="#e3b341" font-size="10" font-weight="bold">枚举 + 职业注册</text>
+    <text x="430" y="702" fill="#8b949e" font-size="8">EnumRegistry → CloseFactory()</text>
+    <text x="430" y="718" fill="#8b949e" font-size="8">SkillPackageBase → AddModOnInit</text>
+    <line x1="605" y1="696" x2="635" y2="696" stroke="#f0883e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+    <rect x="640" y="672" width="200" height="48" rx="8" fill="#0d1117" stroke="#f0883e" stroke-width="1.5"/>
+    <text x="740" y="692" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="bold">LocalHost.Start</text>
+    <text x="740" y="710" text-anchor="middle" fill="#8b949e" font-size="8">ASP.NET · localhost:5000</text>
+    <line x1="840" y1="696" x2="870" y2="696" stroke="#f0883e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+    <rect x="875" y="672" width="180" height="48" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="1.2"/>
+    <text x="965" y="692" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">API + 浏览器</text>
+    <text x="965" y="710" text-anchor="middle" fill="#8b949e" font-size="8">/api/* · wwwroot</text>
+
+    <!-- Separator -->
+    <rect x="20" y="748" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
+
+    <!-- ====== SECTION 4: RUNTIME CORE OBJECTS ====== -->
+    <text x="680" y="778" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">运行时核心对象</text>
+
+    <!-- GameInstance -->
+    <rect x="300" y="792" width="760" height="115" rx="10" fill="#0d1117" stroke="#f0883e" stroke-width="2" filter="url(#sh)"/>
+    <rect x="300" y="792" width="760" height="28" rx="10" fill="rgba(240,136,62,0.18)"/>
+    <text x="680" y="811" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="bold">GameInstance : ISudoOperations</text>
+
+    <rect x="320" y="828" width="225" height="65" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="1"/>
+    <text x="432" y="848" text-anchor="middle" fill="#58a6ff" font-size="10">Community Player</text>
+    <text x="432" y="868" text-anchor="middle" fill="#8b949e" font-size="8">Focus + SummonList</text>
+    <text x="432" y="884" text-anchor="middle" fill="#8b949e" font-size="8">AddTransform · AddCallbackKilled</text>
+
+    <rect x="560" y="828" width="225" height="65" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="1"/>
+    <text x="672" y="848" text-anchor="middle" fill="#58a6ff" font-size="10">Community Enemy</text>
+    <text x="672" y="868" text-anchor="middle" fill="#8b949e" font-size="8">Focus + SummonList</text>
+    <text x="672" y="884" text-anchor="middle" fill="#8b949e" font-size="8">Update() · Transform 管理</text>
+
+    <rect x="800" y="828" width="240" height="65" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="920" y="848" text-anchor="middle" fill="#c9d1d9" font-size="10">Judger · GameHistory</text>
+    <text x="920" y="868" text-anchor="middle" fill="#8b949e" font-size="8">JudgeRuleManager · 11阶段</text>
+    <text x="920" y="884" text-anchor="middle" fill="#8b949e" font-size="8">SkillHistory · DeepCopy · Swap</text>
+
+    <!-- Arrow down -->
+    <line x1="432" y1="893" x2="432" y2="930" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+    <!-- Body Detail -->
+    <rect x="60" y="935" width="1240" height="195" rx="10" fill="#0d1117" stroke="#58a6ff" stroke-width="1.2"/>
+    <text x="680" y="960" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Body : ClapBody → 7 个组件注入</text>
+
+    <!-- 7 components -->
+    <rect x="80" y="978" width="155" height="65" rx="6" fill="#161b22" stroke="#f0883e" stroke-width="1"/>
+    <text x="157" y="998" text-anchor="middle" fill="#f0883e" font-size="10">Health</text>
+    <text x="95" y="1018" fill="#8b949e" font-size="8">HP/MHP · GainHP/LoseHP</text>
+    <text x="95" y="1035" fill="#8b949e" font-size="8">GainMHP/LoseMHP</text>
+
+    <rect x="245" y="978" width="155" height="65" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="1"/>
+    <text x="322" y="998" text-anchor="middle" fill="#58a6ff" font-size="10">Resource</text>
+    <text x="260" y="1018" fill="#8b949e" font-size="8">Gold_ 前缀自动配对</text>
+    <text x="260" y="1035" fill="#8b949e" font-size="8">Check · Use · Gain · Query</text>
+
+    <rect x="410" y="978" width="155" height="65" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="1"/>
+    <text x="487" y="998" text-anchor="middle" fill="#3fb950" font-size="10">Defense</text>
+    <text x="425" y="1018" fill="#8b949e" font-size="8">List&lt;DefenseBase&gt;</text>
+    <text x="425" y="1035" fill="#8b949e" font-size="8">Add · Merge · 优先级排序</text>
+
+    <rect x="575" y="978" width="155" height="65" rx="6" fill="#161b22" stroke="#bc8cff" stroke-width="1"/>
+    <text x="652" y="998" text-anchor="middle" fill="#bc8cff" font-size="10">Effect</text>
+    <text x="590" y="1018" fill="#8b949e" font-size="8">List&lt;EffectEntity&gt;</text>
+    <text x="590" y="1035" fill="#8b949e" font-size="8">Execute · Update 清理</text>
+
+    <rect x="740" y="978" width="155" height="65" rx="6" fill="#161b22" stroke="#e3b341" stroke-width="1"/>
+    <text x="817" y="998" text-anchor="middle" fill="#e3b341" font-size="10">TurnContext</text>
+    <text x="755" y="1018" fill="#8b949e" font-size="8">4 种 Resolution 缓存</text>
+    <text x="755" y="1035" fill="#8b949e" font-size="8">AddPreprocess 钩子</text>
+
+    <rect x="905" y="978" width="155" height="65" rx="6" fill="#161b22" stroke="#39d2c0" stroke-width="1"/>
+    <text x="982" y="998" text-anchor="middle" fill="#39d2c0" font-size="10">Skill</text>
+    <text x="920" y="1018" fill="#8b949e" font-size="8">List&lt;PackageContainer&gt;</text>
+    <text x="920" y="1035" fill="#8b949e" font-size="8">ClapSharedFlag 管理</text>
+
+    <rect x="1070" y="978" width="210" height="65" rx="6" fill="#161b22" stroke="#f85149" stroke-width="1"/>
+    <text x="1175" y="998" text-anchor="middle" fill="#f85149" font-size="10">Community (自引用)</text>
+    <text x="1085" y="1018" fill="#8b949e" font-size="8">指向所属 Community</text>
+    <text x="1085" y="1035" fill="#8b949e" font-size="8">Focus / SummonList 上下文</text>
+
+    <!-- Arrow to BodyView -->
+    <rect x="80" y="1063" width="240" height="45" rx="6" fill="rgba(63,185,80,0.04)" stroke="#3fb950" stroke-width="1"/>
+    <text x="200" y="1082" text-anchor="middle" fill="#3fb950" font-size="10">GetView() → BodyView</text>
+    <text x="200" y="1098" text-anchor="middle" fill="#8b949e" font-size="8">HP · MHP · Defenses · Resources · Skills</text>
+
+    <rect x="360" y="1063" width="500" height="45" rx="6" fill="rgba(57,210,192,0.04)" stroke="#39d2c0" stroke-width="1"/>
+    <text x="610" y="1082" text-anchor="middle" fill="#39d2c0" font-size="10">SummonList + AddTransform + AddCallbackKilled</text>
+    <text x="610" y="1098" text-anchor="middle" fill="#8b949e" font-size="8">分身创建 · 延迟加入 · 死亡回调 · 多角色管理</text>
+
+    <!-- Separator -->
+    <rect x="20" y="1148" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
+
+    <!-- ====== SECTION 5: SKILL PIPELINE ====== -->
+    <text x="680" y="1178" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">技能生命周期管道</text>
+
+    <!-- Declare -->
+    <rect x="40" y="1192" width="190" height="95" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="1.8"/>
+    <rect x="40" y="1192" width="190" height="24" rx="8" fill="rgba(88,166,255,0.15)"/>
+    <text x="135" y="1208" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="bold">① Declare 声明</text>
+    <text x="52" y="1238" fill="#8b949e" font-size="9">GameInstance.Declare()</text>
+    <text x="52" y="1255" fill="#8b949e" font-size="9">TryDeclare → Check 通过?</text>
+    <text x="52" y="1272" fill="#8b949e" font-size="9">Declare → 执行技能方法</text>
+    <text x="52" y="1286" fill="#c9d1d9" font-size="8">产出: IDSLSourceFile</text>
+    <line x1="230" y1="1240" x2="265" y2="1240" stroke="#f0883e" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- Compile -->
+    <rect x="270" y="1192" width="190" height="95" rx="8" fill="#0d1117" stroke="#bc8cff" stroke-width="1.8"/>
+    <rect x="270" y="1192" width="190" height="24" rx="8" fill="rgba(188,140,255,0.15)"/>
+    <text x="365" y="1208" text-anchor="middle" fill="#bc8cff" font-size="10" font-weight="bold">② Compile 编译</text>
+    <text x="282" y="1238" fill="#8b949e" font-size="9">SourceFile.Compile(judger)</text>
+    <text x="282" y="1255" fill="#8b949e" font-size="9">展开修辞缓存</text>
+    <text x="282" y="1272" fill="#8b949e" font-size="9">注册动态 Mutation</text>
+    <text x="282" y="1286" fill="#c9d1d9" font-size="8">产出: Intent</text>
+    <line x1="460" y1="1240" x2="495" y2="1240" stroke="#f0883e" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- Execute -->
+    <rect x="500" y="1192" width="190" height="95" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="1.8"/>
+    <rect x="500" y="1192" width="190" height="24" rx="8" fill="rgba(63,185,80,0.15)"/>
+    <text x="595" y="1208" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">③ Execute 写入</text>
+    <text x="512" y="1238" fill="#8b949e" font-size="9">Intent.Execute(Community)</text>
+    <text x="512" y="1255" fill="#8b949e" font-size="9">Sentence.Structure 执行</text>
+    <text x="512" y="1272" fill="#8b949e" font-size="9">WriteXxx → Resolution</text>
+    <text x="512" y="1286" fill="#c9d1d9" font-size="8">写入: TurnContext</text>
+    <line x1="690" y1="1240" x2="725" y2="1240" stroke="#f0883e" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- Judge -->
+    <rect x="730" y="1192" width="220" height="95" rx="8" fill="#0d1117" stroke="#f0883e" stroke-width="2.5" filter="url(#sh)"/>
+    <rect x="730" y="1192" width="220" height="24" rx="8" fill="rgba(240,136,62,0.2)"/>
+    <text x="840" y="1208" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="bold">④ Judge 判定</text>
+    <text x="742" y="1238" fill="#8b949e" font-size="9">JudgeRuleManager.Judge()</text>
+    <text x="742" y="1255" fill="#8b949e" font-size="9">11 StageRuleContainer 依次执行</text>
+    <text x="742" y="1272" fill="#8b949e" font-size="9">Before → 核心 → After → Update</text>
+    <text x="742" y="1286" fill="#c9d1d9" font-size="8">产出: Body.GetView() 快照</text>
+
+    <!-- 4 Resolutions below -->
+    <rect x="40" y="1305" width="1280" height="70" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+    <text x="680" y="1328" text-anchor="middle" fill="#e3b341" font-size="11" font-weight="bold">TurnContext 中的 4 种 Resolution</text>
+
+    <rect x="60" y="1338" width="290" height="28" rx="5" fill="#161b22" stroke="#f85149" stroke-width="0.8"/>
+    <text x="80" y="1357" fill="#f85149" font-size="9" font-family="monospace">AttackResolution</text>
+    <text x="230" y="1357" fill="#8b949e" font-size="8">Type · Power · Clock · 阶段钩子 OnHitArmor/OnHitBody/OnEnd</text>
+
+    <rect x="360" y="1338" width="290" height="28" rx="5" fill="#161b22" stroke="#3fb950" stroke-width="0.8"/>
+    <text x="380" y="1357" fill="#3fb950" font-size="9" font-family="monospace">DefenseResolution</text>
+    <text x="530" y="1357" fill="#8b949e" font-size="8">Defense · Power · Clock · Owner 自动赋值</text>
+
+    <rect x="660" y="1338" width="290" height="28" rx="5" fill="#161b22" stroke="#bc8cff" stroke-width="0.8"/>
+    <text x="680" y="1357" fill="#bc8cff" font-size="9" font-family="monospace">EffectResolution</text>
+    <text x="830" y="1357" fill="#8b949e" font-size="8">Type · TargetType · Power · Clock · delayRounds</text>
+
+    <rect x="960" y="1338" width="340" height="28" rx="5" fill="#161b22" stroke="#e3b341" stroke-width="0.8"/>
+    <text x="980" y="1357" fill="#e3b341" font-size="9" font-family="monospace">ResourceResolution</text>
+    <text x="1130" y="1357" fill="#8b949e" font-size="8">Type · Power · Clock (UseResource 不在此)</text>
+
+    <!-- Separator -->
+    <rect x="20" y="1393" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
+
+    <!-- ====== SECTION 6: DSL PIPELINE ====== -->
+    <text x="680" y="1420" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">DSL 编译管线</text>
+
+    <!-- Pen Pattern -->
+    <rect x="40" y="1435" width="380" height="130" rx="8" fill="#0d1117" stroke="#bc8cff" stroke-width="1.2"/>
+    <rect x="40" y="1435" width="380" height="22" rx="8" fill="rgba(188,140,255,0.12)"/>
+    <text x="230" y="1451" text-anchor="middle" fill="#bc8cff" font-size="10" font-weight="bold">Pen 链式 DSL</text>
+    <text x="55" y="1476" fill="#c9d1d9" font-size="9" font-family="monospace">using Pen = Func&lt;SourceFile, SourceFile&gt;</text>
+    <text x="55" y="1496" fill="#c9d1d9" font-size="9" font-family="monospace">Pen pen = sf =&gt; sf</text>
+    <text x="55" y="1514" fill="#c9d1d9" font-size="9" font-family="monospace">  .UseResource(1, Iron)</text>
+    <text x="55" y="1532" fill="#c9d1d9" font-size="9" font-family="monospace">  .WriteAttack(3, Physical)</text>
+    <text x="55" y="1550" fill="#c9d1d9" font-size="9" font-family="monospace">  .WithBloodSuck(0.66);</text>
+    <text x="55" y="1565" fill="#8b949e" font-size="8">DSL.Create(sc.Self, pen) → SourceFile</text>
+
+    <!-- SourceFile -->
+    <rect x="450" y="1435" width="380" height="130" rx="8" fill="#0d1117" stroke="#f0883e" stroke-width="1.2"/>
+    <rect x="450" y="1435" width="380" height="22" rx="8" fill="rgba(240,136,62,0.12)"/>
+    <text x="640" y="1451" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="bold">SourceFile 内部</text>
+    <text x="465" y="1476" fill="#8b949e" font-size="9">Community _owner — 施放者</text>
+    <text x="465" y="1494" fill="#8b949e" font-size="9">List&lt;Sentence&gt; _sentences — 待执行语句</text>
+    <text x="465" y="1512" fill="#8b949e" font-size="9">Stack&lt;Sentence&gt; _rhetoricCache — WithXxx 修辞</text>
+    <text x="465" y="1530" fill="#8b949e" font-size="9">List&lt;List&lt;Mutation&gt;&gt; _mutationsOnCompile</text>
+    <text x="465" y="1552" fill="#39d2c0" font-size="8">每个 Sentence: Structure + SentenceType + CanMove</text>
+
+    <!-- Compile 3 steps -->
+    <rect x="860" y="1435" width="460" height="130" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="1.2"/>
+    <rect x="860" y="1435" width="460" height="22" rx="8" fill="rgba(63,185,80,0.12)"/>
+    <text x="1090" y="1451" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">Compile(judger) 三步</text>
+    <text x="880" y="1476" fill="#c9d1d9" font-size="9">① 展开修辞 — Pop _rhetoricCache → Insert</text>
+    <text x="880" y="1496" fill="#c9d1d9" font-size="9">② 注册 Mutation — AddJudgeRule 落地到阶段链</text>
+    <text x="880" y="1516" fill="#c9d1d9" font-size="9">③ 合并 Sentence — 多播 Action&lt;Community&gt;</text>
+    <text x="880" y="1540" fill="#39d2c0" font-size="8">→ Intent { Execute = 合并后的 Action }</text>
+
+    <!-- Separator -->
+    <rect x="20" y="1583" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
+
+    <!-- ====== SECTION 7: JUDGMENT CHAIN ====== -->
+    <text x="680" y="1610" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">判定阶段链 · JudgeRuleManager</text>
+
+    <!-- 11 stages as horizontal -->
+    <rect x="40" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="1"/>
+    <text x="85" y="1642" text-anchor="middle" fill="#58a6ff" font-size="8">OnBegin</text>
+    <text x="85" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">0</text>
+    <text x="85" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">空</text>
+    <text x="85" y="1696" text-anchor="middle" fill="#39d2c0" font-size="6">动态注册口</text>
+
+    <text x="130" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="145" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="1"/>
+    <text x="190" y="1642" text-anchor="middle" fill="#3fb950" font-size="8">SwapEffects</text>
+    <text x="190" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">8</text>
+    <text x="190" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">交换 Effect</text>
+    <text x="190" y="1696" text-anchor="middle" fill="#8b949e" font-size="7">Reflect 拦截</text>
+
+    <text x="235" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="250" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="1"/>
+    <text x="295" y="1642" text-anchor="middle" fill="#bc8cff" font-size="8">ApplyEffect</text>
+    <text x="295" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">16</text>
+    <text x="295" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">执行 Effect</text>
+    <text x="295" y="1696" text-anchor="middle" fill="#8b949e" font-size="7">→ EffectEntity</text>
+
+    <text x="340" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="355" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="1"/>
+    <text x="400" y="1642" text-anchor="middle" fill="#f0883e" font-size="8">AfterReso</text>
+    <text x="400" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">32</text>
+    <text x="400" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">TakeEffects</text>
+    <text x="400" y="1696" text-anchor="middle" fill="#8b949e" font-size="7">致幻</text>
+
+    <text x="445" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="460" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="1"/>
+    <text x="505" y="1642" text-anchor="middle" fill="#f85149" font-size="8">CancelAtk</text>
+    <text x="505" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">64</text>
+    <text x="505" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">1:1 对消</text>
+    <text x="505" y="1696" text-anchor="middle" fill="#8b949e" font-size="7">反击 Before</text>
+
+    <text x="550" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="565" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="1"/>
+    <text x="610" y="1642" text-anchor="middle" fill="#58a6ff" font-size="8">SwapAtk</text>
+    <text x="610" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">128</text>
+    <text x="610" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">交换攻击</text>
+    <text x="610" y="1696" text-anchor="middle" fill="#8b949e" font-size="7">Reflect 拦截</text>
+
+    <text x="655" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="670" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="1"/>
+    <text x="715" y="1642" text-anchor="middle" fill="#3fb950" font-size="8">AfterTrans</text>
+    <text x="715" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">256</text>
+    <text x="715" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">TakeEffects</text>
+    <text x="715" y="1696" text-anchor="middle" fill="#8b949e" font-size="7">禁言·闪避</text>
+
+    <text x="760" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="775" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="2.2"/>
+    <text x="820" y="1642" text-anchor="middle" fill="#f0883e" font-size="8">⭐ApplyOthers</text>
+    <text x="820" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">512</text>
+    <text x="820" y="1678" text-anchor="middle" fill="#f0883e" font-size="7">防御→攻击→资源</text>
+    <text x="820" y="1696" text-anchor="middle" fill="#f0883e" font-size="7">OnHitArmor/OnHitBody</text>
+
+    <text x="865" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="880" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="1"/>
+    <text x="925" y="1642" text-anchor="middle" fill="#bc8cff" font-size="8">Update</text>
+    <text x="925" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">1024</text>
+    <text x="925" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">Community.Update</text>
+    <text x="925" y="1696" text-anchor="middle" fill="#8b949e" font-size="7">清理+推进</text>
+
+    <text x="970" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="985" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#e3b341" stroke-width="1"/>
+    <text x="1030" y="1642" text-anchor="middle" fill="#e3b341" font-size="8">AfterResult</text>
+    <text x="1030" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">2048</text>
+    <text x="1030" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">TakeEffects</text>
+
+    <text x="1075" y="1670" text-anchor="middle" fill="#f0883e" font-size="14">→</text>
+
+    <rect x="1090" y="1622" width="90" height="92" rx="6" fill="#0d1117" stroke="#8b949e" stroke-width="1"/>
+    <text x="1135" y="1642" text-anchor="middle" fill="#8b949e" font-size="8">OnEnd</text>
+    <text x="1135" y="1658" text-anchor="middle" fill="#e3b341" font-size="7">4096</text>
+    <text x="1135" y="1678" text-anchor="middle" fill="#8b949e" font-size="7">空</text>
+    <text x="1135" y="1696" text-anchor="middle" fill="#39d2c0" font-size="6">Mist 复位</text>
+
+    <!-- Stage execution pattern -->
+    <rect x="40" y="1728" width="1280" height="45" rx="6" fill="rgba(240,136,62,0.03)" stroke="#f0883e" stroke-width="1" stroke-opacity="0.3"/>
+    <text x="680" y="1748" text-anchor="middle" fill="#8b949e" font-size="10">每阶段: Before Modifiers (仅 IsRinging) → 核心 (Override 替换 Base，否则执行 Base) → After Modifiers (仅 IsRinging) → Update() 清理 IsDead + 剩余规则 RoundPass()</text>
+    <text x="680" y="1764" text-anchor="middle" fill="#39d2c0" font-size="9">动态规则 = Mutation → RuleUnit → 插入 StageRuleContainer · RuleType: Override (替换) / Modifier (追加 Before/After)</text>
+
+    <!-- Separator -->
+    <rect x="20" y="1788" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
+
+    <!-- ====== SECTION 8: EXTENSION PATHS ====== -->
+    <text x="680" y="1818" text-anchor="middle" fill="#e3b341" font-size="13" font-weight="bold">6 条典型扩展路径</text>
+
+    <rect x="40" y="1832" width="420" height="62" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="1"/>
+    <text x="250" y="1852" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="bold">新增职业</text>
+    <text x="55" y="1872" fill="#8b949e" font-size="9">MainProfession → [IsProfessionModifier] → [IsProfessionSkill] + AddPackage</text>
+    <text x="55" y="1888" fill="#39d2c0" font-size="8">参考: 职业Mod.md · 高级技能模式.md</text>
+
+    <rect x="470" y="1832" width="420" height="62" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="1"/>
+    <text x="680" y="1852" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">扩展枚举</text>
+    <text x="485" y="1872" fill="#8b949e" font-size="9">[IsBlacksmithEnumModifier] 静态类 → Create(name, priority) → DSL 直接使用</text>
+    <text x="485" y="1888" fill="#39d2c0" font-size="8">参考: 枚举Mod.md</text>
+
+    <rect x="900" y="1832" width="420" height="62" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="1"/>
+    <text x="1110" y="1852" text-anchor="middle" fill="#bc8cff" font-size="10" font-weight="bold">自定义防御</text>
+    <text x="915" y="1872" fill="#8b949e" font-size="9">扩展 DefenseType → 继承 DefenseBase → Work/Update/Merge → WriteDefense</text>
+    <text x="915" y="1888" fill="#39d2c0" font-size="8">参考: 高级技能模式.md §4</text>
+
+    <rect x="40" y="1902" width="420" height="62" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="1"/>
+    <text x="250" y="1922" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="bold">动态注册</text>
+    <text x="55" y="1942" fill="#8b949e" font-size="9">Mutation(Stage/RuleType/JudgeRule/Clock) → LinkJudgeRuleDynamic</text>
+    <text x="55" y="1958" fill="#39d2c0" font-size="8">参考: 判定实现.md · 高级技能模式.md §6</text>
+
+    <rect x="470" y="1902" width="420" height="62" rx="6" fill="#0d1117" stroke="#e3b341" stroke-width="1"/>
+    <text x="680" y="1922" text-anchor="middle" fill="#e3b341" font-size="10" font-weight="bold">Association 联想</text>
+    <text x="485" y="1942" fill="#8b949e" font-size="9">DeepCopy() → Swap() → TryDeclare → Declare → Move(sc.Self) → 追加消耗</text>
+    <text x="485" y="1958" fill="#39d2c0" font-size="8">参考: 高级技能模式.md §7 · PhantomBook Mod</text>
+
+    <rect x="900" y="1902" width="420" height="62" rx="6" fill="#0d1117" stroke="#39d2c0" stroke-width="1"/>
+    <text x="1110" y="1922" text-anchor="middle" fill="#39d2c0" font-size="10" font-weight="bold">分身/召唤物</text>
+    <text x="915" y="1942" fill="#8b949e" font-size="9">new Body → AddPackage → AddTransform → AddCallbackKilled</text>
+    <text x="915" y="1958" fill="#39d2c0" font-size="8">参考: 高级技能模式.md §10 · Monk Mod</text>
+
+    <!-- Final note -->
+    <rect x="40" y="1980" width="1280" height="48" rx="8" fill="rgba(240,136,62,0.04)" stroke="#f0883e" stroke-width="1" stroke-opacity="0.3"/>
+    <text x="680" y="2000" text-anchor="middle" fill="#8b949e" font-size="9">完整文档: Documents/项目架构.md · 判定流程.md · 高级技能模式.md · Mod基础指南/ · Mod进阶指南/</text>
+    <text x="680" y="2018" text-anchor="middle" fill="#8b949e" font-size="9">所有 Resolution、预处理钩子、动态规则、EffectEntity、Community Transform 统一使用 ClapRoundClock 管理时序</text>
+
+    <!-- Legend -->
+    <text x="680" y="2050" text-anchor="middle" fill="#8b949e" font-size="11">图例</text>
+    <rect x="250" y="2045" width="12" height="12" rx="2" fill="none" stroke="#3fb950" stroke-width="1.5"/><text x="268" y="2056" fill="#8b949e" font-size="9">ClapInfra 基础层</text>
+    <rect x="410" y="2045" width="12" height="12" rx="2" fill="none" stroke="#f0883e" stroke-width="1.5"/><text x="428" y="2056" fill="#8b949e" font-size="9">Blacksmith 游戏层</text>
+    <rect x="600" y="2045" width="12" height="12" rx="2" fill="none" stroke="#58a6ff" stroke-width="1.5"/><text x="618" y="2056" fill="#8b949e" font-size="9">技能系统</text>
+    <rect x="740" y="2045" width="12" height="12" rx="2" fill="none" stroke="#bc8cff" stroke-width="1.5"/><text x="758" y="2056" fill="#8b949e" font-size="9">DSL / 实体</text>
+    <rect x="880" y="2045" width="12" height="12" rx="2" fill="none" stroke="#39d2c0" stroke-width="1.5"/><text x="898" y="2056" fill="#8b949e" font-size="9">扩展 / 动态</text>
+    <rect x="1020" y="2045" width="12" height="12" rx="2" fill="none" stroke="#e3b341" stroke-width="1.5"/><text x="1038" y="2056" fill="#8b949e" font-size="9">工具 / 元数据</text>
+  </svg>
+</div>
+</div>
+
+<footer>
+  Generated from Documents/项目架构.md · Blacksmith Framework
+</footer>
+</body>
+</html>
