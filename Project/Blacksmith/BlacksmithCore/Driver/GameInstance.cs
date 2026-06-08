@@ -92,13 +92,19 @@ namespace BlacksmithCore.Driver
 
             var ps = Player.Focus.Get<Skill>();
             var psfs = ps.GetPassiveSkill(playerContext);
-            Player.SummonList.ForEach(s => psfs.AddRange(s.Get<Skill>().GetPassiveSkill(playerContext)));
-            psfs.Add(ps.Declare(skillName, playerContext));
+            foreach (var s in Player.SummonList)
+            {
+                psfs = psfs.Concat(s.Get<Skill>().GetPassiveSkill(playerContext));
+            }
+            psfs = psfs.Append(ps.Declare(skillName, playerContext));
 
             var es = Enemy.Focus.Get<Skill>();
             var esfs = es.GetPassiveSkill(enemyContext);
-            Enemy.SummonList.ForEach(s => esfs.AddRange(s.Get<Skill>().GetPassiveSkill(enemyContext)));
-            esfs.Add(es.Declare(esn, enemyContext));
+            foreach (var s in Enemy.SummonList)
+            {
+                esfs = esfs.Concat(s.Get<Skill>().GetPassiveSkill(playerContext));
+            }
+            esfs = esfs.Append(es.Declare(esn, enemyContext));
 
             Judger.Judge(psfs, esfs);
             History.SkillHistory.Add((playerContext, enemyContext));

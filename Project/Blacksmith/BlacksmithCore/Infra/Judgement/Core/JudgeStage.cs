@@ -1,9 +1,7 @@
 using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using BlacksmithCore.Infra.Enum;
-using BlacksmithCore.Infra.Models.Entites;
-using ClapInfra.ClapUnit;
 
-namespace BlacksmithCore.Infra.Judgement
+namespace BlacksmithCore.Infra.Judgement.Core
 {
     public class JudgeStage : BlacksmithEnum<JudgeStage>
     {
@@ -30,36 +28,5 @@ namespace BlacksmithCore.Infra.Judgement
         public CEValue OnEffectTaking_AfterResult() => GetCEValue();
         [IsBlacksmithEnumMember(4096)]
         public CEValue OnEnd() => GetCEValue();
-    }
-    public enum RuleType
-    {
-        Override,
-        Modifier
-    }
-    public enum ModifierOrder
-    {
-        Before,
-        After
-    }
-    public class Mutation
-    {
-        public ClapRoundClock Clock;
-        public JudgeStage.CEValue Stage;
-        public RuleType RuleType;
-        public ModifierOrder ModifierOrder;
-        public Action<Community, Community> JudgeRule;
-        public Mutation(
-            Action<Community, Community> judgeRule,
-            JudgeStage.CEValue stage,
-            RuleType ruleType,
-            ModifierOrder modifierOrder,
-            ClapRoundClock clock)
-        {
-            Clock = clock;
-            Stage = stage;
-            RuleType = ruleType;
-            ModifierOrder = modifierOrder;
-            JudgeRule = judgeRule;
-        }
     }
 }

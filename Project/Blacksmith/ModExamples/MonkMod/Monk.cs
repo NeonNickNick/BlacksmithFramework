@@ -1,5 +1,7 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
@@ -63,10 +65,10 @@ namespace ModExamples.MonkMod
                             .Compile().Execute(source);
                     });
                 }, true)
-                .LinkJudgeRuleDynamic(
+                .RegistCallbackOnJudge(
                     new()
                     {
-                        new((player, enemy) =>
+                        new ModifierCallback((player, enemy) =>
                         {
                             foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
                             {
@@ -86,7 +88,6 @@ namespace ModExamples.MonkMod
                             }
                         },
                         JudgeStage.Instance.OnApplyingOthers(),
-                        RuleType.Modifier,
                         ModifierOrder.Before,
                         new(isInfinite: true, forceKill: () =>
                         {
@@ -111,7 +112,8 @@ namespace ModExamples.MonkMod
         {
             return _cloneNum.Value > 0;
         }
-        private IDSLSourceFile MazeFist(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile MazeFist(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .WriteFree(source =>
@@ -164,15 +166,14 @@ namespace ModExamples.MonkMod
                     };
                     hpMin!.Get<Effect>().Add(entity);
                 }, true)
-                .LinkJudgeRuleDynamic(new()
+                .RegistCallbackOnJudge(new()
                 {
-                    new((player, enemy) =>
+                    new ModifierCallback((player, enemy) =>
                     {
                         _transmitPercent.Reset();
                         _mist.Reset();
                     },
                     JudgeStage.Instance.OnEnd(),
-                    RuleType.Modifier,
                     ModifierOrder.Before,
                     new(delayRounds: 2, remainingRounds: 1))
                 });
@@ -182,7 +183,8 @@ namespace ModExamples.MonkMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Jade(), 2f);
         }
-        private IDSLSourceFile Disillusionment(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile Disillusionment(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(2f, ResourceType.Instance.Jade())

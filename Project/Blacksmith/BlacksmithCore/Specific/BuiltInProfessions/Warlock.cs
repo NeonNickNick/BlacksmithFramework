@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes.Profession;
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
@@ -30,6 +30,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Magic(), sc.Param);
         }
+        [IsAttack]
         private IDSLSourceFile MagicAttack(ISkillContext sc)
         {
             Pen pen = sf => sf

@@ -94,7 +94,7 @@
     <!-- Dynamic rule callout -->
     <rect x="1120" y="30" width="390" height="58" rx="8" fill="rgba(57,210,192,0.04)" stroke="#39d2c0" stroke-width="1" stroke-dasharray="5,3"/>
     <text x="1315" y="52" text-anchor="middle" fill="#39d2c0" font-size="11" font-weight="bold">动态规则 = 插入阶段的回调 (Before / Override / After)</text>
-    <text x="1315" y="72" text-anchor="middle" fill="#8b949e" font-size="10">LinkJudgeRuleDynamic → _mutationsOnCompile → Compile 时落地到 StageRuleContainer</text>
+    <text x="1315" y="72" text-anchor="middle" fill="#8b949e" font-size="10">RegistCallbackOnJudge → _mutationsOnCompile → Compile 时落地到 StageRuleContainer</text>
 
     <!-- ====== COLUMN HEADERS ====== -->
     <!-- Stage# -->
@@ -119,7 +119,7 @@
 
     <!-- Dynamic Rules column -->
     <rect x="970" y="120" width="260" height="38" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-    <text x="1100" y="144" text-anchor="middle" fill="#8b949e" font-size="11" font-weight="bold">动态规则 Mutation 插入点</text>
+    <text x="1100" y="144" text-anchor="middle" fill="#8b949e" font-size="11" font-weight="bold">动态回调 ICallbackOnJudge 插入点</text>
 
     <!-- Body / Community column -->
     <rect x="1238" y="120" width="180" height="38" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
@@ -157,13 +157,13 @@
     <!-- JudgeRuleManager column -->
     <rect x="762" y="175" width="200" height="80" rx="6" fill="#0d1117" stroke="#bc8cff" stroke-width="1" stroke-dasharray="4,2"/>
     <text x="862" y="198" text-anchor="middle" fill="#bc8cff" font-size="11">Compile 阶段动态注册</text>
-    <text x="774" y="218" fill="#8b949e" font-size="9">LinkJudgeRuleDynamic 记录</text>
+    <text x="774" y="218" fill="#8b949e" font-size="9">RegistCallbackOnJudge 记录</text>
     <text x="774" y="234" fill="#8b949e" font-size="9">Compile 时 AddJudgeRule</text>
     <text x="774" y="250" fill="#8b949e" font-size="9">→ 按 source 专门化 → RuleUnit</text>
 
     <!-- Dynamic Rules: how they register -->
     <rect x="970" y="175" width="260" height="80" rx="6" fill="rgba(57,210,192,0.04)" stroke="#39d2c0" stroke-width="1"/>
-    <text x="1100" y="198" text-anchor="middle" fill="#39d2c0" font-size="11">Mutation → RuleUnit 插入</text>
+    <text x="1100" y="198" text-anchor="middle" fill="#39d2c0" font-size="11">ICallbackOnJudge → RuleUnit 插入</text>
     <text x="982" y="218" fill="#8b949e" font-size="9">Override → _overrideRules (替换 Base)</text>
     <text x="982" y="234" fill="#8b949e" font-size="9">Modifier+Before → _modifiersBefore</text>
     <text x="982" y="250" fill="#8b949e" font-size="9">Modifier+After → _modifiersAfter</text>
@@ -709,7 +709,7 @@
     <rect x="20" y="1860" width="1520" height="2" stroke="#f0883e" stroke-width="2"/>
 
     <rect x="20" y="1872" width="1520" height="58" rx="8" fill="rgba(240,136,62,0.04)" stroke="#f0883e" stroke-width="1" stroke-opacity="0.3"/>
-    <text x="780" y="1896" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="bold">动态规则 (Mutation) 的本质：向任意阶段的 StageRuleContainer 插入 Action&lt;Community,Community&gt; 回调</text>
+    <text x="780" y="1896" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="bold">动态回调 (ICallbackOnJudge) 的本质：向任意阶段的 StageRuleContainer 插入 Action&lt;Community,Community&gt; 回调</text>
     <text x="780" y="1916" text-anchor="middle" fill="#8b949e" font-size="10">每个 RuleUnit 携带独立的 ClapRoundClock → IsRinging 控制执行 · IsDead 控制清理 · RoundPass() 推进 · isInfinite+forceKill 条件终止</text>
 
     <!-- === LEGEND === -->
@@ -717,7 +717,7 @@
     <rect x="65" y="1982" width="12" height="12" rx="2" fill="none" stroke="#f0883e" stroke-width="2"/>
     <text x="85" y="1994" fill="#8b949e" font-size="10">核心结算阶段</text>
     <rect x="220" y="1982" width="12" height="12" rx="2" fill="none" stroke="#39d2c0" stroke-width="1.5"/>
-    <text x="240" y="1994" fill="#8b949e" font-size="10">动态规则插入点 (Mutation)</text>
+    <text x="240" y="1994" fill="#8b949e" font-size="10">动态回调插入点 (ICallbackOnJudge)</text>
     <rect x="430" y="1982" width="12" height="12" rx="2" fill="none" stroke="#3fb950" stroke-width="1.5"/>
     <text x="450" y="1994" fill="#8b949e" font-size="10">Effect 系统</text>
     <rect x="590" y="1982" width="12" height="12" rx="2" fill="none" stroke="#f85149" stroke-width="1.5"/>

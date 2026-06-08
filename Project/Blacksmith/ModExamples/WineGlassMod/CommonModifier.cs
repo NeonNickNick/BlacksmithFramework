@@ -6,26 +6,26 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.BuiltInProfessions;
 
-namespace ModExamples.CauldronMod
+namespace ModExamples.WineGlassMod
 {
     using DSL = DSLforSkillLogic;
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     [IsProfessionModifier(nameof(Common))]
     public partial class CommonModifier : ProfessionModifier
     {
-        private bool CauldronCheck(ISkillContext sc)
+        private bool WineGlassCheck(ISkillContext sc)
         {
-            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3f);
+            return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1.5f);
         }
-        [IsEquipmentSkill]
-        private IDSLSourceFile Cauldron(ISkillContext sc)
+        [IsProfessionSkill]
+        private IDSLSourceFile WineGlass(ISkillContext sc)
         {
-            sc.Self.Focus.Get<Skill>().AddPackage(new(new Cauldron()));
+            sc.Self.Focus.Get<Skill>().AddPackage(new(new WineGlass()));
             Pen pen = sf => sf
-                .UseResource(3f, ResourceType.Instance.Iron())
+                .UseResource(1.5f, ResourceType.Instance.Iron())
                 .WriteFree(source =>
                 {
-                    source.Focus.Get<Skill>().RemoveSkill(nameof(Common), nameof(Cauldron));
+                    Common.ExcludeAllProfessions(source);
                 }, false);
             return DSL.Create(sc.Self, pen);
         }

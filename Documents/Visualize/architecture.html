@@ -295,7 +295,7 @@
     <text x="365" y="1208" text-anchor="middle" fill="#bc8cff" font-size="10" font-weight="bold">② Compile 编译</text>
     <text x="282" y="1238" fill="#8b949e" font-size="9">SourceFile.Compile(judger)</text>
     <text x="282" y="1255" fill="#8b949e" font-size="9">展开修辞缓存</text>
-    <text x="282" y="1272" fill="#8b949e" font-size="9">注册动态 Mutation</text>
+    <text x="282" y="1272" fill="#8b949e" font-size="9">注册动态 ICallbackOnJudge</text>
     <text x="282" y="1286" fill="#c9d1d9" font-size="8">产出: Intent</text>
     <line x1="460" y1="1240" x2="495" y2="1240" stroke="#f0883e" stroke-width="2" marker-end="url(#arr)"/>
 
@@ -362,7 +362,7 @@
     <text x="465" y="1476" fill="#8b949e" font-size="9">Community _owner — 施放者</text>
     <text x="465" y="1494" fill="#8b949e" font-size="9">List&lt;Sentence&gt; _sentences — 待执行语句</text>
     <text x="465" y="1512" fill="#8b949e" font-size="9">Stack&lt;Sentence&gt; _rhetoricCache — WithXxx 修辞</text>
-    <text x="465" y="1530" fill="#8b949e" font-size="9">List&lt;List&lt;Mutation&gt;&gt; _mutationsOnCompile</text>
+    <text x="465" y="1530" fill="#8b949e" font-size="9">List&lt;List&lt;ICallbackOnJudge&gt;&gt; _mutationsOnCompile</text>
     <text x="465" y="1552" fill="#39d2c0" font-size="8">每个 Sentence: Structure + SentenceType + CanMove</text>
 
     <!-- Compile 3 steps -->
@@ -370,7 +370,7 @@
     <rect x="860" y="1435" width="460" height="22" rx="8" fill="rgba(63,185,80,0.12)"/>
     <text x="1090" y="1451" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">Compile(judger) 三步</text>
     <text x="880" y="1476" fill="#c9d1d9" font-size="9">① 展开修辞 — Pop _rhetoricCache → Insert</text>
-    <text x="880" y="1496" fill="#c9d1d9" font-size="9">② 注册 Mutation — AddJudgeRule 落地到阶段链</text>
+    <text x="880" y="1496" fill="#c9d1d9" font-size="9">② 注册 ICallbackOnJudge — AddJudgeRule 落地到阶段链</text>
     <text x="880" y="1516" fill="#c9d1d9" font-size="9">③ 合并 Sentence — 多播 Action&lt;Community&gt;</text>
     <text x="880" y="1540" fill="#39d2c0" font-size="8">→ Intent { Execute = 合并后的 Action }</text>
 
@@ -469,7 +469,7 @@
     <!-- Stage execution pattern -->
     <rect x="40" y="1728" width="1280" height="45" rx="6" fill="rgba(240,136,62,0.03)" stroke="#f0883e" stroke-width="1" stroke-opacity="0.3"/>
     <text x="680" y="1748" text-anchor="middle" fill="#8b949e" font-size="10">每阶段: Before Modifiers (仅 IsRinging) → 核心 (Override 替换 Base，否则执行 Base) → After Modifiers (仅 IsRinging) → Update() 清理 IsDead + 剩余规则 RoundPass()</text>
-    <text x="680" y="1764" text-anchor="middle" fill="#39d2c0" font-size="9">动态规则 = Mutation → RuleUnit → 插入 StageRuleContainer · RuleType: Override (替换) / Modifier (追加 Before/After)</text>
+    <text x="680" y="1764" text-anchor="middle" fill="#39d2c0" font-size="9">动态回调 = ICallbackOnJudge → RuleUnit → 插入 StageRuleContainer · OverrideCallback (替换) / ModifierCallback (追加 Before/After)</text>
 
     <!-- Separator -->
     <rect x="20" y="1788" width="1320" height="1" stroke="#f0883e" stroke-width="1.5"/>
@@ -494,7 +494,7 @@
 
     <rect x="40" y="1902" width="420" height="62" rx="6" fill="#0d1117" stroke="#f0883e" stroke-width="1"/>
     <text x="250" y="1922" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="bold">动态注册</text>
-    <text x="55" y="1942" fill="#8b949e" font-size="9">Mutation(Stage/RuleType/JudgeRule/Clock) → LinkJudgeRuleDynamic</text>
+    <text x="55" y="1942" fill="#8b949e" font-size="9">ModifierCallback(Stage/JudgeRule/ModifierOrder/Clock) → RegistCallbackOnJudge</text>
     <text x="55" y="1958" fill="#39d2c0" font-size="8">参考: 判定实现.md · 高级技能模式.md §6</text>
 
     <rect x="470" y="1902" width="420" height="62" rx="6" fill="#0d1117" stroke="#e3b341" stroke-width="1"/>

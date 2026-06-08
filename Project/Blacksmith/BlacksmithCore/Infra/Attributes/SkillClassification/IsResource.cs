@@ -1,8 +1,8 @@
-namespace BlacksmithCore.Infra.Attributes.Profession
+namespace BlacksmithCore.Infra.Attributes.SkillClassification
 {
     [AttributeUsage(AttributeTargets.Method,
         AllowMultiple = false, Inherited = false)]
-    public class IsProfessionSkill : Attribute
+    public class IsResource : Attribute
     {
     }
 }

@@ -42,11 +42,12 @@ namespace BlacksmithCore.Infra.DSL
                     CanMove = canMove;
                 }
             }
+            public bool IsPassive { get; set; } = false;
 
             protected Community _owner;
             protected List<Sentence> _sentences = new();
             protected Stack<Sentence> _rhetoricCache = new();
-            protected List<List<Mutation>> _mutationsOnCompile = new();
+            protected List<List<ICallbackOnJudge>> _mutationsOnCompile = new();
             protected SourceFile(SourceFile origin)
             {
                 _owner = origin._owner;
@@ -266,8 +267,8 @@ namespace BlacksmithCore.Infra.DSL
             {
                 return WriteFree(source => source.Focus.Get<Health>().LoseMHP(loss), false);
             }
-            public SourceFile LinkJudgeRuleDynamic(
-                List<Mutation> mutations)
+            public SourceFile RegistCallbackOnJudge(
+                List<ICallbackOnJudge> mutations)
             {
                 _mutationsOnCompile.Add(mutations);
                 return this;

@@ -1,5 +1,7 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
@@ -63,7 +65,8 @@ namespace ModExamples.CauldronMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), sc.Param);
         }
-        private IDSLSourceFile Explosion(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile Explosion(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param, ResourceType.Instance.Fire())
@@ -74,7 +77,8 @@ namespace ModExamples.CauldronMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Water(), sc.Param);
         }
-        private IDSLSourceFile IceBlade(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile IceBlade(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param, ResourceType.Instance.Water())
@@ -127,10 +131,10 @@ namespace ModExamples.CauldronMod
                 .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 1)
                 .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 2)
                 .WriteDefense(1, new PercentageReduction(baseline: 2), delayRounds: 3)
-                .LinkJudgeRuleDynamic(
+                .RegistCallbackOnJudge(
                     new()
                     {
-                        new((player, enemy) =>
+                        new ModifierCallback((player, enemy) =>
                         {
                             foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
                             {
@@ -142,10 +146,9 @@ namespace ModExamples.CauldronMod
                             }
                         },
                         JudgeStage.Instance.OnApplyingOthers(),
-                        RuleType.Modifier,
                         ModifierOrder.Before,
                         new(remainingRounds: 4)),
-                        new((player, enemy) =>
+                        new ModifierCallback((player, enemy) =>
                         {
                             foreach(var resolution in player.Focus.Get<TurnContext>().Get<AttackResolution>())
                             {
@@ -156,15 +159,13 @@ namespace ModExamples.CauldronMod
                             }
                         },
                         JudgeStage.Instance.OnBegin(),
-                        RuleType.Modifier,
                         ModifierOrder.After,
                         new(remainingRounds: 3, delayRounds: 1)),
-                        new((player, enemy) =>
+                        new ModifierCallback((player, enemy) =>
                         {
                             player.Focus.Get<Health>().LoseMHP(114514);
                         },
                         JudgeStage.Instance.OnEnd(),
-                        RuleType.Modifier,
                         ModifierOrder.Before,
                         new(remainingRounds: 1, delayRounds: 3)),
                     });
@@ -176,7 +177,8 @@ namespace ModExamples.CauldronMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Earth(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), 1f);
         }
-        private IDSLSourceFile FireRain(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile FireRain(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1f, ResourceType.Instance.Fire())

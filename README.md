@@ -67,6 +67,11 @@ BlacksmithClient.exe
 - [高级技能模式](./Documents/高级技能模式.md)
 - [Mod 基础指南](./Documents/Mod基础指南/引言.md)
 - [Mod 进阶指南](./Documents/Mod进阶指南/引言.md)
+- [SkillClassification 规划](./Documents/SkillClassification规划.md)
+
+## 当前规划
+
+- [SkillClassification](./Documents/规划/SkillClassification规划.md)
 
 ## 关于 Xio
 

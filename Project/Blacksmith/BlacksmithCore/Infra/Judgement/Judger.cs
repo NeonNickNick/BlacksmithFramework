@@ -15,17 +15,25 @@ namespace BlacksmithCore.Infra.Judgement
         {
 
         }
-        Action<Community> temp = (a) => { };
-        protected override IEnumerable<Intent> Compile(List<IDSLSourceFile> sourceFiles)
+        protected override IEnumerable<Intent> Compile(IEnumerable<IDSLSourceFile> sourceFiles)
         {
-            var skillIntents = new List<Intent>() { new() { Execute = temp } };
-            var passive = sourceFiles[0];
-            int n = sourceFiles.Count;
-            for (int i = 1; i < n; ++i)
+            Intent temp = new() { Execute = null! };
+            var skillIntents = new List<Intent>() { };
+            var group = sourceFiles.ToLookup(s => s.IsPassive);
+            foreach (var sf in group[true])
             {
-                skillIntents.Add(sourceFiles[i].Compile(this));
+                skillIntents.Add(temp);
             }
-            skillIntents[0] = passive.Compile(this);
+            foreach (var sf in group[false])
+            {
+                skillIntents.Add(sf.Compile(this));
+            }
+            var index = 0;
+            foreach (var sf in group[true])
+            {
+                skillIntents[index] = sf.Compile(this);
+                index++;
+            }
             return skillIntents;
         }
     }

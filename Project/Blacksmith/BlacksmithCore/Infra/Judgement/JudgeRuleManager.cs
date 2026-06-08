@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
@@ -230,8 +231,8 @@ namespace BlacksmithCore.Infra.Judgement
             var playerTemp = playerResolutions.Where(e => e.Clock.IsRinging).ToList();
             var enemyTemp = enemyResolutions.Where(e => e.Clock.IsRinging).ToList();
 
-            playerResolutions.RemoveAll(e => playerTemp.Contains(e));
-            enemyResolutions.RemoveAll(e => enemyTemp.Contains(e));
+            playerResolutions.RemoveAll(playerTemp.Contains);
+            enemyResolutions.RemoveAll(enemyTemp.Contains);
 
             playerResolutions.AddRange(enemyTemp);
             enemyResolutions.AddRange(playerTemp);
@@ -267,13 +268,13 @@ namespace BlacksmithCore.Infra.Judgement
             }
         }
 
-        public void AddJudgeRule(Community source, List<Mutation> mutations)
+        public void AddJudgeRule(Community source, IEnumerable<ICallbackOnJudge> callbacks)
         {
-            mutations.ForEach(m =>
+            foreach (var callback in callbacks)
             {
-                var originalRule = m.JudgeRule;
+                var originalRule = callback.JudgeRule;
 
-                m.JudgeRule = (player, enemy) =>
+                callback.JudgeRule = (player, enemy) =>
                 {
                     if (source == player)
                     {
@@ -284,17 +285,18 @@ namespace BlacksmithCore.Infra.Judgement
                         originalRule(enemy, player);
                     }
                 };
-            });
-            foreach (var mutation in mutations)
+            }
+            ;
+            foreach (var callback in callbacks)
             {
-                StageRuleContainer.RuleUnit unit = new(mutation.Clock, mutation.JudgeRule);
-                if (mutation.RuleType == RuleType.Override)
+                StageRuleContainer.RuleUnit unit = new(callback.Clock, callback.JudgeRule);
+                if (callback is OverrideCallback overideCallback)
                 {
-                    _ruleContainers[mutation.Stage].AddOverride(unit);
+                    _ruleContainers[overideCallback.Stage].AddOverride(unit);
                 }
-                else
+                else if (callback is ModifierCallback modifierCallback)
                 {
-                    _ruleContainers[mutation.Stage].AddModifier(unit, mutation.ModifierOrder);
+                    _ruleContainers[callback.Stage].AddModifier(unit, modifierCallback.ModifierOrder);
                 }
             }
         }

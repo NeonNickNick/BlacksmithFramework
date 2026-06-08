@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
@@ -13,7 +14,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1, true);
         }
-
+        [IsResource]
         private IDSLSourceFile MidasTouch(ISkillContext sc)
         {
             Pen pen = sf => sf

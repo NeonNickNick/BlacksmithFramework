@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
@@ -156,6 +157,7 @@ namespace ModExamples.ProphetMod
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.CrystalBall(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Crystal(), 2f);
         }
+        [IsAttack]
         private IDSLSourceFile Ultimatum(ISkillContext sc)
         {
             Pen pen = sf => sf

@@ -1,4 +1,4 @@
-namespace BlacksmithCore.Infra.Attributes.MarkOnly
+namespace BlacksmithCore.Infra.Attributes.SkillMarkOnly
 {
     [AttributeUsage(AttributeTargets.Method,
         AllowMultiple = false, Inherited = false)]

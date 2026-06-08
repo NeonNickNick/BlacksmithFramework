@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
@@ -15,7 +16,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
 
         private int AttackPower(int basePower) => _nextAttackBonus.ApplyToAttackPower(basePower);
 
-        public override IDSLSourceFile PassiveSkill(ISkillContext sc)
+        public override IDSLSourceFile PassiveSkillImpl(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .WriteDefense(1, new RealReduction())
@@ -26,6 +27,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), sc.Param);
         }
+        [IsAttack]
         private IDSLSourceFile SpaceAttack(ISkillContext sc)
         {
             Pen pen = sf => sf

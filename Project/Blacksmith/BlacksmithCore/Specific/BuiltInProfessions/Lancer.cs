@@ -1,5 +1,7 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
@@ -14,15 +16,15 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class Lancer : MainProfession
     {
-        private ClapStateVar<bool> _fire = new(false);
-        private ClapStateVar<bool> _ice = new(false);
-        private Pen _icePen = sf => sf
+        private readonly ClapStateVar<bool> _fire = new(false);
+        private readonly ClapStateVar<bool> _ice = new(false);
+        private readonly Pen _icePen = sf => sf
             .WriteDefense(2, new CommonArmor());
-        private ClapStateVar<bool> _light = new(false);
-        private Pen _lightPen = sf => sf
+        private readonly ClapStateVar<bool> _light = new(false);
+        private readonly Pen _lightPen = sf => sf
             .WriteRecovery(2);
-        private ClapStateVar<bool> _dark = new(false);
-        private Pen _darkPen = sf => sf
+        private readonly ClapStateVar<bool> _dark = new(false);
+        private readonly Pen _darkPen = sf => sf
             .LoseMHP(1)
             .WriteAttack(1, AttackType.Instance.Real(), delayRounds: 0)
             .WriteAttack(1, AttackType.Instance.Real(), delayRounds: 1);
@@ -64,6 +66,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
+        [IsAttack]
         private IDSLSourceFile SkyStrike(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -77,6 +80,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
+        [IsAttack]
         private IDSLSourceFile DragonTooth(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -90,6 +94,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
+        [IsAttack]
         private IDSLSourceFile TyrantDestruction(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -102,6 +107,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
+        [IsAttack]
         private IDSLSourceFile TripleStab(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -121,6 +127,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), _chargeCost.Value);
         }
+        [IsAttack]
         private IDSLSourceFile RisingDragon(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -170,14 +177,13 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .UseResource(_chargeCost.Value, ResourceType.Instance.Iron())
                 .WriteFree(a => _chargeCount.Increment(), true)
                 .WriteFree(a => _chargeCost.Set(0), true)
-                .LinkJudgeRuleDynamic(new()
+                .RegistCallbackOnJudge(new()
                 {
-                    new(AttackCanceling_Modifier_Before,
+                    new ModifierCallback(AttackCanceling_Modifier_Before,
                     JudgeStage.Instance.OnAttackCanceling(),
-                    RuleType.Modifier,
                     ModifierOrder.Before,
                     new()),
-                    new((player, enemy) =>
+                    new ModifierCallback((player, enemy) =>
                     {
                         if(_chargeCount.Value == chargeCountThis && !_wasPassive.Value)
                         {
@@ -187,7 +193,6 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                         _wasPassive.Reset();
                     },
                     JudgeStage.Instance.OnBegin(),
-                    RuleType.Modifier,
                     ModifierOrder.Before,
                     new(delayRounds: 1))
                 });

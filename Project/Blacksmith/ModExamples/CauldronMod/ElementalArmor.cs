@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
@@ -10,6 +11,7 @@ namespace ModExamples.CauldronMod
     public partial class ElementalArmor : MainProfession
     {
         private bool HammerCheck(ISkillContext sc) => true;
+        [IsAttack]
         private IDSLSourceFile Hammer(ISkillContext sc)
         {
             Pen pen = sf => sf

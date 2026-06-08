@@ -86,7 +86,7 @@ namespace BlacksmithCore.Infra.Models.Components
             List<string> enumNames = _dictRef!.Keys.ToList();
             string prefix = "Gold_";
             List<string> golds = enumNames.Where(e => e.StartsWith(prefix)).ToList();
-            enumNames.RemoveAll(e => golds.Contains(e));
+            enumNames.RemoveAll(golds.Contains);
             foreach (var gold in golds)
             {
                 string commonName = gold.Remove(0, prefix.Length);

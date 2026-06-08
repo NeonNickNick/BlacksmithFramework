@@ -28,11 +28,11 @@ namespace ClapInfra.ClapJudgement
                 JudgeRuleManager.Judge(Player, Enemy);
             };
         }
-        protected virtual IEnumerable<TIntent> Compile(List<TIDSLSourceFile> sourceFiles)
+        protected virtual IEnumerable<TIntent> Compile(IEnumerable<TIDSLSourceFile> sourceFiles)
         {
             return sourceFiles.Select(s => s.Compile((TJudger)this));
         }
-        public virtual void Judge(List<TIDSLSourceFile> playerSfs, List<TIDSLSourceFile> enemySfs)
+        public virtual void Judge(IEnumerable<TIDSLSourceFile> playerSfs, IEnumerable<TIDSLSourceFile> enemySfs)
         {
             _playerIntents = Compile(playerSfs);
             _enemyIntents = Compile(enemySfs);

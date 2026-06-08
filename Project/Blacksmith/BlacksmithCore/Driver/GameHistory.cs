@@ -7,7 +7,12 @@ namespace BlacksmithCore.Driver
         public List<(ISkillContext, ISkillContext)> SkillHistory { get; set; } = new();
         public void Swap()
         {
-            SkillHistory = SkillHistory.Select(s => (s.Item2, s.Item1)).ToList();
+            int n = SkillHistory.Count;
+            for (int i = 0; i < n; ++i)
+            {
+                var item = SkillHistory[i];
+                (item.Item1, item.Item2) = (item.Item2, item.Item1);
+            }
         }
     }
 }

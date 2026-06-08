@@ -1,6 +1,8 @@
 
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
@@ -30,7 +32,8 @@ namespace ModExamples.CrossBowMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Bolt(), sc.Param);
         }
-        private IDSLSourceFile BoltVolley(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile BoltVolley(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param, ResourceType.Instance.Bolt())
@@ -48,7 +51,8 @@ namespace ModExamples.CrossBowMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Bolt(), 1f);
         }
-        private IDSLSourceFile CriticalHit(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile CriticalHit(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1f, ResourceType.Instance.Bolt())
@@ -73,16 +77,17 @@ namespace ModExamples.CrossBowMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Bolt(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1f);
         }
-        private IDSLSourceFile MarkingBolt(ISkillContext sc)
+		[IsAttack]
+		private IDSLSourceFile MarkingBolt(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1f, ResourceType.Instance.Bolt())
                 .UseResource(1f, ResourceType.Instance.Iron())
                 .WriteAttack(1f, AttackType.Instance.Physical())
-                .LinkJudgeRuleDynamic(
+                .RegistCallbackOnJudge(
                     new()
                     {
-                        new((player, enemy) =>
+                        new ModifierCallback((player, enemy) =>
                         {
                             foreach(var resolution in enemy.Focus.Get<TurnContext>().Get<AttackResolution>())
                             {
@@ -96,7 +101,6 @@ namespace ModExamples.CrossBowMod
                             }
                         },
                         JudgeStage.Instance.OnApplyingOthers(),
-                        RuleType.Modifier,
                         ModifierOrder.Before,
                         new(remainingRounds: 1, delayRounds: 1)),
                     });

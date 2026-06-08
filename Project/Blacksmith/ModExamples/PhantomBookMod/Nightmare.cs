@@ -1,4 +1,5 @@
-using BlacksmithCore.Infra.Attributes.MarkOnly;
+using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMarkOnly;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
@@ -16,6 +17,7 @@ namespace ModExamples.PhantomBookMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 1f);
         }
+        [IsAttack]
         private IDSLSourceFile DreamDive(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -32,6 +34,7 @@ namespace ModExamples.PhantomBookMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Spirit(), 2f);
         }
+        [IsAttack]
         private IDSLSourceFile Materialize(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -46,6 +49,7 @@ namespace ModExamples.PhantomBookMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Spirit(), 1f);
         }
+        [IsAttack]
         private IDSLSourceFile ClingingHaunt(ISkillContext sc)
         {
             Pen pen = sf => sf

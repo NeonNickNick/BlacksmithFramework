@@ -1,6 +1,7 @@
-using BlacksmithCore.Infra.Attributes.Profession;
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
+using BlacksmithCore.Infra.Judgement.Core;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
 using BlacksmithCore.Infra.Models.Core;
@@ -27,6 +28,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 0.5f);
         }
+        [IsAttack]
         private IDSLSourceFile Stick(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -39,6 +41,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1.5f);
         }
+        [IsAttack]
         private IDSLSourceFile Drill(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -51,6 +54,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2.5f);
         }
+        [IsAttack]
         private IDSLSourceFile Slash(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -123,6 +127,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), 1f);
         }
+        [IsAttack]
         private IDSLSourceFile Tear(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -138,19 +143,17 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             Pen pen = sf => sf
                 .UseResource(2, ResourceType.Instance.Space())
-                .LinkJudgeRuleDynamic(
+                .RegistCallbackOnJudge(
                     new()
                     {
-                        new(
+                        new ModifierCallback(
                             ReflectRule.EffectSwaping_Modifier_After,
                             JudgeStage.Instance.OnEffectSwaping(),
-                            RuleType.Modifier,
                             ModifierOrder.After,
                             new()),
-                        new(
+                        new ModifierCallback(
                             ReflectRule.AttackSwaping_Modifier_After,
                             JudgeStage.Instance.OnAttackSwaping(),
-                            RuleType.Modifier,
                             ModifierOrder.After,
                             new())
                     });
@@ -265,12 +268,14 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             var playerResolutions = player.Focus.Get<TurnContext>().Get<EffectResolution>();
 
-            var reflect = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.Clock.IsRinging).ToList();
+            var reflect = playerResolutions.Where(e => e.TargetType == EffectTargetType.Instance.Enemy() || e.Clock.IsRinging);
 
-            playerResolutions.RemoveAll(e => reflect.Contains(e));
+            playerResolutions.RemoveAll(reflect.Contains);
 
-            reflect.ForEach(e => e.Clock.DelayRounds = 1);
-
+            foreach (var e in reflect)
+            {
+                e.Clock.DelayRounds = 1;
+            }
             playerResolutions.AddRange(reflect);
         }
         public static void AttackSwaping_Modifier_After(Community player, Community enemy)
@@ -278,15 +283,16 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             var tc = player.Focus.Get<TurnContext>();
             var playerResolutions = tc.Get<AttackResolution>();
 
-            var reflect = playerResolutions.Where(a => a.Clock.IsRinging).ToList();
+            var reflect = playerResolutions.Where(a => a.Clock.IsRinging);
 
             playerResolutions.RemoveAll(a => reflect.Contains(a));
 
-            reflect.ForEach(a =>
+            foreach (var a in reflect)
             {
                 a.Clock.DelayRounds = 1;
                 a.Source = player;
-            });
+            }
+
             foreach (var res in reflect)
             {
                 tc.WriteResolution(res);

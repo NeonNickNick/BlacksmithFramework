@@ -1,5 +1,5 @@
 using System.Reflection;
-using BlacksmithCore.Infra.Attributes.Profession;
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 
 namespace BlacksmithCore.Infra.Profession

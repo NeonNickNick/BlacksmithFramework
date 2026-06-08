@@ -1,4 +1,5 @@
-using BlacksmithCore.Infra.Attributes.MarkOnly;
+using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMarkOnly;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
@@ -37,6 +38,7 @@ namespace ModExamples
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 2f);
         }
+        [IsAttack]
         private IDSLSourceFile Ark(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -50,6 +52,7 @@ namespace ModExamples
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 1f);
         }
+        [IsAttack]
         private IDSLSourceFile Blasphemy(ISkillContext sc)
         {
             Pen pen = sf => sf

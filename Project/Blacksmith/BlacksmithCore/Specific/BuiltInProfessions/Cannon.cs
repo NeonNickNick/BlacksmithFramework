@@ -1,3 +1,4 @@
+using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
@@ -19,6 +20,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
+        [IsAttack]
         private IDSLSourceFile Strike(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -31,6 +33,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2);
         }
+        [IsAttack]
         private IDSLSourceFile DoubleStrike(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -43,6 +46,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
+        [IsAttack]
         private IDSLSourceFile TripleStrike(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -57,6 +61,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
+        [IsAttack]
         private IDSLSourceFile APShell(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -67,6 +72,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
 
         private bool CannonBarrelCheck(ISkillContext sc) => true;
+        [IsAttack]
         private IDSLSourceFile CannonBarrel(ISkillContext sc)
         {
             Pen pen = sf => sf

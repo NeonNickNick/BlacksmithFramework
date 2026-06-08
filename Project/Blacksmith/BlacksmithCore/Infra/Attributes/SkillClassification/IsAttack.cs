@@ -1,8 +1,8 @@
-namespace BlacksmithCore.Infra.Attributes.Skill
+namespace BlacksmithCore.Infra.Attributes.SkillClassification
 {
     [AttributeUsage(AttributeTargets.Method,
         AllowMultiple = false, Inherited = false)]
-    public class IsRecovery : Attribute
+    public class IsAttack : Attribute
     {
     }
 }
