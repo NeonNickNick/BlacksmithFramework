@@ -13,7 +13,8 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            // ── Phase 1: MainProfession 源码 → 收集私有成员 → 生成 [BindingContract] ──
+            // ── Phase 1: MainProfession 子类 → 生成 [BindingContract] ──
+            // 编译进 DLL，供 Phase 2 跨项目读取
             var mainInSource = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: (node, _) => node is ClassDeclarationSyntax,
@@ -23,7 +24,7 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
 
             context.RegisterSourceOutput(mainInSource.Collect(), GenerateContracts);
 
-            // ── Phase 2: 读 [BindingContract] → 生成 public 字段 + Bind() ──
+            // ── Phase 2: ProfessionModifier → 发现 target 私有成员 → 生成 Bind() ──
             var modifierInSource = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: (node, _) => node is ClassDeclarationSyntax,
@@ -32,11 +33,11 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                 .Select((info, _) => info!);
 
             var combined = modifierInSource.Collect().Combine(context.CompilationProvider);
-            context.RegisterSourceOutput(combined, GenerateModifierSide);
+            context.RegisterSourceOutput(combined, GenerateBinding);
         }
 
         // ════════════════════════════════════════════════════════════════
-        //  Phase 1 helpers
+        //  数据模型
         // ════════════════════════════════════════════════════════════════
 
         private sealed class MainInfo
@@ -47,12 +48,22 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
             { ClassName = cn; Namespace = ns; FullTypeName = ft; Fields = f; Properties = p; }
         }
 
+        private sealed class ModifierInfo
+        {
+            public string ClassName, Namespace, TargetName;
+            public ModifierInfo(string c, string ns, string t) { ClassName = c; Namespace = ns; TargetName = t; }
+        }
+
         private sealed class Member
         {
             public string Name, TypeFull;
             public bool Flag; // field → IsReadonly, property → HasSetter
             public Member(string n, string t, bool f) { Name = n; TypeFull = t; Flag = f; }
         }
+
+        // ════════════════════════════════════════════════════════════════
+        //  Phase 1: 收集 MainProfession 私有成员 → 生成 [BindingContract]
+        // ════════════════════════════════════════════════════════════════
 
         private static MainInfo? GetMainInfo(GeneratorSyntaxContext ctx)
         {
@@ -103,14 +114,8 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
         }
 
         // ════════════════════════════════════════════════════════════════
-        //  Phase 2 helpers
+        //  Phase 2: 收集 ProfessionModifier 信息
         // ════════════════════════════════════════════════════════════════
-
-        private sealed class ModifierInfo
-        {
-            public string ClassName, Namespace, TargetName;
-            public ModifierInfo(string c, string ns, string t) { ClassName = c; Namespace = ns; TargetName = t; }
-        }
 
         private static ModifierInfo? GetModifierInfo(GeneratorSyntaxContext ctx)
         {
@@ -135,7 +140,15 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
             return new ModifierInfo(sym.Name, sym.ContainingNamespace.ToDisplayString(), target);
         }
 
-        private static void GenerateModifierSide(
+        // ════════════════════════════════════════════════════════════════
+        //  Phase 2: 生成 Bind()
+        //
+        //  双渠道收集私有成员（用 seen 去重，渠道A优先）：
+        //    渠道A — target.GetMembers()：同项目源码类型，首次编译即可用
+        //    渠道B — [BindingContract] attribute：跨项目，通过引用 DLL 读取
+        // ════════════════════════════════════════════════════════════════
+
+        private static void GenerateBinding(
             SourceProductionContext ctx,
             (ImmutableArray<ModifierInfo> Modifiers, Compilation Compilation) data)
         {
@@ -152,60 +165,83 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                 if (target == null) continue;
                 var targetFull = target.ToDisplayString(FullTypeFormat);
 
-                // Read [BindingContract] attributes
                 var fields = new List<Member>();
                 var props = new List<Member>();
-                foreach (var a in target.GetAttributes())
-                {
-                    bool match = contractAttr != null
-                        ? SymbolEqualityComparer.Default.Equals(a.AttributeClass, contractAttr)
-                        : a.AttributeClass?.Name == "BindingContract";
-                    if (!match) continue;
-                    var args = a.ConstructorArguments;
-                    if (args.Length < 4) continue;
-                    var n = args[0].Value?.ToString();
-                    var t = args[1].Value?.ToString();
-                    var isF = args[2].Value as bool?;
-                    var fl = args[3].Value as bool?;
-                    if (n == null || t == null || isF == null || fl == null) continue;
-                    if (isF.Value) fields.Add(new Member(n, t, fl.Value));
-                    else props.Add(new Member(n, t, fl.Value));
-                }
-                if (fields.Count == 0 && props.Count == 0) continue;
+                var seen = new HashSet<string>();
 
-                // Generate partial class
+                // 渠道A: GetMembers() — 同项目源码类型
+                foreach (var f in target.GetMembers().OfType<IFieldSymbol>())
+                {
+                    if (f is not { DeclaredAccessibility: Accessibility.Private, IsStatic: false }
+                        || !f.Type.IsReferenceType) continue;
+                    if (seen.Add(f.Name))
+                        fields.Add(new Member(f.Name, f.Type.ToDisplayString(FullTypeFormat), f.IsReadOnly));
+                }
+                foreach (var p in target.GetMembers().OfType<IPropertySymbol>())
+                {
+                    if (p is not { DeclaredAccessibility: Accessibility.Private, IsStatic: false, GetMethod: not null }
+                        || !p.Type.IsReferenceType) continue;
+                    if (seen.Add(p.Name))
+                        props.Add(new Member(p.Name, p.Type.ToDisplayString(FullTypeFormat), p.SetMethod != null));
+                }
+
+                // 渠道B: [BindingContract] — 跨项目元数据类型
+                if (contractAttr != null)
+                {
+                    foreach (var a in target.GetAttributes())
+                    {
+                        if (!SymbolEqualityComparer.Default.Equals(a.AttributeClass, contractAttr)) continue;
+                        var args = a.ConstructorArguments;
+                        if (args.Length < 4) continue;
+                        var n = args[0].Value?.ToString();
+                        var t = args[1].Value?.ToString();
+                        var isF = args[2].Value as bool?;
+                        var fl = args[3].Value as bool?;
+                        if (n == null || t == null || isF == null || fl == null) continue;
+                        if (!seen.Add(n)) continue;
+                        if (isF.Value) fields.Add(new Member(n, t, fl.Value));
+                        else props.Add(new Member(n, t, fl.Value));
+                    }
+                }
+
+                var hasMembers = fields.Count > 0 || props.Count > 0;
+
                 var sb = new StringBuilder();
                 sb.AppendLine("// <auto-generated/>");
                 sb.AppendLine("#nullable enable");
                 sb.AppendLine();
                 sb.AppendLine("using System;");
-                sb.AppendLine("using System.Runtime.CompilerServices;");
+                if (hasMembers)
+                    sb.AppendLine("using System.Runtime.CompilerServices;");
                 sb.AppendLine("using BlacksmithCore.Infra.Profession;");
                 sb.AppendLine($"namespace {mod.Namespace};");
                 sb.AppendLine();
                 sb.AppendLine($"partial class {mod.ClassName}");
                 sb.AppendLine("{");
 
-                // UnsafeAccessor extern methods for private fields
+                // UnsafeAccessor extern — 字段
                 foreach (var f in fields)
                 {
                     sb.AppendLine($"    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = \"{f.Name}\")]");
                     sb.AppendLine($"    private static extern ref {f.TypeFull} __ref_{f.Name}({targetFull} __t);");
                 }
 
-                // UnsafeAccessor extern methods for private property accessors
+                // UnsafeAccessor extern — 属性
                 foreach (var p in props)
                 {
                     sb.AppendLine($"    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = \"get_{p.Name}\")]");
                     sb.AppendLine($"    private static extern {p.TypeFull} __get_{p.Name}({targetFull} __t);");
-                    if (p.Flag) // HasSetter
+                    if (p.Flag)
                     {
                         sb.AppendLine($"    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = \"set_{p.Name}\")]");
                         sb.AppendLine($"    private static extern void __set_{p.Name}({targetFull} __t, {p.TypeFull} value);");
                     }
                 }
-                sb.AppendLine();
-                // Captured storage (private — accessed via UnsafeAccessor or within this class)
+
+                if (hasMembers)
+                    sb.AppendLine();
+
+                // 捕获存储
                 foreach (var f in fields)
                     sb.AppendLine($"    private {f.TypeFull} {f.Name} = null!;");
                 foreach (var p in props)
@@ -215,18 +251,21 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                         sb.AppendLine($"    private Action<{p.TypeFull}> Set{p.Name} = null!;");
                 }
 
-                // Bind method
+                // Bind()
                 sb.AppendLine();
                 sb.AppendLine("    public override void Bind(MainProfession package)");
                 sb.AppendLine("    {");
-                sb.AppendLine($"        var target = ({targetFull})package;");
-                foreach (var f in fields)
-                    sb.AppendLine($"        this.{f.Name} = __ref_{f.Name}(target);");
-                foreach (var p in props)
+                if (hasMembers)
                 {
-                    sb.AppendLine($"        this.{p.Name} = () => __get_{p.Name}(target);");
-                    if (p.Flag)
-                        sb.AppendLine($"        this.Set{p.Name} = v => __set_{p.Name}(target, v);");
+                    sb.AppendLine($"        var target = ({targetFull})package;");
+                    foreach (var f in fields)
+                        sb.AppendLine($"        this.{f.Name} = __ref_{f.Name}(target);");
+                    foreach (var p in props)
+                    {
+                        sb.AppendLine($"        this.{p.Name} = () => __get_{p.Name}(target);");
+                        if (p.Flag)
+                            sb.AppendLine($"        this.Set{p.Name} = v => __set_{p.Name}(target, v);");
+                    }
                 }
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
@@ -234,6 +273,10 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                 ctx.AddSource($"{mod.Namespace}.{mod.ClassName}.Binding.g.cs", sb.ToString());
             }
         }
+
+        // ════════════════════════════════════════════════════════════════
+        //  在 Compilation 中按名字查找 MainProfession 子类
+        // ════════════════════════════════════════════════════════════════
 
         private static INamedTypeSymbol? FindMainByName(Compilation comp, INamedTypeSymbol baseType, string name)
         {

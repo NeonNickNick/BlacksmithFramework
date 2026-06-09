@@ -214,9 +214,9 @@ public partial class CommonModifier : ProfessionModifier
 
 ### 源生成器内部机制（自动完成，无需关注）
 
-**Phase 1**：扫描所有 `MainProfession` 子类 → 收集 `private` 引用类型字段/属性 → 自动生成 `[BindingContract]` 特性（附着在生成的 partial 类上，开发者看不见）
+**Phase 1**：扫描所有 `MainProfession` 子类 → 收集 `private` 引用类型字段/属性 → 自动生成 `[BindingContract]` 特性编译进 DLL（跨项目可见）
 
-**Phase 2**：扫描所有 `ProfessionModifier` 子类 → 读取 Phase 1 生成的 `[BindingContract]` → 在 Modifier 的 partial 类中生成：
+**Phase 2**：扫描所有 `ProfessionModifier` 子类 → 定位其 `[IsProfessionModifier]` 指向的目标 MainProfession → 双渠道收集私有成员（源码直接读取 + DLL 特性读取，去重合并）→ 在 Modifier 的 partial 类中生成：
 - `[UnsafeAccessor]` extern 方法（.NET 8 特性，零开销访问私有成员）
 - 同名的公开字段（引用目标私有字段）或 `Func`/`Action` 委托（封装目标私有属性）
 - `Bind(MainProfession package)` 的完整实现——cast 到具体目标类型，将所有私有成员的引用赋值给生成的公开字段
