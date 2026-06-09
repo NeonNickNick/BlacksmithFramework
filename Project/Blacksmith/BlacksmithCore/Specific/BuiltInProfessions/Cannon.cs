@@ -1,10 +1,10 @@
-using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;
-using BlacksmithCore.Specific.Combat;
 using BlacksmithCore.Specific.Defense;
+using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
@@ -12,10 +12,18 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class Cannon : MainProfession
     {
-        private readonly NextAttackAdditiveBonus _nextAttackBonus = new();
+        private readonly ClapStateVar<int> _pending = new(0);
+        private int AttackPower(int basePower)
+        {
+            if (_pending.Value <= 0)
+            {
+                return basePower;
+            }
 
-        private int AttackPower(int basePower) => _nextAttackBonus.ApplyToAttackPower(basePower);
-
+            var result = basePower + _pending.Value;
+            _pending.Reset();
+            return result;
+        }
         private bool StrikeCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
@@ -53,7 +61,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                 .UseResource(3, ResourceType.Instance.Iron())
                 .WriteAttack(AttackPower(11), AttackType.Instance.Physical())
                 .WriteResource(0.5f, ResourceType.Instance.Iron())
-                .WriteFree(_ => _nextAttackBonus.Grant(1), canMove: true);
+                .WriteFree(_ => _pending.Increment(), canMove: true);
             return DSL.Create(sc.Self, pen);
         }
 

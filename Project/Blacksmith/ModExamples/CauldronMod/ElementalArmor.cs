@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Profession;

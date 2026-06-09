@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace ClapSourceGenerators.SkillRegistration
+namespace ClapSourceGenerators.SkillRegistration.Common
 {
     [Generator]
     public class SkillRegistrationGenerator : IIncrementalGenerator

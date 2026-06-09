@@ -1,6 +1,6 @@
 using BlacksmithCore.Driver;
-using BlacksmithCore.Infra.Attributes.SkillClassification;
 using BlacksmithCore.Infra.Attributes.SkillMarkOnly;
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Models.Components;
 using BlacksmithCore.Infra.Models.Components.Resolutions;
@@ -35,12 +35,11 @@ namespace ModExamples.PhantomBookMod
         {
             string expectedSkill = sc.StringParam;
             var swapInstance = sc.SudoOperations.DeepCopy();
-            swapInstance.Swap();
-            var fakeSelf = sc.SudoOperations.IsPlayer(sc.Self) ? swapInstance.Player : swapInstance.Enemy;
+            var fakeSelf = sc.SudoOperations.IsPlayer(sc.Self) ? swapInstance.Enemy : swapInstance.Player;
             var fakeSkill = fakeSelf.Focus.Get<Skill>();
             var fsc = new DefaultSkillContext(swapInstance, expectedSkill, fakeSelf, sc.Param, sc.StringParam);
-            if (sc.SudoOperations.EquipmentSkillNames.Contains(expectedSkill) ||
-                sc.SudoOperations.ProfessionSkillNames.Contains(expectedSkill) ||
+            if (sc.SudoOperations.GameMetadata.EquipmentSkillNames.Contains(expectedSkill) ||
+                sc.SudoOperations.GameMetadata.MainProfessionSkillNames.Contains(expectedSkill) ||
                 expectedSkill == $"{nameof(Association).ToLower()}" ||
                 fakeSkill.TryDeclare(fsc.SkillName, fsc) != SkillDeclareResult.Success)
             {
@@ -53,8 +52,7 @@ namespace ModExamples.PhantomBookMod
         {
             string expectedSkill = sc.StringParam;
             var swapInstance = sc.SudoOperations.DeepCopy();
-            swapInstance.Swap();
-            var fakeSelf = sc.SudoOperations.IsPlayer(sc.Self) ? swapInstance.Player : swapInstance.Enemy;
+            var fakeSelf = sc.SudoOperations.IsPlayer(sc.Self) ? swapInstance.Enemy : swapInstance.Player;
             var fakeSkill = fakeSelf.Focus.Get<Skill>();
             var fsc = new DefaultSkillContext(swapInstance, expectedSkill, fakeSelf, sc.Param, sc.StringParam);
             var stolenSF = fakeSkill.Declare(fsc.SkillName, fsc);

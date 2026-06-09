@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Judgement.Core;
@@ -65,8 +65,8 @@ namespace ModExamples.CauldronMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), sc.Param);
         }
-		[IsAttack]
-		private IDSLSourceFile Explosion(ISkillContext sc)
+        [IsAttack]
+        private IDSLSourceFile Explosion(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param, ResourceType.Instance.Fire())
@@ -77,8 +77,8 @@ namespace ModExamples.CauldronMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Water(), sc.Param);
         }
-		[IsAttack]
-		private IDSLSourceFile IceBlade(ISkillContext sc)
+        [IsAttack]
+        private IDSLSourceFile IceBlade(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(sc.Param, ResourceType.Instance.Water())
@@ -177,8 +177,8 @@ namespace ModExamples.CauldronMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Earth(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), 1f);
         }
-		[IsAttack]
-		private IDSLSourceFile FireRain(ISkillContext sc)
+        [IsAttack]
+        private IDSLSourceFile FireRain(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(1f, ResourceType.Instance.Fire())

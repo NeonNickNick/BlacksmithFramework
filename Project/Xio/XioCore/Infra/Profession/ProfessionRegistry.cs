@@ -31,7 +31,7 @@ namespace XioCore.Infra.Profession
                 foreach (var type in types)
                 {
                     var modifier = (SkillPackageBase)Activator.CreateInstance(type)!;
-                    package.AvailableSkillNames.AddRange(modifier.AvailableSkillNames);
+                    package.AvailableSkillNames.UnionWith(modifier.AvailableSkillNames);
                     foreach (var kv in modifier.SkillChecker)
                     {
                         package.SkillChecker[kv.Key] = kv.Value;

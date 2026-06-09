@@ -1,5 +1,6 @@
 using System.Reflection;
-using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
+using BlacksmithCore.Infra.Attributes.SkillMetadata.Core;
 using BlacksmithCore.Infra.DSL;
 
 namespace BlacksmithCore.Infra.Profession
@@ -7,8 +8,30 @@ namespace BlacksmithCore.Infra.Profession
     public static class ProfessionRegistry
     {
         public static readonly HashSet<string> Professions = new();
-        public static readonly HashSet<string> ProfessionSkillNames = new();
-        public static readonly HashSet<string> EquipmentSkillNames = new();
+        private static HashSet<string> _mainProfessionSkillNames = null!;
+        public static IReadOnlySet<string> MainProfessionSkillNames
+        {
+            get
+            {
+                if (_mainProfessionSkillNames == null)
+                {
+                    _mainProfessionSkillNames = new();
+                    foreach (var skillName in SkillMetadataDict.Keys)
+                    {
+                        foreach (var isc in SkillMetadataDict[skillName])
+                        {
+                            if (isc.GetType() == typeof(IsProfessionSkill))
+                            {
+                                _mainProfessionSkillNames.Add(skillName);
+                                break;
+                            }
+                        }
+                    }
+                }
+                return _mainProfessionSkillNames;
+            }
+        }
+        public static readonly Dictionary<string, HashSet<ISkillMetadata>> SkillMetadataDict = new();
         private static readonly Dictionary<string, List<Type>> _modifierTypes = new();
 
         public static void RegistProfessionName(string professionName)
@@ -21,7 +44,7 @@ namespace BlacksmithCore.Infra.Profession
             Console.WriteLine($"Successfully added the extended profession \"{professionName}\"!");
         }
 
-        public static void RegistProfessionEquipmentSkillName(SkillPackageBase package)
+        public static void CollectSkillMetadata(SkillPackageBase package, List<ISkillMetadata> skillClassifications)
         {
             static bool IsValidSkillMethod(MethodInfo method)
             {
@@ -36,25 +59,28 @@ namespace BlacksmithCore.Infra.Profession
 
             foreach (var info in minfos)
             {
-                var pmark = info.GetCustomAttribute<IsProfessionSkill>();
-                var emark = info.GetCustomAttribute<IsEquipmentSkill>();
-
-                if (pmark != null)
+                if (!IsValidSkillMethod(info))
                 {
-                    if (IsValidSkillMethod(info))
-                        ProfessionSkillNames.Add(info.Name.ToLower());
+                    continue;
                 }
-                if (emark != null)
+                if (!SkillMetadataDict.TryGetValue(info.Name.ToLower(), out var set))
                 {
-                    if (IsValidSkillMethod(info))
-                        EquipmentSkillNames.Add(info.Name.ToLower());
+                    SkillMetadataDict[info.Name.ToLower()] = new();
+                }
+                foreach (var classification in skillClassifications)
+                {
+                    var type = classification.GetType();
+                    var metadata = info.GetCustomAttribute(type);
+                    if (metadata == null)
+                    {
+                        continue;
+                    }
+                    SkillMetadataDict[info.Name.ToLower()].Add((ISkillMetadata)metadata);
                 }
             }
         }
 
-
-
-        public static void RegistProfessionModifier(string targetName, SkillPackageBase modifier)
+        public static void RegistProfessionModifier(string targetName, ProfessionModifier modifier)
         {
             if (!_modifierTypes.TryGetValue(targetName, out var list))
             {
@@ -63,14 +89,15 @@ namespace BlacksmithCore.Infra.Profession
             list.Add(modifier.GetType());
         }
 
-        public static void AddModOnInit(SkillPackageBase package)
+        public static void AddModOnInit(MainProfession package)
         {
             if (_modifierTypes.TryGetValue(package.GetType().Name, out var types))
             {
                 foreach (var type in types)
                 {
-                    var modifier = (SkillPackageBase)Activator.CreateInstance(type)!;
-                    package.AvailableSkillNames.AddRange(modifier.AvailableSkillNames);
+                    var modifier = (ProfessionModifier)Activator.CreateInstance(type)!;
+                    package.AvailableSkillNames.UnionWith(modifier.AvailableSkillNames);
+                    modifier.Bind(package);
                     foreach (var kv in modifier.SkillChecker)
                     {
                         package.SkillChecker[kv.Key] = kv.Value;

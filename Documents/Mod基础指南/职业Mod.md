@@ -19,19 +19,34 @@ public interface ISkillContext
     ISudoOperations SudoOperations { get; }
     string SkillName { get; }
     Community Self { get; }
-    int Param { get; }        // 前端 -p 标志
+    int Param { get; }           // 前端 -p 标志
     string StringParam { get; }  // 前端 -s 标志
+    IReadOnlyList<(ISkillContext, ISkillContext)> SkillHistory { get; }
+    IGameMetadata GameMetadata { get; }
 }
 public interface ISudoOperations
 {
     GameInstance DeepCopy(int preRounds = 0);
     bool IsPlayer(Community community);
-    IReadOnlySet<string> ProfessionSkillNames { get; }
+    IGameMetadata GameMetadata { get; }
+}
+public interface IGameMetadata
+{
+    IReadOnlySet<string> MainProfessionSkillNames { get; }
     IReadOnlySet<string> EquipmentSkillNames { get; }
 }
 ```
 
-常用：`sc.Self`（`Community`）、`sc.Self.Focus`（`Body`）、`sc.Param`、`sc.StringParam`、`sc.SudoOperations`。
+常用：`sc.Self`（`Community`）、`sc.Self.Focus`（`Body`）、`sc.Param`、`sc.StringParam`、`sc.SudoOperations`、`sc.GameMetadata`。
+
+### IGameMetadata 元数据入口
+
+新增的只读元数据查询接口，通过 `ISkillContext.GameMetadata` 暴露：
+
+- **`MainProfessionSkillNames`**：所有标注 `[IsProfessionSkill]` 的技能名集合——用于 Association 安全检查中排除转职入口
+- **`EquipmentSkillNames`**：所有标注 `[IsEquipmentSkill]` 的技能名集合——用于排除装备技能
+
+底层通过 `GameMetadata.SkillMetadataDict`（`IReadOnlyDictionary<string, IReadOnlySet<ISkillMetadata>>`）提供技能名到所有元数据属性集合的完整映射，引擎可在回合中获知双方声明技能的完整类型信息。
 
 ### Community 与 Body
 
@@ -50,20 +65,26 @@ public interface ISudoOperations
 
 技能名转小写。**必须返回 `IDSLSourceFile`，不能返回具体类 `DSL.SourceFile`**——否则编译报错。
 
-## [IsProfessionSkill] 与 [IsEquipmentSkill]
+## SkillMetadata 技能元数据
 
-标记技能分类，启动时 `ProfessionRegistry` 扫描注册到全局集合（见[项目架构 - ProfessionRegistry](../项目架构.md#professionregistry)），通过 `ISudoOperations` 暴露：
+命名空间 `BlacksmithCore.Infra.Attributes.SkillMetadata` 中的所有属性实现 `ISkillMetadata` 接口。`ProfessionRegistry.CollectSkillMetadata()` 在启动时扫描所有技能方法收集元数据，存入 `SkillMetadataDict`，通过 `GameMetadata` → `IGameMetadata` 暴露：
 
 ```csharp
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
+
 [IsProfessionSkill]  // 标记为职业技能——通常是转职入口
 private IDSLSourceFile HolyBook(ISkillContext sc) { ... }
 
 [IsEquipmentSkill]   // 标记为装备技能
 private IDSLSourceFile StarRifle(ISkillContext sc) { ... }
+
+[IsAttack]           // 标记为攻击技能（提供回合类型信息）
+private IDSLSourceFile Slash(ISkillContext sc) { ... }
 ```
 
 - 新增职业的转职入口 → `[IsProfessionSkill]`
 - 装备提供的技能 → `[IsEquipmentSkill]`
+- 攻击/防御/资源/恢复技能 → 对应标注 `[IsAttack]` / `[IsDefense]` / `[IsResource]` / `[IsRecovery]`
 - 普通技能无需标注
 
 ## DSL 基础用法
@@ -137,7 +158,7 @@ public class MyProfession : MainProfession
 
 ```csharp
 [IsProfessionModifier(nameof(Common))]
-public class CommonModifier : ProfessionModifier
+public partial class CommonModifier : ProfessionModifier
 {
     private bool MyProfessionCheck(ISkillContext sc)
     {
@@ -158,9 +179,71 @@ public class CommonModifier : ProfessionModifier
 }
 ```
 
+> **注意**：Modifier 类必须声明为 `partial class`。`Bind()` 方法由 `ModifierBindingGenerator` 源生成器自动实现，**不需要手写**。
+
+## Modifier 访问目标职业私有状态（UnsafeAccessor）
+
+这是此次重构的核心增强。`ModifierBindingGenerator`（位于 `ClapSourceGenerators/SkillRegistration/BlacksmithOnly/`）是一个两阶段 Roslyn 增量源生成器，使 Modifier 能够**零开销直接读写**目标 MainProfession 的私有字段和属性。
+
+### 开发者视角（你只需要做什么）
+
+1. 在 `MainProfession` 中正常声明私有状态变量（`ClapStateVar<T>`、`ClapRoundClock` 等）
+2. 将 Modifier 声明为 `partial class`，标注 `[IsProfessionModifier(nameof(Target))]`
+3. **直接使用**目标职业的私有字段名——如同它们声明在 Modifier 中一样
+
+```csharp
+[IsProfessionModifier(nameof(Common))]
+public partial class CommonModifier : ProfessionModifier
+{
+    // _pending 是 Driver/Cannon 的 private 字段！
+    // 源生成器自动生成了对应的 public ref 字段和 Bind() 实现
+    private bool WineGlassCheck(ISkillContext sc)
+    {
+        return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1.5f);
+    }
+
+    [IsProfessionSkill]
+    private IDSLSourceFile WineGlass(ISkillContext sc)
+    {
+        sc.Self.Focus.Get<Skill>().AddPackage(new(new WineGlass()));
+        // ...
+        return DSL.Create(sc.Self, pen);
+    }
+}
+```
+
+### 源生成器内部机制（自动完成，无需关注）
+
+**Phase 1**：扫描所有 `MainProfession` 子类 → 收集 `private` 引用类型字段/属性 → 自动生成 `[BindingContract]` 特性（附着在生成的 partial 类上，开发者看不见）
+
+**Phase 2**：扫描所有 `ProfessionModifier` 子类 → 读取 Phase 1 生成的 `[BindingContract]` → 在 Modifier 的 partial 类中生成：
+- `[UnsafeAccessor]` extern 方法（.NET 8 特性，零开销访问私有成员）
+- 同名的公开字段（引用目标私有字段）或 `Func`/`Action` 委托（封装目标私有属性）
+- `Bind(MainProfession package)` 的完整实现——cast 到具体目标类型，将所有私有成员的引用赋值给生成的公开字段
+
+运行时流程：`ProfessionRegistry.AddModOnInit` → `new Modifier()` → `modifier.Bind(targetPackage)`（源生成器实现） → Modifier 中所有目标私有状态字段就绪。
+
+### 使用场景
+
+- 修改器需要检查目标职业的蓄力层数、Buff 状态
+- 修改器需要修改目标职业的计数器、阈值
+- 修改器需要读取目标职业的跨回合状态来决定是否启用自身技能
+- 等价于：任何 Modifier 逻辑需要使用目标 MainProfession 的 `private` 字段时
+
+> `ModifierBindingGenerator` 源码：`Project/Clap/ClapSourceGenerators/SkillRegistration/BlacksmithOnly/ModifierBindingGenerator.cs`
+```
+
 ## 被动技能
 
-重写 `MainProfession` 的 `PassiveSkill(ISkillContext sc)` 方法。
+重写 `MainProfession` 的 `PassiveSkillImpl(ISkillContext sc)` 方法（`virtual`）。`PassiveSkill` 已改为 `sealed override`，内部调用 `PassiveSkillImpl` 后自动设置 `IsPassive = true`——框架据此区分被动/主动技能的编译顺序。返回类型与主动技能相同：`IDSLSourceFile`。
+
+```csharp
+public override IDSLSourceFile PassiveSkillImpl(ISkillContext sc)
+{
+    Pen pen = sf => sf.WriteDefense(1, new RealReduction());
+    return DSL.Create(sc.Self, pen);
+}
+```
 
 ## 注意事项
 

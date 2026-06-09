@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Judgement.Core;
@@ -15,11 +15,12 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     using Pen = Func<DSLforSkillLogic.SourceFile, DSLforSkillLogic.SourceFile>;
     public partial class Common : MainProfession
     {
-        private static HashSet<string> ProfessionSkillNames => ProfessionRegistry.ProfessionSkillNames;
+        private static IReadOnlySet<string> ProfessionSkillNames => ProfessionRegistry.MainProfessionSkillNames;
 
         private bool IronCheck(ISkillContext sc) => true;
         private IDSLSourceFile Iron(ISkillContext sc)
         {
+
             Pen pen = sf => sf.WriteResource(1, ResourceType.Instance.Iron());
             return DSL.Create(sc.Self, pen);
         }

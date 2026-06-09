@@ -7,10 +7,6 @@ namespace BlacksmithCore.Infra.Profession
     public abstract class SkillPackageBase
         : ClapSkillPackage<ISkillContext, IDSLSourceFile>
     {
-        protected override void AddModOnInit() => ProfessionRegistry.AddModOnInit(this);
-        protected SkillPackageBase(PackageType packageType) : base(packageType)
-        {
-        }
         public sealed override IDSLSourceFile PassiveSkill(ISkillContext sc)
         {
             var sf = PassiveSkillImpl(sc);
@@ -21,5 +17,6 @@ namespace BlacksmithCore.Infra.Profession
         {
             return new DSL.SourceFile(sc.Self);
         }
+
     }
 }

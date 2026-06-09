@@ -89,9 +89,9 @@ namespace XioCore.Infra.Utils
         private static void LoadProfessions()
         {
             var ModProfessionPlugins = _dllLoader.LoadByType<SkillPackageBase>();
-            foreach (var plugin in ModProfessionPlugins)
+            foreach (var p in ModProfessionPlugins)
             {
-                if (plugin.PackageType == PackageType.Main)
+                if (p is MainProfession plugin)
                 {
                     ProfessionRegistry.RegistProfessionName(plugin.GetType().Name);
                 }

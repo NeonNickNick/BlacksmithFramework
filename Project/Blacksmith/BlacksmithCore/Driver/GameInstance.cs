@@ -28,26 +28,20 @@ namespace BlacksmithCore.Driver
         public Community Enemy { get; private set; }
         public Judger Judger { get; private set; }
         public GameHistory History { get; private set; }
-        public void Swap()
-        {
-            (Player, Enemy) = (Enemy, Player);
-            Judger.Swap();
-            History.Swap();
-        }
+        public GameMetadata Metadata { get; private set; }
         public GameInstance()
         {
             Player = new();
             Enemy = new();
             Judger = new(Player, Enemy);
             History = new();
+            Metadata = new();
         }
         public bool IsPlayer(Community community)
         {
             return community == Player;
         }
-        public List<(ISkillContext, ISkillContext)> SkillHistory => History.SkillHistory;
-        public IReadOnlySet<string> ProfessionSkillNames => ProfessionRegistry.ProfessionSkillNames;
-        public IReadOnlySet<string> EquipmentSkillNames => ProfessionRegistry.EquipmentSkillNames;
+        public IReadOnlyList<(ISkillContext, ISkillContext)> SkillHistory => History.SkillHistory;
         public GameInstance DeepCopy(int preRounds = 0)
         {
             GameInstance res = new();
@@ -66,14 +60,7 @@ namespace BlacksmithCore.Driver
             }
             return res;
         }
-        public Community GetEnemyDeepCopy(int preRounds = 0)
-        {
-            return DeepCopy().Enemy;
-        }
-        public Community GetSelfDeepCopy(int preRounds = 0)
-        {
-            return DeepCopy().Player;
-        }
+        public IGameMetadata GameMetadata => Metadata;
         public SkillDeclareResult TryDeclare(string skillName, int param, string stringParam = "")
         {
             DefaultSkillContext context = new(this, skillName, Player, param, stringParam);
@@ -87,6 +74,7 @@ namespace BlacksmithCore.Driver
 
         public void Declare(string skillName, int param, string esn, int ep, string stringParam = "", string esp = "")
         {
+            Metadata.UpdateCurrentSkill(skillName, esn);
             var playerContext = new DefaultSkillContext(this, skillName, Player, param, stringParam);
             var enemyContext = new DefaultSkillContext(this, esn, Enemy, ep, esp);
 

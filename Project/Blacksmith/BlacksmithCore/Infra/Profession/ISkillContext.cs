@@ -15,8 +15,12 @@ namespace BlacksmithCore.Infra.Profession
     {
         public GameInstance DeepCopy(int preRounds = 0);
         public bool IsPlayer(Community community);
-        public List<(ISkillContext, ISkillContext)> SkillHistory { get; }
-        public IReadOnlySet<string> ProfessionSkillNames { get; }
+        public IReadOnlyList<(ISkillContext, ISkillContext)> SkillHistory { get; }
+        public IGameMetadata GameMetadata { get; }
+    }
+    public interface IGameMetadata
+    {
+        public IReadOnlySet<string> MainProfessionSkillNames { get; }
         public IReadOnlySet<string> EquipmentSkillNames { get; }
     }
 }

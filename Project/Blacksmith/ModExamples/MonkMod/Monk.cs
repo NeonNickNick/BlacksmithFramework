@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes.SkillClassification;
+using BlacksmithCore.Infra.Attributes.SkillMetadata;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Judgement.Core;
@@ -112,8 +112,8 @@ namespace ModExamples.MonkMod
         {
             return _cloneNum.Value > 0;
         }
-		[IsAttack]
-		private IDSLSourceFile MazeFist(ISkillContext sc)
+        [IsAttack]
+        private IDSLSourceFile MazeFist(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .WriteFree(source =>
@@ -183,8 +183,8 @@ namespace ModExamples.MonkMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Jade(), 2f);
         }
-		[IsAttack]
-		private IDSLSourceFile Disillusionment(ISkillContext sc)
+        [IsAttack]
+        private IDSLSourceFile Disillusionment(ISkillContext sc)
         {
             Pen pen = sf => sf
                 .UseResource(2f, ResourceType.Instance.Jade())

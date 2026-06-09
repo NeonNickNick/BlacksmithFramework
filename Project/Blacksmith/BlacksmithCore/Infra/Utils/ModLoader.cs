@@ -2,10 +2,10 @@ using System.Reflection;
 using System.Text.Json;
 using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using BlacksmithCore.Infra.Attributes.Profession;
+using BlacksmithCore.Infra.Attributes.SkillMetadata.Core;
 using BlacksmithCore.Infra.Enum;
 using BlacksmithCore.Infra.Profession;
 using ClapInfra.ClapEnum;
-using ClapInfra.ClapProfession;
 using ClapInfra.ClapUtils;
 namespace BlacksmithCore.Infra.Utils
 {
@@ -92,18 +92,18 @@ namespace BlacksmithCore.Infra.Utils
         {
             //先注册Mod包名，然后从里面收集关于职业和装备技能的信息
             var ModProfessionPlugins = _dllLoader.LoadByType<SkillPackageBase>();
-            foreach (var plugin in ModProfessionPlugins)
+            var SkillMetadatas = _dllLoader.LoadByType<ISkillMetadata>();
+            foreach (var p in ModProfessionPlugins)
             {
-                if (plugin.PackageType == PackageType.Main)
+                if (p is MainProfession plugin)
                 {
                     ProfessionRegistry.RegistProfessionName(plugin.GetType().Name);
                 }
-                ProfessionRegistry.RegistProfessionEquipmentSkillName(plugin);
             }
             //接下来记录Mod对已有包的修改，最重要的是给Common包扩展技能，否则无法使用Mod职业
-            foreach (var plugin in ModProfessionPlugins)
+            foreach (var p in ModProfessionPlugins)
             {
-                if (plugin.PackageType == PackageType.Modifier)
+                if (p is ProfessionModifier plugin)
                 {
                     var metaData = plugin.GetType().GetCustomAttribute<IsProfessionModifier>();
                     if (metaData == null)
@@ -112,6 +112,11 @@ namespace BlacksmithCore.Infra.Utils
                     }
                     ProfessionRegistry.RegistProfessionModifier(metaData.TargetName, plugin);
                 }
+            }
+            foreach (var plugin in ModProfessionPlugins)
+            {
+                //最后收集技能元数据
+                ProfessionRegistry.CollectSkillMetadata(plugin, SkillMetadatas);
             }
         }
         private static void LoadBlacksmithEnumModifiers()

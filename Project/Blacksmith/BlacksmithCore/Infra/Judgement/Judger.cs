@@ -7,10 +7,6 @@ namespace BlacksmithCore.Infra.Judgement
 {
     public class Judger : ClapJudger<Community, Judger, JudgeRuleManager, Intent, IDSLSourceFile>
     {
-        public void Swap()
-        {
-            (Player, Enemy) = (Enemy, Player);
-        }
         public Judger(Community player, Community enemy) : base(player, enemy)
         {
 

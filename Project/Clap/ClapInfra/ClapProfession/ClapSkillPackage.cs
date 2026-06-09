@@ -2,38 +2,26 @@ namespace ClapInfra.ClapProfession
 {
     public interface IClapSkillPackage<TISkillContext, TIDSLSourceFile>
     {
-        public List<string> AvailableSkillNames { get; }
+        public HashSet<string> AvailableSkillNames { get; }
         public Dictionary<string, Func<TISkillContext, bool>> SkillChecker { get; }
         public Dictionary<string, Func<TISkillContext, TIDSLSourceFile>> SkillSourceFileGenerator { get; }
         public abstract TIDSLSourceFile PassiveSkill(TISkillContext sc);
     }
 
-    public enum PackageType
-    {
-        Main,
-        Modifier
-    }
-
     public abstract class ClapSkillPackage<TISkillContext, TIDSLSourceFile>
         : IClapSkillPackage<TISkillContext, TIDSLSourceFile>
     {
-        public abstract PackageType PackageType { get; protected set; }
-        protected readonly List<string> _availableSkillNames = new();
+        protected readonly HashSet<string> _availableSkillNames = new();
         protected readonly Dictionary<string, Func<TISkillContext, bool>> _skillChecker = new();
         protected readonly Dictionary<string, Func<TISkillContext, TIDSLSourceFile>> _skillSourceFileGenerator = new();
 
-        public List<string> AvailableSkillNames => _availableSkillNames;
+        public HashSet<string> AvailableSkillNames => _availableSkillNames;
         public Dictionary<string, Func<TISkillContext, bool>> SkillChecker => _skillChecker;
         public Dictionary<string, Func<TISkillContext, TIDSLSourceFile>> SkillSourceFileGenerator => _skillSourceFileGenerator;
 
-        protected ClapSkillPackage(PackageType packageType)
+        protected ClapSkillPackage()
         {
             RegistSkills();
-            PackageType = packageType;
-            if (PackageType == PackageType.Main)
-            {
-                AddModOnInit();
-            }
         }
 
         protected void RegistSkill(
@@ -51,7 +39,6 @@ namespace ClapInfra.ClapProfession
         /// </summary>
         protected virtual void RegistSkills() { }
 
-        protected abstract void AddModOnInit();
         public abstract TIDSLSourceFile PassiveSkill(TISkillContext sc);
     }
 }
