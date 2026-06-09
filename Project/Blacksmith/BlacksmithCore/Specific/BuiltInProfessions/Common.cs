@@ -8,6 +8,7 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
+using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {

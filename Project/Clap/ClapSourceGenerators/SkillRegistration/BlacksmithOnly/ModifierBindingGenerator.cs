@@ -57,12 +57,20 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
         private sealed class Member
         {
             public string Name, TypeFull;
-            public bool Flag; // field → IsReadonly, property → HasSetter
+            /// <summary>
+            /// For fields: IsReadonly (true → ref readonly, false → ref).
+            /// For properties: HasSetter (true → generate Action setter delegate).
+            /// </summary>
+            public bool Flag;
             public Member(string n, string t, bool f) { Name = n; TypeFull = t; Flag = f; }
         }
 
         // ════════════════════════════════════════════════════════════════
         //  Phase 1: 收集 MainProfession 私有成员 → 生成 [BindingContract]
+        //
+        //  字段：ref 属性（零拷贝共享，readonly 字段用 ref readonly）
+        //  属性：Func/Action 委托捕获（属性本质是方法，通过 get_/set_ 访问）
+        //  过滤：编译器生成的 backing field（名称含 '<'）
         // ════════════════════════════════════════════════════════════════
 
         private static MainInfo? GetMainInfo(GeneratorSyntaxContext ctx)
@@ -81,11 +89,11 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
             var props = ImmutableArray.CreateBuilder<Member>();
 
             foreach (var f in sym.GetMembers().OfType<IFieldSymbol>())
-                if (f is { DeclaredAccessibility: Accessibility.Private, IsStatic: false } && f.Type.IsReferenceType)
+                if (f is { DeclaredAccessibility: Accessibility.Private, IsStatic: false } && !f.Name.Contains('<'))
                     fields.Add(new Member(f.Name, f.Type.ToDisplayString(FullTypeFormat), f.IsReadOnly));
 
             foreach (var p in sym.GetMembers().OfType<IPropertySymbol>())
-                if (p is { DeclaredAccessibility: Accessibility.Private, IsStatic: false } && p.Type.IsReferenceType && p.GetMethod != null)
+                if (p is { DeclaredAccessibility: Accessibility.Private, IsStatic: false } && p.GetMethod != null)
                     props.Add(new Member(p.Name, p.Type.ToDisplayString(FullTypeFormat), p.SetMethod != null));
 
             if (fields.Count == 0 && props.Count == 0) return null;
@@ -143,9 +151,12 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
         // ════════════════════════════════════════════════════════════════
         //  Phase 2: 生成 Bind()
         //
-        //  双渠道收集私有成员（用 seen 去重，渠道A优先）：
-        //    渠道A — target.GetMembers()：同项目源码类型，首次编译即可用
-        //    渠道B — [BindingContract] attribute：跨项目，通过引用 DLL 读取
+        //  双渠道收集（seen 去重，渠道A优先）：
+        //    渠道A — target.GetMembers()：同项目源码类型
+        //    渠道B — [BindingContract] attribute：跨项目 DLL 元数据
+        //
+        //  字段 → ref / ref readonly 属性（存储 _target，零拷贝）
+        //  属性 → Func< T > / Action< T > 委托（捕获 getter/setter 方法）
         // ════════════════════════════════════════════════════════════════
 
         private static void GenerateBinding(
@@ -172,15 +183,13 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                 // 渠道A: GetMembers() — 同项目源码类型
                 foreach (var f in target.GetMembers().OfType<IFieldSymbol>())
                 {
-                    if (f is not { DeclaredAccessibility: Accessibility.Private, IsStatic: false }
-                        || !f.Type.IsReferenceType) continue;
+                    if (f is not { DeclaredAccessibility: Accessibility.Private, IsStatic: false } || f.Name.Contains('<')) continue;
                     if (seen.Add(f.Name))
                         fields.Add(new Member(f.Name, f.Type.ToDisplayString(FullTypeFormat), f.IsReadOnly));
                 }
                 foreach (var p in target.GetMembers().OfType<IPropertySymbol>())
                 {
-                    if (p is not { DeclaredAccessibility: Accessibility.Private, IsStatic: false, GetMethod: not null }
-                        || !p.Type.IsReferenceType) continue;
+                    if (p is not { DeclaredAccessibility: Accessibility.Private, IsStatic: false, GetMethod: not null }) continue;
                     if (seen.Add(p.Name))
                         props.Add(new Member(p.Name, p.Type.ToDisplayString(FullTypeFormat), p.SetMethod != null));
                 }
@@ -211,7 +220,7 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                 sb.AppendLine("#nullable enable");
                 sb.AppendLine();
                 sb.AppendLine("using System;");
-                if (hasMembers)
+                if (fields.Count > 0)
                     sb.AppendLine("using System.Runtime.CompilerServices;");
                 sb.AppendLine("using BlacksmithCore.Infra.Profession;");
                 sb.AppendLine($"namespace {mod.Namespace};");
@@ -219,14 +228,14 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                 sb.AppendLine($"partial class {mod.ClassName}");
                 sb.AppendLine("{");
 
-                // UnsafeAccessor extern — 字段
+                // ── UnsafeAccessor extern：字段 ──
                 foreach (var f in fields)
                 {
                     sb.AppendLine($"    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = \"{f.Name}\")]");
                     sb.AppendLine($"    private static extern ref {f.TypeFull} __ref_{f.Name}({targetFull} __t);");
                 }
 
-                // UnsafeAccessor extern — 属性
+                // ── UnsafeAccessor extern：属性 ──
                 foreach (var p in props)
                 {
                     sb.AppendLine($"    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = \"get_{p.Name}\")]");
@@ -241,31 +250,38 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                 if (hasMembers)
                     sb.AppendLine();
 
-                // 捕获存储
+                // ── target 存储 ──
+                sb.AppendLine($"    private {targetFull} _target = null!;");
+
+                // ── 字段公开：ref 属性（零拷贝共享）──
+                // readonly 字段 → ref readonly，不可写
+                // 非 readonly 字段 → ref，完全共享
                 foreach (var f in fields)
-                    sb.AppendLine($"    private {f.TypeFull} {f.Name} = null!;");
-                foreach (var p in props)
                 {
-                    sb.AppendLine($"    private Func<{p.TypeFull}> {p.Name} = null!;");
-                    if (p.Flag)
-                        sb.AppendLine($"    private Action<{p.TypeFull}> Set{p.Name} = null!;");
+                    if (f.Flag)
+                        sb.AppendLine($"    public ref readonly {f.TypeFull} {f.Name} => ref __ref_{f.Name}(_target);");
+                    else
+                        sb.AppendLine($"    public ref {f.TypeFull} {f.Name} => ref __ref_{f.Name}(_target);");
                 }
 
-                // Bind()
+                // ── 属性公开：Func / Action 委托（方法捕获）──
+                foreach (var p in props)
+                {
+                    sb.AppendLine($"    public Func<{p.TypeFull}> {p.Name} = null!;");
+                    if (p.Flag)
+                        sb.AppendLine($"    public Action<{p.TypeFull}> Set{p.Name} = null!;");
+                }
+
+                // ── Bind() ──
                 sb.AppendLine();
                 sb.AppendLine("    public override void Bind(MainProfession package)");
                 sb.AppendLine("    {");
-                if (hasMembers)
+                sb.AppendLine($"        _target = ({targetFull})package;");
+                foreach (var p in props)
                 {
-                    sb.AppendLine($"        var target = ({targetFull})package;");
-                    foreach (var f in fields)
-                        sb.AppendLine($"        this.{f.Name} = __ref_{f.Name}(target);");
-                    foreach (var p in props)
-                    {
-                        sb.AppendLine($"        this.{p.Name} = () => __get_{p.Name}(target);");
-                        if (p.Flag)
-                            sb.AppendLine($"        this.Set{p.Name} = v => __set_{p.Name}(target, v);");
-                    }
+                    sb.AppendLine($"        {p.Name} = () => __get_{p.Name}(_target);");
+                    if (p.Flag)
+                        sb.AppendLine($"        Set{p.Name} = v => __set_{p.Name}(_target, v);");
                 }
                 sb.AppendLine("    }");
                 sb.AppendLine("}");
