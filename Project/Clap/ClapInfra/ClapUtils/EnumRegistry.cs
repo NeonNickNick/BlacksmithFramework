@@ -10,13 +10,20 @@ namespace ClapInfra.ClapUtils
         public IReadOnlyDictionary<Type, TIEnum> SupportedEnumDict
             => _supportedEnumDict;
         private Dictionary<Type, Type>? _CEValueTypeDict = null;
+        private readonly object _ceValueTypeDictLock = new();
         public IReadOnlyDictionary<Type, Type> CEValueTypeDict
         {
             get
             {
                 if (_CEValueTypeDict == null)
                 {
-                    _CEValueTypeDict = SupportedEnumDict.ToDictionary(s => s.Key, s => s.Value.GetCEValueType());
+                    lock (_ceValueTypeDictLock)
+                    {
+                        if (_CEValueTypeDict == null)
+                        {
+                            _CEValueTypeDict = SupportedEnumDict.ToDictionary(s => s.Key, s => s.Value.GetCEValueType());
+                        }
+                    }
                 }
                 return _CEValueTypeDict;
             }

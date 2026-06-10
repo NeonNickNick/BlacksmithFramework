@@ -9,22 +9,30 @@ namespace BlacksmithCore.Infra.Profession
     {
         public static readonly HashSet<string> Professions = new();
         private static HashSet<string> _mainProfessionSkillNames = null!;
+        private static readonly object _mainProfessionSkillNamesLock = new();
         public static IReadOnlySet<string> MainProfessionSkillNames
         {
             get
             {
                 if (_mainProfessionSkillNames == null)
                 {
-                    _mainProfessionSkillNames = new();
-                    foreach (var skillName in SkillMetadataDict.Keys)
+                    lock (_mainProfessionSkillNamesLock)
                     {
-                        foreach (var isc in SkillMetadataDict[skillName])
+                        if (_mainProfessionSkillNames == null)
                         {
-                            if (isc.GetType() == typeof(IsProfessionSkill))
+                            var set = new HashSet<string>();
+                            foreach (var skillName in SkillMetadataDict.Keys)
                             {
-                                _mainProfessionSkillNames.Add(skillName);
-                                break;
+                                foreach (var isc in SkillMetadataDict[skillName])
+                                {
+                                    if (isc.GetType() == typeof(IsProfessionSkill))
+                                    {
+                                        set.Add(skillName);
+                                        break;
+                                    }
+                                }
                             }
+                            _mainProfessionSkillNames = set;
                         }
                     }
                 }

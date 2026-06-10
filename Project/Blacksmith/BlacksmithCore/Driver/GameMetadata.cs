@@ -28,22 +28,30 @@ namespace BlacksmithCore.Driver
             => ProfessionRegistry.MainProfessionSkillNames;
 
         private HashSet<string> _equipmentSkillNames = null!;
+        private readonly object _equipmentSkillNamesLock = new();
         public IReadOnlySet<string> EquipmentSkillNames
         {
             get
             {
                 if (_equipmentSkillNames == null)
                 {
-                    _equipmentSkillNames = new();
-                    foreach (var skillName in ProfessionRegistry.SkillMetadataDict.Keys)
+                    lock (_equipmentSkillNamesLock)
                     {
-                        foreach (var isc in ProfessionRegistry.SkillMetadataDict[skillName])
+                        if (_equipmentSkillNames == null)
                         {
-                            if (isc.GetType() == typeof(IsEquipmentSkill))
+                            var set = new HashSet<string>();
+                            foreach (var skillName in ProfessionRegistry.SkillMetadataDict.Keys)
                             {
-                                _equipmentSkillNames.Add(skillName);
-                                break;
+                                foreach (var isc in ProfessionRegistry.SkillMetadataDict[skillName])
+                                {
+                                    if (isc.GetType() == typeof(IsEquipmentSkill))
+                                    {
+                                        set.Add(skillName);
+                                        break;
+                                    }
+                                }
                             }
+                            _equipmentSkillNames = set;
                         }
                     }
                 }
@@ -51,14 +59,21 @@ namespace BlacksmithCore.Driver
             }
         }
         private IReadOnlyDictionary<string, IReadOnlySet<ISkillMetadata>> _skillMetadataDict = null!;
+        private readonly object _skillMetadataDictLock = new();
         public IReadOnlyDictionary<string, IReadOnlySet<ISkillMetadata>> SkillMetadataDict
         {
             get
             {
                 if (_skillMetadataDict == null)
                 {
-                    _skillMetadataDict = ProfessionRegistry.SkillMetadataDict
-                        .ToDictionary(s => s.Key, s => (IReadOnlySet<ISkillMetadata>)s.Value);
+                    lock (_skillMetadataDictLock)
+                    {
+                        if (_skillMetadataDict == null)
+                        {
+                            _skillMetadataDict = ProfessionRegistry.SkillMetadataDict
+                                .ToDictionary(s => s.Key, s => (IReadOnlySet<ISkillMetadata>)s.Value);
+                        }
+                    }
                 }
                 return _skillMetadataDict;
             }
