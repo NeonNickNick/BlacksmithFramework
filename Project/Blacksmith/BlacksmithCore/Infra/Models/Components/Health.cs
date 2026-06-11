@@ -18,6 +18,12 @@ namespace BlacksmithCore.Infra.Models.Components
             }
         }
         public int MHP { get; set; }
+        public void Reset()
+        {
+            _hp = 10;
+            MHP = 10;
+            _killed = false;
+        }
         public Health(int hp, int mhp)
         {
             HP = hp;

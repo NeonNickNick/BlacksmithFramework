@@ -7,6 +7,10 @@ namespace BlacksmithCore.Infra.Models.Components
     public class Effect : IUpdatePerRound
     {
         private readonly List<EffectEntity> _effects = new();
+        public void Reset()
+        {
+            _effects.Clear();
+        }
         public void Add(EffectEntity effectEntity)
         {
             _effects.Add(effectEntity);

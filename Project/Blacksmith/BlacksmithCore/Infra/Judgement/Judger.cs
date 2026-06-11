@@ -11,6 +11,12 @@ namespace BlacksmithCore.Infra.Judgement
         {
 
         }
+        public void Reset()
+        {
+            _playerIntents = new List<Intent>();
+            _enemyIntents = new List<Intent>();
+            JudgeRuleManager.Reset();
+        }
         protected override IEnumerable<Intent> Compile(IEnumerable<IDSLSourceFile> sourceFiles)
         {
             Intent temp = new() { Execute = null! };

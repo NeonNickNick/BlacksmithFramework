@@ -30,7 +30,7 @@ namespace ClapInfra.ClapModels.Components
                 _resolutionLists[type] = (IList)Activator.CreateInstance(listType)!;
             }
         }
-        public void Clear()
+        public virtual void Reset()
         {
             foreach (var list in _resolutionLists.Values)
             {

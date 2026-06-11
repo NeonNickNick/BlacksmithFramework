@@ -17,6 +17,10 @@ namespace BlacksmithCore.Infra.Models.Components
     {
         protected override List<PackageContainer> _packages { get; set; } = new() { new(new Common()) };
         public bool HaveProfession => _packages.Count > 1;
+        public void Reset()
+        {
+            _packages = new() { new(new Common()) };
+        }
         public override SkillDeclareResult TryDeclare(string skillName, ISkillContext sc)
         {
             foreach (var package in _packages.Where(p => p.Flag.IsActive))

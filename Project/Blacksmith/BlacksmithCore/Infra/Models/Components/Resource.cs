@@ -12,6 +12,11 @@ namespace BlacksmithCore.Infra.Models.Components
             public ResourceType.CEValue GoldType { get; }
             public float Common { get; set; } = 0;
             public float Gold { get; set; } = 0;
+            public void Reset()
+            {
+                Common = 0;
+                Gold = 0;
+            }
             public ResourceTemplate(ResourceType.CEValue commonType, ResourceType.CEValue goldType)
             {
                 CommonType = commonType;
@@ -106,6 +111,13 @@ namespace BlacksmithCore.Infra.Models.Components
             {
                 var template = new ResourceTemplate(_dictRef[rest], _dictRef[rest]);
                 _resources[_dictRef[rest]] = template;
+            }
+        }
+        public void Reset()
+        {
+            foreach(var tmp in _resources.Values)
+            {
+                tmp.Reset();
             }
         }
         public bool Check(ResourceType.CEValue type, float need, bool ifCommonOnly = false)

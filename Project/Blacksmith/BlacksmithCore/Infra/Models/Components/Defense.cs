@@ -7,7 +7,10 @@ namespace BlacksmithCore.Infra.Models.Components
     {
         private List<DefenseBase> _defenses = new();
         public List<DefenseBase> Defenses => _defenses;
-
+        public void Reset()
+        {
+            _defenses.Clear();
+        }
         public void Update()
         {
             int n = _defenses.Count;

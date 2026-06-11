@@ -37,6 +37,14 @@ namespace BlacksmithCore.Infra.Models.Components
                 _preprocesses[key] = new();
             }
         }
+        public override void Reset()
+        {
+            foreach (var key in _resolutionLists.Keys)
+            {
+                _preprocesses[key].Clear();
+            }
+            base.Reset();
+        }
         public void AddPreprocess<TResolution>(
             Action<TResolution> preprocess,
             int delayRounds = 0,

@@ -71,10 +71,8 @@ namespace BlacksmithCore.Infra.Profession
                 {
                     continue;
                 }
-                if (!SkillMetadataDict.TryGetValue(info.Name.ToLower(), out var set))
-                {
-                    SkillMetadataDict[info.Name.ToLower()] = new();
-                }
+                // 直接覆盖
+                SkillMetadataDict[info.Name.ToLower()] = new();
                 foreach (var classification in skillClassifications)
                 {
                     var type = classification.GetType();

@@ -321,6 +321,7 @@ namespace BlacksmithCore.AI.Strategies
                 }
 
                 double result = Evaluate(simState);
+                simState.ReturnToPool();
 
                 // Backprop
                 while (node != null)
@@ -331,7 +332,20 @@ namespace BlacksmithCore.AI.Strategies
                 }
             }
 
-            return root.Children;
+            var children = new List<MCTSNode>(root.Children);
+            CleanupTree(root);
+            return children;
+        }
+
+        private static void CleanupTree(MCTSNode node)
+        {
+            node.State?.ReturnToPool();
+            node.State = null!;
+            foreach (var child in node.Children)
+            {
+                CleanupTree(child);
+            }
+            node.Children.Clear();
         }
 
         /// <summary>
@@ -376,6 +390,8 @@ namespace BlacksmithCore.AI.Strategies
                     bestScore = score;
                     bestAction = a;
                 }
+
+                sim.ReturnToPool();
             }
             return bestAction;
         }

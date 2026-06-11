@@ -23,6 +23,13 @@ namespace BlacksmithCore.Infra.Models.Entites
         {
             Focus = new(this, "Main");
         }
+        public void Reset()
+        {
+            SummonList.Clear();
+            _transforms.Clear();
+            _callbacks.Clear();
+            Focus.Reset();
+        }
         public void AddTransform(
             Action action,
             int delayRounds = 0,

@@ -18,6 +18,11 @@ namespace BlacksmithCore.Driver
         }
         public SkillMetadata CurrentPlayerSkillMetadata = null!;
         public SkillMetadata CurrentEnemySkillMetadata = null!;
+        public void Reset()
+        {
+            CurrentEnemySkillMetadata = null!;
+            CurrentPlayerSkillMetadata = null!;
+        }
         public void UpdateCurrentSkill(string playerSkill, string enemySkill)
         {
             CurrentPlayerSkillMetadata = new(playerSkill, SkillMetadataDict[playerSkill]);

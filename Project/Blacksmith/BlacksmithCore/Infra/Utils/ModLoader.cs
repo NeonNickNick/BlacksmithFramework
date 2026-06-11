@@ -98,6 +98,7 @@ namespace BlacksmithCore.Infra.Utils
                 if (p is MainProfession plugin)
                 {
                     ProfessionRegistry.RegistProfessionName(plugin.GetType().Name);
+                    ProfessionRegistry.CollectSkillMetadata(plugin, SkillMetadatas);
                 }
             }
             //接下来记录Mod对已有包的修改，最重要的是给Common包扩展技能，否则无法使用Mod职业
@@ -111,12 +112,9 @@ namespace BlacksmithCore.Infra.Utils
                         continue;
                     }
                     ProfessionRegistry.RegistProfessionModifier(metaData.TargetName, plugin);
+                    // 元数据直接覆盖
+                    ProfessionRegistry.CollectSkillMetadata(plugin, SkillMetadatas);
                 }
-            }
-            foreach (var plugin in ModProfessionPlugins)
-            {
-                //最后收集技能元数据
-                ProfessionRegistry.CollectSkillMetadata(plugin, SkillMetadatas);
             }
         }
         private static void LoadBlacksmithEnumModifiers()

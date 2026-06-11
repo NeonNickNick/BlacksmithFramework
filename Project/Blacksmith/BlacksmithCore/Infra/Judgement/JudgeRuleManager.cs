@@ -56,6 +56,12 @@ namespace BlacksmithCore.Infra.Judgement
                 _modifiersBefore.ForEach(o => o.Clock.RoundPass());
                 _modifiersAfter.ForEach(o => o.Clock.RoundPass());
             }
+            public void Reset()
+            {
+                _overrideRules.Clear();
+                _modifiersBefore.Clear();
+                _modifiersAfter.Clear();
+            }
             public void Execute(Community player, Community enemy)
             {
                 Action<Community, Community>? overrideRule = null;
@@ -268,6 +274,13 @@ namespace BlacksmithCore.Infra.Judgement
             }
         }
 
+        public void Reset()
+        {
+            foreach (var container in _ruleContainers.Values)
+            {
+                container.Reset();
+            }
+        }
         public void AddJudgeRule(Community source, IEnumerable<ICallbackOnJudge> callbacks)
         {
             foreach (var callback in callbacks)

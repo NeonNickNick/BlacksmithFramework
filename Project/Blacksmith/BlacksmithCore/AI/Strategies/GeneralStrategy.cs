@@ -185,6 +185,8 @@ namespace BlacksmithCore.AI.Strategies
                         node.Wins += result;
                         node = node.Parent!;
                     }
+
+                    simState.ReturnToPool();
                 }
                 else
                 {
@@ -200,7 +202,20 @@ namespace BlacksmithCore.AI.Strategies
                 }
             }
 
-            return root.Children;
+            var children = new List<MCTSNode>(root.Children);
+            CleanupTree(root);
+            return children;
+        }
+
+        private static void CleanupTree(MCTSNode node)
+        {
+            node.State?.ReturnToPool();
+            node.State = null;
+            foreach (var child in node.Children)
+            {
+                CleanupTree(child);
+            }
+            node.Children.Clear();
         }
 
         private void EnsureState(MCTSNode node)

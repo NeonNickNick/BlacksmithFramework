@@ -19,6 +19,15 @@ namespace BlacksmithCore.Infra.Models.Entites
         {
             _name = name;
         }
+        public void Reset()
+        {
+            Get<Skill>().Reset();
+            Get<Health>().Reset();
+            Get<Defense>().Reset();
+            Get<Resource>().Reset();
+            Get<Effect>().Reset();
+            Get<TurnContext>().Reset();
+        }
         public BodyView GetView()
         {
             return new()
