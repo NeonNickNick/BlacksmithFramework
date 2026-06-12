@@ -11,7 +11,7 @@ namespace ModExamples.CauldronMod
     public partial class ElementalArmor : MainProfession
     {
         private bool HammerCheck(ISkillContext sc) => true;
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile Hammer(ISkillContext sc)
         {
             Pen pen = sf => sf

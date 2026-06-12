@@ -210,9 +210,9 @@ namespace BlacksmithCore.AI.Strategies
 
         public string Name => "Adversarial";
 
-        public AdversarialStrategy(AdversarialStrategyParams? parameters = null)
+        public AdversarialStrategy()
         {
-            _params = parameters ?? new AdversarialStrategyParams();
+            _params = new AdversarialStrategyParams();
         }
 
         public void Init(GameInstance gameInstance)
@@ -225,7 +225,7 @@ namespace BlacksmithCore.AI.Strategies
             var sw = Stopwatch.StartNew();
 
             int threadCount = Math.Min(7, Environment.ProcessorCount);
-            int iterationsPerThread = Math.Max(1, _params.MctsIterations / threadCount);
+            int iterationsPerThread = Math.Max(1, 70 / threadCount);
             var tasks = new List<Task<List<MCTSNode>>>();
 
             for (int t = 0; t < threadCount; t++)

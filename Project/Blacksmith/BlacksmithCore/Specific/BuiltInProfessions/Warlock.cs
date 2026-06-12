@@ -18,6 +18,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
+        [HasResource]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile Magic(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -30,7 +32,11 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Magic(), sc.Param);
         }
-        [IsAttack]
+        [HasAttack(2)]
+        [HasAttack(2)]
+        [HasAttack(2)]
+        [IsInfinite]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile MagicAttack(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -42,6 +48,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         }
 
         private bool MuteCheck(ISkillContext sc) => true;
+        [Labels(Impression.Aggressive, Strength.Super)]
         private IDSLSourceFile Mute(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -57,6 +64,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Health>().HP > 1;
         }
+        [HasDefense]
+        [HasResource]
+        [Labels(Impression.Robust, Strength.Super)]
         private IDSLSourceFile Sacrifice(ISkillContext sc)
         {
             Pen pen = sf => sf

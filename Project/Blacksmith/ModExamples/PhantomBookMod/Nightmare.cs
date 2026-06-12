@@ -17,7 +17,7 @@ namespace ModExamples.PhantomBookMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 1f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile DreamDive(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -34,7 +34,7 @@ namespace ModExamples.PhantomBookMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Dream(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Spirit(), 2f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile Materialize(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -49,7 +49,7 @@ namespace ModExamples.PhantomBookMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Spirit(), 1f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile ClingingHaunt(ISkillContext sc)
         {
             Pen pen = sf => sf

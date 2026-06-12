@@ -66,7 +66,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
-        [IsAttack]
+        [HasAttack(3)]
+        [HasBuff]
+        [Labels(Impression.Aggressive, Strength.Strong)]
         private IDSLSourceFile SkyStrike(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -80,7 +82,10 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
-        [IsAttack]
+        [HasAttack(3)]
+        [HasDefense]
+        [HasBuff]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile DragonTooth(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -94,7 +99,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
-        [IsAttack]
+        [HasAttack(3)]
+        [HasBuff]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile TyrantDestruction(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -107,7 +114,11 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1);
         }
-        [IsAttack]
+        [HasAttack(2)]
+        [HasAttack(2)]
+        [HasAttack(1)]
+        [HasBuff]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile TripleStab(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -127,7 +138,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), _chargeCost.Value);
         }
-        [IsAttack]
+        [HasAttack(10)]
+        [Labels(Impression.Aggressive, Strength.Strong)]
         private IDSLSourceFile RisingDragon(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -170,6 +182,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
 
         注意：前提条件是不考虑跨回合伤害技能。如果出现了战矛可用的这种技能，那么要将反击规则插入到攻击抵消之后，并且重新再做一遍抵消
         */
+        [HasBuff]
+        [Labels(Impression.Robust, Strength.Super)]
         private IDSLSourceFile Charge(ISkillContext sc)
         {
             int chargeCountThis = _chargeCount.Value + 1;

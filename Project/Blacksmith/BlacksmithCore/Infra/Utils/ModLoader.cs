@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Text.Json;
 using BlacksmithCore.Infra.Attributes.BlacksmithEnum;
 using BlacksmithCore.Infra.Attributes.Profession;
-using BlacksmithCore.Infra.Attributes.SkillMetadata.Core;
 using BlacksmithCore.Infra.Enum;
 using BlacksmithCore.Infra.Profession;
 using ClapInfra.ClapEnum;
@@ -14,6 +13,7 @@ namespace BlacksmithCore.Infra.Utils
         private static readonly DllLoader _dllLoader = new();
         private static readonly string _modConfigName = "mod.json";
         private static string _configDirectory = ".blacksmith";
+        public static List<T> LoadByType<T>() => _dllLoader.LoadByType<T>();
         public static void Initialize(string basePath)
         {
             _configDirectory = Path.Combine(basePath, _configDirectory);
@@ -92,13 +92,12 @@ namespace BlacksmithCore.Infra.Utils
         {
             //先注册Mod包名，然后从里面收集关于职业和装备技能的信息
             var ModProfessionPlugins = _dllLoader.LoadByType<SkillPackageBase>();
-            var SkillMetadatas = _dllLoader.LoadByType<ISkillMetadata>();
             foreach (var p in ModProfessionPlugins)
             {
                 if (p is MainProfession plugin)
                 {
                     ProfessionRegistry.RegistProfessionName(plugin.GetType().Name);
-                    ProfessionRegistry.CollectSkillMetadata(plugin, SkillMetadatas);
+                    ProfessionRegistry.CollectSkillMetadata(plugin);
                 }
             }
             //接下来记录Mod对已有包的修改，最重要的是给Common包扩展技能，否则无法使用Mod职业
@@ -113,7 +112,7 @@ namespace BlacksmithCore.Infra.Utils
                     }
                     ProfessionRegistry.RegistProfessionModifier(metaData.TargetName, plugin);
                     // 元数据直接覆盖
-                    ProfessionRegistry.CollectSkillMetadata(plugin, SkillMetadatas);
+                    ProfessionRegistry.CollectSkillMetadata(plugin);
                 }
             }
         }

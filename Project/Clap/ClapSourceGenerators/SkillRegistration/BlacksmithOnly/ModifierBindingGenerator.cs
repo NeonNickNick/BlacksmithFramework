@@ -104,6 +104,7 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
 
         private static void GenerateContracts(SourceProductionContext ctx, ImmutableArray<MainInfo> mains)
         {
+            //顺便生成外部可调用的统一构造函数入口
             foreach (var m in mains)
             {
                 var sb = new StringBuilder();
@@ -115,7 +116,10 @@ namespace ClapSourceGenerators.SkillRegistration.BlacksmithOnly
                     sb.AppendLine($"[BindingContract(\"{f.Name}\", \"{f.TypeFull}\", true, {(f.Flag ? "true" : "false")})]");
                 foreach (var p in m.Properties)
                     sb.AppendLine($"[BindingContract(\"{p.Name}\", \"{p.TypeFull}\", false, {(p.Flag ? "true" : "false")})]");
-                sb.AppendLine($"partial class {m.ClassName} {{ }}");
+
+                sb.AppendLine($"partial class {m.ClassName}");
+                sb.AppendLine("{");
+                sb.AppendLine("}");
 
                 ctx.AddSource($"{m.Namespace}.{m.ClassName}.Contract.g.cs", sb.ToString());
             }

@@ -8,10 +8,10 @@ using ClapInfra.ClapModels.Components;
 
 namespace BlacksmithCore.AI.Strategies
 {
-    public class GeneralStrategyParams
+    public class MetadataStrategyParams
     {
         [JsonConstructor]
-        public GeneralStrategyParams()
+        public MetadataStrategyParams()
         {
 
         }
@@ -50,24 +50,20 @@ namespace BlacksmithCore.AI.Strategies
         // ========== 终局分数 ==========
         public double WinScore = 100;
     }
-    public class GeneralStrategy : IAIStrategy
+    public class MetadataStrategy : IAIStrategy
     {
-        private readonly GeneralStrategyParams _params;
+        private readonly MetadataStrategyParams _params;
         private GameInstance _main = null!;
-        private static readonly HashSet<string> _uselessActions = new()
-        {
-            "stick", "drill", "recovery", "shield", "thornshield", "mute"
-        };
         private static ThreadLocal<Random> _random = new(() =>
         {
             return new Random(Random.Shared.Next());
         });
 
-        public string Name => "General";
+        public string Name => "Metadata";
 
-        public GeneralStrategy()
+        public MetadataStrategy()
         {
-            _params = new GeneralStrategyParams();
+            _params = new MetadataStrategyParams();
         }
 
         public void Init(GameInstance gameInstance)
@@ -421,9 +417,6 @@ namespace BlacksmithCore.AI.Strategies
 
             foreach (var name in names)
             {
-                if (_uselessActions.Contains(name))
-                    continue;
-
                 for (int i = 0; i <= 5; i++)
                 {
                     if (name != "magicattack" && name != "spaceattack" && i > 0)

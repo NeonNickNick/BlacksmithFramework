@@ -157,7 +157,7 @@ namespace ModExamples.ProphetMod
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.CrystalBall(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Crystal(), 2f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile Ultimatum(ISkillContext sc)
         {
             Pen pen = sf => sf

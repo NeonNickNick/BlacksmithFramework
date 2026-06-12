@@ -1,4 +1,3 @@
-using System.Reflection;
 using BlacksmithCore.Infra.Models.Core;
 
 namespace BlacksmithCore.Infra.Models.Components
@@ -71,21 +70,7 @@ namespace BlacksmithCore.Infra.Models.Components
             }
         }
         private Dictionary<ResourceType.CEValue, ResourceTemplate> _resources = new();
-        private static Dictionary<string, ResourceType.CEValue>? _dictRef = new();
-        static Resource()
-        {
-            Type type = ResourceType.Instance.GetType();
-            FieldInfo? field = type.BaseType?.BaseType?.GetField("_enumDict", BindingFlags.NonPublic | BindingFlags.Static);
-            if (field == null)
-            {
-                throw new ArgumentException("Unreachable2!");//不应到达这里
-            }
-            _dictRef = field.GetValue(null) as Dictionary<string, ResourceType.CEValue>;
-            if (_dictRef == null)
-            {
-                throw new ArgumentException("Unreachable3!");//不应到达这里
-            }
-        }
+        private static IReadOnlyDictionary<string, ResourceType.CEValue> _dictRef => ResourceType.EnumDict;
         public Resource()
         {
             List<string> enumNames = _dictRef!.Keys.ToList();
@@ -115,7 +100,7 @@ namespace BlacksmithCore.Infra.Models.Components
         }
         public void Reset()
         {
-            foreach(var tmp in _resources.Values)
+            foreach (var tmp in _resources.Values)
             {
                 tmp.Reset();
             }

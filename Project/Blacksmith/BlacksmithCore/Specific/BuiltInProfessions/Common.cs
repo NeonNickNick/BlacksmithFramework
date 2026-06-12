@@ -8,7 +8,6 @@ using BlacksmithCore.Infra.Models.Core;
 using BlacksmithCore.Infra.Models.Entites;
 using BlacksmithCore.Infra.Profession;
 using BlacksmithCore.Specific.Defense;
-using ClapInfra.ClapUnit;
 
 namespace BlacksmithCore.Specific.BuiltInProfessions
 {
@@ -19,6 +18,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         private static IReadOnlySet<string> ProfessionSkillNames => ProfessionRegistry.MainProfessionSkillNames;
 
         private bool IronCheck(ISkillContext sc) => true;
+        [HasResource]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile Iron(ISkillContext sc)
         {
 
@@ -30,7 +31,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 0.5f);
         }
-        [IsAttack]
+        [HasAttack(1)]
+        [Labels(Impression.Conservative, Strength.Useless)]
         private IDSLSourceFile Stick(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -43,7 +45,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1.5f);
         }
-        [IsAttack]
+        [HasAttack(3)]
+        [Labels(Impression.Conservative, Strength.Useless)]
         private IDSLSourceFile Drill(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -56,7 +59,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2.5f);
         }
-        [IsAttack]
+        [HasAttack(1)]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile Slash(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -69,6 +73,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), sc.Param * 0.5f);
         }
+        [HasDefense]
+        [Labels(Impression.Conservative, Strength.Useless)]
         private IDSLSourceFile Shield(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -81,6 +87,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1 + sc.Param * 0.5f);
         }
+        [HasDefense]
+        [Labels(Impression.Robust, Strength.Useless)]
         private IDSLSourceFile ThornShield(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -93,6 +101,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1 + sc.Param);
         }
+        [HasRecovery]
+        [Labels(Impression.Conservative, Strength.Useless)]
         private IDSLSourceFile Recovery(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -105,6 +115,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
+        [HasResource]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile Space(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -117,6 +129,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
+        [HasResource]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile Time(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -129,7 +143,8 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), 1f);
         }
-        [IsAttack]
+        [HasAttack(8)]
+        [Labels(Impression.Aggressive, Strength.Strong)]
         private IDSLSourceFile Tear(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -141,6 +156,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), 2f);
         }
+        [HasDefense]
+        [HasBuff]
+        [Labels(Impression.Aggressive, Strength.Super)]
         private IDSLSourceFile Reflect(ISkillContext sc)
         {
             Pen pen = sf => sf

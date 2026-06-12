@@ -52,7 +52,7 @@ namespace BlacksmithCore.Infra.Profession
             Console.WriteLine($"Successfully added the extended profession \"{professionName}\"!");
         }
 
-        public static void CollectSkillMetadata(SkillPackageBase package, List<ISkillMetadata> skillClassifications)
+        public static void CollectSkillMetadata(SkillPackageBase package)
         {
             static bool IsValidSkillMethod(MethodInfo method)
             {
@@ -73,15 +73,17 @@ namespace BlacksmithCore.Infra.Profession
                 }
                 // 直接覆盖
                 SkillMetadataDict[info.Name.ToLower()] = new();
-                foreach (var classification in skillClassifications)
+                var metadatas = info.GetCustomAttributes();
+                if (metadatas == null)
                 {
-                    var type = classification.GetType();
-                    var metadata = info.GetCustomAttribute(type);
-                    if (metadata == null)
+                    continue;
+                }
+                foreach (var m in metadatas)
+                {
+                    if (m is ISkillMetadata metadata)
                     {
-                        continue;
+                        SkillMetadataDict[info.Name.ToLower()].Add(metadata);
                     }
-                    SkillMetadataDict[info.Name.ToLower()].Add((ISkillMetadata)metadata);
                 }
             }
         }

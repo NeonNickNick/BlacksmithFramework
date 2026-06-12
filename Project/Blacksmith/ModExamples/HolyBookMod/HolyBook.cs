@@ -38,7 +38,7 @@ namespace ModExamples
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 2f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile Ark(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -52,7 +52,7 @@ namespace ModExamples
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Cross(), 1f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile Blasphemy(ISkillContext sc)
         {
             Pen pen = sf => sf

@@ -32,7 +32,7 @@ namespace ModExamples.CrossBowMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Bolt(), sc.Param);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile BoltVolley(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -51,7 +51,7 @@ namespace ModExamples.CrossBowMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Bolt(), 1f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile CriticalHit(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -77,7 +77,7 @@ namespace ModExamples.CrossBowMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Bolt(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile MarkingBolt(ISkillContext sc)
         {
             Pen pen = sf => sf

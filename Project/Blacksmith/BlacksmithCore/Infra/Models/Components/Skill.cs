@@ -86,9 +86,9 @@ namespace BlacksmithCore.Infra.Models.Components
                 }
             }
         }
-        public IEnumerable<IDSLSourceFile> GetPassiveSkill(ISkillContext sc)
+        public List<IDSLSourceFile> GetPassiveSkill(ISkillContext sc)
         {
-            return _packages.Where(p => p.Flag.IsActive).Select(p => p.SkillPackage.PassiveSkill(sc));
+            return _packages.Where(p => p.Flag.IsActive).Select(p => p.SkillPackage.PassiveSkill(sc)).ToList();
         }
         public List<string> GetView()
         {

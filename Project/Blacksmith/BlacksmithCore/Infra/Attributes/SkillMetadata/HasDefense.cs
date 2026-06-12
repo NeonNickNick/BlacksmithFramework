@@ -3,8 +3,8 @@ using BlacksmithCore.Infra.Attributes.SkillMetadata.Core;
 namespace BlacksmithCore.Infra.Attributes.SkillMetadata
 {
     [AttributeUsage(AttributeTargets.Method,
-        AllowMultiple = false, Inherited = false)]
-    public class IsRecovery : Attribute, ISkillMetadata
+        AllowMultiple = true, Inherited = false)]
+    public class HasDefense : Attribute, ISkillMetadata
     {
     }
 }

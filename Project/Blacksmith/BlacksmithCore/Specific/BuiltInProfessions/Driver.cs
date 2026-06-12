@@ -35,7 +35,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), sc.Param);
         }
-        [IsAttack]
+        [HasAttack(12)]
+        [IsInfinite]
+        [Labels(Impression.Robust, Strength.Super)]
         private IDSLSourceFile SpaceAttack(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -48,6 +50,10 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Space(), 1);
         }
+        [HasResource]
+        [HasDefense]
+        [HasBuff]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile Space2Time(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -62,6 +68,10 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Time(), 1);
         }
+        [HasResource]
+        [HasDefense]
+        [HasBuff]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile Time2Space(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -76,6 +86,9 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         {
             return sc.Param > 0 && sc.Param <= 5 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), sc.Param);
         }
+        [HasDefense]
+        [IsInfinite]
+        [Labels(Impression.Conservative, Strength.Useless)]
         private IDSLSourceFile SpaceBarrier(ISkillContext sc)
         {
             Pen pen = sf => sf

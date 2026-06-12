@@ -65,7 +65,7 @@ namespace ModExamples.CauldronMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), sc.Param);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile Explosion(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -77,7 +77,7 @@ namespace ModExamples.CauldronMod
         {
             return sc.Param > 0 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Water(), sc.Param);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile IceBlade(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -177,7 +177,7 @@ namespace ModExamples.CauldronMod
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Earth(), 1f)
                 && sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Fire(), 1f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile FireRain(ISkillContext sc)
         {
             Pen pen = sf => sf

@@ -85,7 +85,7 @@ namespace BlacksmithCore.Driver
             var count = Interlocked.Increment(ref _rentCount);
             if (count % DiagnosticInterval == 0)
             {
-                Console.WriteLine($"[GameInstancePool] Rent 累计={count}, 池中实例={_pool.Count}");
+               // Console.WriteLine($"[GameInstancePool] Rent 累计={count}, 池中实例={_pool.Count}");
             }
             return instance;
         }
@@ -168,17 +168,17 @@ namespace BlacksmithCore.Driver
             var psfs = ps.GetPassiveSkill(playerContext);
             foreach (var s in Player.SummonList)
             {
-                psfs = psfs.Concat(s.Get<Skill>().GetPassiveSkill(playerContext));
+                psfs.AddRange(s.Get<Skill>().GetPassiveSkill(playerContext));
             }
-            psfs = psfs.Append(ps.Declare(skillName, playerContext));
+            psfs.Add(ps.Declare(skillName, playerContext));
 
             var es = Enemy.Focus.Get<Skill>();
             var esfs = es.GetPassiveSkill(enemyContext);
             foreach (var s in Enemy.SummonList)
             {
-                esfs = esfs.Concat(s.Get<Skill>().GetPassiveSkill(playerContext));
+                esfs.AddRange(s.Get<Skill>().GetPassiveSkill(playerContext));
             }
-            esfs = esfs.Append(es.Declare(esn, enemyContext));
+            esfs.Add(es.Declare(esn, enemyContext));
 
             Judger.Judge(psfs, esfs);
             History.SkillHistory.Add((playerContext, enemyContext));

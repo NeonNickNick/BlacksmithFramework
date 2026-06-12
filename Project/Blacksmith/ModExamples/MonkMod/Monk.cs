@@ -112,7 +112,7 @@ namespace ModExamples.MonkMod
         {
             return _cloneNum.Value > 0;
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile MazeFist(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -183,7 +183,7 @@ namespace ModExamples.MonkMod
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Jade(), 2f);
         }
-        [IsAttack]
+        [HasAttack]
         private IDSLSourceFile Disillusionment(ISkillContext sc)
         {
             Pen pen = sf => sf

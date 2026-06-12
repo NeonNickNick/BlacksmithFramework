@@ -4,7 +4,7 @@ namespace BlacksmithCore.Infra.Attributes.SkillMetadata
 {
     [AttributeUsage(AttributeTargets.Method,
         AllowMultiple = false, Inherited = false)]
-    public class IsResource : Attribute, ISkillMetadata
+    public class IsInfinite : Attribute, ISkillMetadata
     {
     }
 }

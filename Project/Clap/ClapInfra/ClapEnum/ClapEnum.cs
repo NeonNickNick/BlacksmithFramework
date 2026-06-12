@@ -106,7 +106,8 @@ namespace ClapInfra.ClapEnum
                 Create(methodName, metaData.Priority);
             }
         }
-        private static Dictionary<string, CEValue> _enumDict = new();
+        private static readonly Dictionary<string, CEValue> _enumDict = new();
+        public static IReadOnlyDictionary<string, CEValue> EnumDict => _enumDict;
         public static CEValue GetCEValue([CallerMemberName] string name = "") => _enumDict[name];
     }
 
