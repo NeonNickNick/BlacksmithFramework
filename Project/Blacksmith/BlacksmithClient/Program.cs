@@ -10,11 +10,11 @@ namespace BlacksmithClient
         {
             ModLoader.Initialize(AppContext.BaseDirectory);
 
-            GeneralStrategyParams? param = null;//暂时使用默认参数
             List<IAIStrategy> strategies = new()
             {
-                new GeneralStrategy(param),
-                new AdversarialStrategy()
+                new GeneralStrategy(),
+                new AdversarialStrategy(),
+                new MetadataStrategy(),
             };
             Console.WriteLine("Welcome!\n");
             LocalHost.Start(strategies);

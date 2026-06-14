@@ -8,7 +8,7 @@ namespace AIPVPPlatform
     {
         private IAIStrategy _s1;
         private IAIStrategy _s2;
-        private static readonly int Times = 100;
+        private static readonly int Times = 1000;
 
         public AIPVP(IAIStrategy s1, IAIStrategy s2)
         {

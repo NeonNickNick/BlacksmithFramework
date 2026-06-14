@@ -82,6 +82,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 2.5f);
         }
         [IsEquipmentSkill]
+        [Labels(Impression.Robust, Strength.Strong)]
         private IDSLSourceFile Alchemy(ISkillContext sc)
         {
             Pen pen = sf => sf

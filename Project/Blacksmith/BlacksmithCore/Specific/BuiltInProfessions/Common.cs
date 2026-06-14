@@ -130,7 +130,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         [HasResource]
-        [Labels(Impression.Robust, Strength.Ordinary)]
+        [Labels(Impression.Robust, Strength.Useless)]
         private IDSLSourceFile Time(ISkillContext sc)
         {
             Pen pen = sf => sf
@@ -185,6 +185,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 1f);
         }
         [IsProfessionSkill]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile Warlock(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Warlock()));
@@ -202,6 +203,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 4);
         }
         [IsProfessionSkill]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile Cannon(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Cannon()));
@@ -220,6 +222,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         [IsProfessionSkill]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile Driver(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Driver()));
@@ -237,6 +240,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 7);
         }
         [IsProfessionSkill]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile BloodSigil(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new BloodSigil()));
@@ -263,6 +267,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
         }
         [IsProfessionSkill]
+        [Labels(Impression.Robust, Strength.Ordinary)]
         private IDSLSourceFile Lancer(ISkillContext sc)
         {
             sc.Self.Focus.Get<Skill>().AddPackage(new(new Lancer()));

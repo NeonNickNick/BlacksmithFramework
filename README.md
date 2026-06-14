@@ -69,9 +69,9 @@ BlacksmithClient.exe
 - [Mod 进阶指南](./Documents/Mod进阶指南/引言.md)
 - [SkillClassification 规划](./Documents/SkillClassification规划.md)
 
-## 当前规划
+## 实验仓库
 
-- [SkillClassification](./Documents/规划/SkillClassification规划.md)
+- [HighPerformanceBlacksmith](https://github.com/NeonNickNick/HighPerformanceBlacksmith)具有速度更快和更智能的人机
 
 ## 关于 Xio
 
