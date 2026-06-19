@@ -225,7 +225,7 @@ namespace BlacksmithCore.AI.Strategies
             var sw = Stopwatch.StartNew();
 
             int threadCount = Math.Min(7, Environment.ProcessorCount);
-            int iterationsPerThread = Math.Max(1, 70 / threadCount);
+            int iterationsPerThread = Math.Max(1, 7000 / threadCount);
             var tasks = new List<Task<List<MCTSNode>>>();
 
             for (int t = 0; t < threadCount; t++)

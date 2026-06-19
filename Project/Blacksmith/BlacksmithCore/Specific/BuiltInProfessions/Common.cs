@@ -261,7 +261,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                     source.Focus.Get<Health>().GainHP(3);
                 }, false);
             return DSL.Create(sc.Self, pen);
-        }
+        }/*
         private bool LancerCheck(ISkillContext sc)
         {
             return sc.Self.Focus.Get<Resource>().Check(ResourceType.Instance.Iron(), 3);
@@ -278,7 +278,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
                     ExcludeAllProfessions(source);
                 }, false);
             return DSL.Create(sc.Self, pen);
-        }
+        }*/
         public static void ExcludeAllProfessions(Community source)
         {
             foreach (var name in ProfessionSkillNames)

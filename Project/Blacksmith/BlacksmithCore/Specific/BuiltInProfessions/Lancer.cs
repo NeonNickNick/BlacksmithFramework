@@ -1,4 +1,4 @@
-using BlacksmithCore.Infra.Attributes.SkillMetadata;
+/*using BlacksmithCore.Infra.Attributes.SkillMetadata;
 using BlacksmithCore.Infra.DSL;
 using BlacksmithCore.Infra.Judgement;
 using BlacksmithCore.Infra.Judgement.Core;
@@ -181,7 +181,7 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
         如果没有使用蓄力，那么就回到了state1
 
         注意：前提条件是不考虑跨回合伤害技能。如果出现了战矛可用的这种技能，那么要将反击规则插入到攻击抵消之后，并且重新再做一遍抵消
-        */
+        
         [HasBuff]
         [Labels(Impression.Robust, Strength.Super)]
         private IDSLSourceFile Charge(ISkillContext sc)
@@ -229,3 +229,4 @@ namespace BlacksmithCore.Specific.BuiltInProfessions
     }
 
 }
+*/

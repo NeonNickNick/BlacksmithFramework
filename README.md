@@ -1,3 +1,6 @@
+
+### **本仓库已停止维护，请移步新仓库：[HighPerformanceBlacksmith](https://github.com/NeonNickNick/HighPerformanceBlacksmith)**
+
 # Blacksmith Framework
 
 一个围绕《打铁》规则构建的可扩展对战框架。
@@ -69,9 +72,6 @@ BlacksmithClient.exe
 - [Mod 进阶指南](./Documents/Mod进阶指南/引言.md)
 - [SkillClassification 规划](./Documents/SkillClassification规划.md)
 
-## 实验仓库
-
-- [HighPerformanceBlacksmith](https://github.com/NeonNickNick/HighPerformanceBlacksmith)具有速度更快和更智能的人机
 
 ## 关于 Xio
 
