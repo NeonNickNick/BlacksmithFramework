@@ -1,5 +1,5 @@
 
-### **本仓库已停止维护，请移步新仓库：[HighPerformanceBlacksmith](https://github.com/NeonNickNick/HighPerformanceBlacksmith)**
+### **本仓库已停止维护，请移步新仓库：[BlacksmithFramework-Core](https://github.com/NeonNickNick/BlacksmithFramework-Core.git)**
 
 # Blacksmith Framework
 
